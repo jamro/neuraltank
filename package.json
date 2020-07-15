@@ -1,0 +1,44 @@
+{
+  "name": "neuraltank",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "start": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "watch": "tsc src/Main.ts --outDir dist -w",
+    "commit": "npx git-cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamro/neuraltank.git"
+  },
+  "author": "Krzysztof Jamroz <jamro@jamro.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jamro/neuraltank/issues"
+  },
+  "homepage": "https://github.com/jamro/neuraltank#readme",
+  "dependencies": {
+    "@types/npm": "^2.0.31",
+    "jsbattle-engine": "^3.4.0"
+  },
+  "devDependencies": {
+    "commitizen": "^4.1.2",
+    "copy-webpack-plugin": "^6.0.3",
+    "cz-conventional-changelog": "^3.2.0",
+    "html-webpack-plugin": "^4.3.0",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.6",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
