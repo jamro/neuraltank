@@ -5,9 +5,12 @@
   "main": "index.js",
   "scripts": {
     "clean": "rimraf dist",
-    "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production",
-    "watch": "tsc src/Main.ts --outDir dist -w",
+    "start": "concurrently \"npm run watch-ai\" \"npm run watch-app\"",
+    "watch-app": "webpack-dev-server --mode development",
+    "watch-ai": "webpack --mode production --config webpack.tank.config.js --watch",
+    "build": "npm run build-ai && npm run build-app",
+    "build-app": "npm run prebuild && webpack --mode production",
+    "build-ai": "webpack --mode production --config webpack.tank.config.js",
     "commit": "npx git-cz"
   },
   "repository": {
@@ -26,6 +29,7 @@
   },
   "devDependencies": {
     "commitizen": "^4.1.2",
+    "concurrently": "^5.2.0",
     "copy-webpack-plugin": "^6.0.3",
     "cz-conventional-changelog": "^3.2.0",
     "html-webpack-plugin": "^4.3.0",
