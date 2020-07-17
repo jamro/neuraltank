@@ -16,7 +16,19 @@ export class App {
       let ai: AiDefinition;
 
       ai = JsBattle.createAiDefinition();
-      ai.fromFile('jamro');
+      ai.fromCode('unit', code);
+      simulation.addTank(ai);
+
+      ai = JsBattle.createAiDefinition();
+      ai.fromCode('unit', code);
+      simulation.addTank(ai);
+
+      ai = JsBattle.createAiDefinition();
+      ai.fromCode('unit', code);
+      simulation.addTank(ai);
+
+      ai = JsBattle.createAiDefinition();
+      ai.fromCode('unit', code);
       simulation.addTank(ai);
 
       ai = JsBattle.createAiDefinition();
