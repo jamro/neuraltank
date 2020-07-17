@@ -1,42 +1,24 @@
-import code from './tankAI/aiScript';
-
-declare const JsBattle: JsBattleModule;
+import SimPlayer from './sim/SimPlayer';
 
 export class App {
 
   constructor() {
 
-    let canvas: HTMLCanvasElement = document.getElementById('battlefield') as HTMLCanvasElement;
+    let sim1: SimPlayer = new SimPlayer('sim1');
+    let sim2: SimPlayer = new SimPlayer('sim2');
+    let sim3: SimPlayer = new SimPlayer('sim3');
+    let sim4: SimPlayer = new SimPlayer('sim4');
 
-    let renderer: PixiRenderer = JsBattle.createRenderer('debug') as PixiRenderer;
-    renderer.init(canvas);
-    renderer.loadAssets(() => {
-      let simulation: Simulation = JsBattle.createSimulation(renderer);
-      simulation.init(900, 600);
-      let ai: AiDefinition;
 
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code);
-      simulation.addTank(ai);
+    sim1.onFinish(() => sim1.start());
+    sim2.onFinish(() => sim2.start());
+    sim3.onFinish(() => sim3.start());
+    sim4.onFinish(() => sim4.start());
 
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code);
-      simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code);
-      simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code);
-      simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code);
-      simulation.addTank(ai);
-
-      simulation.start();
-    })
+    sim1.start();
+    sim2.start();
+    sim3.start();
+    sim4.start();
 
   }
 }

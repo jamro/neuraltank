@@ -1,5 +1,8 @@
 declare class Renderer {
-
+  init(canvas: HTMLCanvasElement): void;
+  loadAssets(done: () => void): void;
+  stop(): void;
+  dispose(): void;
 }
 
 declare class UltimateBattleDescriptor {
@@ -16,12 +19,17 @@ declare class JsBattleModule {
 declare class PixiRenderer {
   init(canvas: HTMLCanvasElement): void;
   loadAssets(done: () => void): void;
+  stop(): void;
+  dispose(): void;
 }
 
 declare class Simulation {
+  setSpeed(multiplier: number): void;
   init(width: number, height: number): void;
   addTank(ai: AiDefinition): void;
   start(): void;
+  stop(): void;
+  onFinish(callback: () => void): void;
 }
 
 declare class AiDefinition {
