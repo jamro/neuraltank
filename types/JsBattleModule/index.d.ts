@@ -24,6 +24,7 @@ declare class PixiRenderer {
 }
 
 declare class Simulation {
+  tankList: any[];
   setSpeed(multiplier: number): void;
   init(width: number, height: number): void;
   addTank(ai: AiDefinition): void;

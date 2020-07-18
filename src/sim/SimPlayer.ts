@@ -1,7 +1,7 @@
 import code from '../tankAI/aiScript';
+import Population from '../evolution/Population';
+import Unit from '../evolution/Unit';
 declare const JsBattle: JsBattleModule;
-
-const GENOME_LENGTH: number = 336;
 
 export default class SimPlayer {
 
@@ -12,16 +12,11 @@ export default class SimPlayer {
   private _renderer: Renderer;
   private _onFinishCallbacks: (() => void)[] = [];
 
-  constructor(containerName: string) {
-    this._domContainer = document.getElementById(containerName) as HTMLDivElement;
-  }
-
-  private generateRandomGenome(): ArrayBuffer {
-    let genome: Uint8Array = new Uint8Array(GENOME_LENGTH);
-    for(let i:number = 0; i < GENOME_LENGTH; i++) {
-      genome[i] = Math.round(Math.random()*0xff);
-    }
-    return genome.buffer;
+  constructor(rootContainer: HTMLDivElement) {
+    this._domContainer = document.createElement('div') as HTMLDivElement;
+    this._domContainer.style.width = '450px';
+    this._domContainer.style.display = 'inline-block';
+    rootContainer.appendChild(this._domContainer);
   }
 
   public onFinish(callback: () => void): void {
@@ -45,9 +40,12 @@ export default class SimPlayer {
     this._isRunning = false;
   }
 
-  public start(): void {
+  public start(population:Population): void {
     if(this._isRunning) {
       this.stop();
+    }
+    if(!population.pickFree()) {
+      return;
     }
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
     this._canvas.style.width = '450px';
@@ -57,38 +55,30 @@ export default class SimPlayer {
     this._renderer = JsBattle.createRenderer('debug') as PixiRenderer;
     this._renderer.init(this._canvas);
     this._renderer.loadAssets(() => {
+      let unit:Unit;
+      let ai: AiDefinition;
+
       this._simulation = JsBattle.createSimulation(this._renderer);
       this._simulation.setSpeed(5);
       this._simulation.init(900, 600);
       this._simulation.onFinish(() => {
+        this._simulation.tankList.forEach((tank) => {
+          population.units.find((unit) => unit.name == tank.name).setScore(tank.score);
+        })
         this._onFinishCallbacks.forEach((c) => c());
       })
-      let ai: AiDefinition;
+      if(!population.pickFree()) {
+        return;
+      }
 
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code, {braindump: this.generateRandomGenome()});
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code, {braindump: this.generateRandomGenome()});
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code, {braindump: this.generateRandomGenome()});
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code, {braindump: this.generateRandomGenome()});
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
-
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('unit', code, {braindump: this.generateRandomGenome()});
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
+      for(let i:number = 0; i < 5 && population.pickFree(); i++) {
+        unit = population.pickFree();
+        unit.startProcessing();
+        ai = JsBattle.createAiDefinition();
+        ai.fromCode(unit.name, code, {braindump: unit.genome});
+        ai.disableSandbox();
+        this._simulation.addTank(ai);
+      }
 
       this._simulation.start();
       this._isRunning = true;

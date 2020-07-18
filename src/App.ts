@@ -1,24 +1,21 @@
 import SimPlayer from './sim/SimPlayer';
+import Population from './evolution/Population';
+import PopulationView from './evolution/PopulationView';
 
 export class App {
 
   constructor() {
 
-    let sim1: SimPlayer = new SimPlayer('sim1');
-    let sim2: SimPlayer = new SimPlayer('sim2');
-    let sim3: SimPlayer = new SimPlayer('sim3');
-    let sim4: SimPlayer = new SimPlayer('sim4');
+    let population:Population = new Population();
+    population.create(150);
+    let populationView: PopulationView = new PopulationView('population', population);
 
-
-    sim1.onFinish(() => sim1.start());
-    sim2.onFinish(() => sim2.start());
-    sim3.onFinish(() => sim3.start());
-    sim4.onFinish(() => sim4.start());
-
-    sim1.start();
-    sim2.start();
-    sim3.start();
-    sim4.start();
+    let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
+    for(let i:number=1; i<=6; i++) {
+      let sim: SimPlayer = new SimPlayer(simRoot);
+      sim.onFinish(() => sim.start(population));
+      sim.start(population);
+    }
 
   }
 }
