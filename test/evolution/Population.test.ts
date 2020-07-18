@@ -29,4 +29,13 @@ describe('test Population', () => {
     expect(unit).to.be.null;
   });
 
+  it('should mark population as completed', () => {
+    let population:Population = new Population();
+    population.create(2);
+    expect(population.completed).to.be.false;
+    population.units[0].setScore(4);
+    expect(population.completed).to.be.false;
+    population.units[1].setScore(3);
+    expect(population.completed).to.be.true;
+  });
 });

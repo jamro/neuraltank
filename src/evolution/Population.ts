@@ -25,6 +25,10 @@ export default class Population {
     }
   }
 
+  clear(): void {
+    this._units = [];
+  }
+
   pickFree(): Unit {
     for(let i:number=0; i<this._units.length;i++) {
       if(!this._units[i].completed && !this._units[i].inProgress) {
@@ -32,6 +36,10 @@ export default class Population {
       }
     }
     return null;
+  }
+
+  get completed(): boolean {
+    return !this._units.find((unit) => !unit.completed);
   }
 
 }
