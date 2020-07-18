@@ -11,7 +11,7 @@
     "build": "npm run build-ai && npm run build-app",
     "build-app": "npm run prebuild && webpack --mode production",
     "build-ai": "webpack --mode production --config webpack.tank.config.js",
-    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "test": "mocha -r './tsnode.js' test/**/*.test.ts",
     "commit": "npx git-cz"
   },
   "repository": {
@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.11",
     "@types/mocha": "^8.0.0",
+    "@types/sinon": "^9.0.4",
     "chai": "^4.2.0",
     "commitizen": "^4.1.2",
     "concurrently": "^5.2.0",
@@ -39,6 +40,8 @@
     "html-webpack-plugin": "^4.3.0",
     "mocha": "^8.0.1",
     "rimraf": "^3.0.2",
+    "sinon": "^9.0.2",
+    "ts-auto-mock": "^2.3.3",
     "ts-loader": "^8.0.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6",

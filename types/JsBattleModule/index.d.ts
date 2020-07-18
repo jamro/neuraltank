@@ -35,6 +35,7 @@ declare class Simulation {
 declare class AiDefinition {
   fromFile(name: string): void;
   fromCode(name: string, code: string, initData?: any): void;
+  disableSandbox(): void;
 }
 
 declare class TankInfoTeam {

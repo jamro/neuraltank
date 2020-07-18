@@ -18,6 +18,7 @@ describe('test Node', () => {
 
     expect(input1).to.have.property('weight', 0.44);
     expect(input2).to.have.property('weight', 0.75);
+    expect(node).to.have.property('inputCount', 6);
   });
 
   it('should create outputs', () => {
@@ -33,6 +34,7 @@ describe('test Node', () => {
 
     expect(output1).to.have.property('weight', 0.12);
     expect(output2).to.have.property('weight', 0.82);
+    expect(node).to.have.property('outputCount', 101);
   });
 
   it('should assign input', () => {

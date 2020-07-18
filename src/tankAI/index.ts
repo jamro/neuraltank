@@ -8,7 +8,7 @@ export default class TankAI {
   private _brain: Brain;
   private _collisionCounter: number = 0;
 
-  init(_settings: TankSettings, _info: TankInfo): void {
+  init(_settings: TankSettings, info: TankInfo): void {
     // Inputs:
     // - wallDistance
     // - enemyDistance
@@ -21,7 +21,7 @@ export default class TankAI {
     // - SHOOT
     this._brain = new Brain();
     this._brain.createLayers([4, 5, 4, 3]);
-    this._brain.randomize();
+    this._brain.restoreSnapshot(info.initData.braindump);
   }
 
   loop(state: TankState, control: TankControl): void {

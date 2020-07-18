@@ -1,11 +1,14 @@
 import Node from './Node';
 import Connection from './Connection';
+import BrainSerializer, { BrainFieldType } from './BrainSerializer';
+import BinaryBrainSerializer from './BinaryBrainSerializer';
 
 export default class Brain {
 
   private _network: Node[][] = [];
   private _connections: Connection[] = [];
   private _nodes: Node[] = [];
+  public serializer: BrainSerializer =  new BinaryBrainSerializer();
 
   public createLayers(layers: number[]) {
     let i: number;
@@ -76,6 +79,49 @@ export default class Brain {
       result.push(lastLayer[i].getOutput(0).process());
     }
     return result;
+  }
+
+  public createSnapshot(): any {
+    this.serializer.allocate(this._nodes.length*2 + this._connections.length);
+
+    let fieldIndex: number = 0;
+    let i: number = 0;
+    let j: number = 0;
+    for(let layer:number=0; layer < this._network.length; layer++) {
+      for(i=0; i < this._network[layer].length; i++) {
+        this.serializer.write(this._network[layer][i].bias, fieldIndex++, BrainFieldType.Bias);
+        this.serializer.write(this._network[layer][i].activationType, fieldIndex++, BrainFieldType.ActivationType);
+        if(layer == this._network.length-1) {
+          // skip outputs from last layer
+          continue;
+        }
+        for(j=0; j<this._network[layer][i].outputCount; j++) {
+          this.serializer.write(this._network[layer][i].getOutput(j).weight, fieldIndex++, BrainFieldType.ConnectionWeight);
+        }
+      }
+    }
+    return this.serializer.serialize();
+  }
+
+  public restoreSnapshot(data: any): void {
+    this.serializer.deserialize(data);
+
+    let fieldIndex: number = 0;
+    let i: number = 0;
+    let j: number = 0;
+    for(let layer:number=0; layer < this._network.length; layer++) {
+      for(i=0; i < this._network[layer].length; i++) {
+        this._network[layer][i].bias = this.serializer.read(fieldIndex++, BrainFieldType.Bias);
+        this._network[layer][i].activationType = this.serializer.read(fieldIndex++, BrainFieldType.ActivationType);
+        if(layer == this._network.length-1) {
+          // skip outputs from last layer
+          continue;
+        }
+        for(j=0; j<this._network[layer][i].outputCount; j++) {
+          this._network[layer][i].getOutput(j).weight = this.serializer.read(fieldIndex++, BrainFieldType.ConnectionWeight);
+        }
+      }
+    }
   }
 
 }

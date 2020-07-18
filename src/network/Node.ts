@@ -7,6 +7,16 @@ export default class Node {
   private _value: number = 0;
   private _activation: Activation = new Activation(ActivationType.Linear);
   public bias: number = 0;
+  private _inputCount: number = 0;
+  private _outputCount: number = 0;
+
+  get inputCount(): number {
+    return this._inputCount;
+  }
+
+  get outputCount(): number {
+    return this._outputCount;
+  }
 
   public get activationType() : ActivationType {
     return this._activation.type;
@@ -20,6 +30,7 @@ export default class Node {
     if(!this._inputs[index]) {
       this._inputs[index] = new Connection();
     }
+    this._inputCount = Math.max(this._inputCount, index+1);
     return this._inputs[index];
   }
 
@@ -32,6 +43,7 @@ export default class Node {
       this._outputs[index] = new Connection();
       this._outputs[index].input = this._value;
     }
+    this._outputCount = Math.max(this._outputCount, index+1);
     return this._outputs[index];
   }
 
