@@ -1,13 +1,24 @@
 import Unit from "./Unit";
+import Genome from "./Genome";
 
 const GENOME_LENGTH: number = 336;
 
 export default class Population {
   private _units: Unit[] = [];
   private _unitIndex: number = 1;
+  private _generation: number = 1;
+  private _bestScore: number = 0;
 
   get size():number {
     return this._units.length;
+  }
+
+  get bestScore():number {
+    return this._bestScore;
+  }
+
+  get generation():number {
+    return this._generation;
   }
 
   get units():Unit[] {
@@ -20,13 +31,48 @@ export default class Population {
       for(let i:number = 0; i < GENOME_LENGTH; i++) {
         genome[i] = Math.round(Math.random()*0xff);
       }
-      this._units.push(new Unit('tank-' + this._unitIndex, genome.buffer));
-      this._unitIndex++;
+      this._units.push(new Unit('tank-' + this._unitIndex++, new Genome(genome.buffer)));
     }
   }
 
-  clear(): void {
-    this._units = [];
+  private pickFitUnit(normalizedPopulation: Unit[]): Unit {
+    let randomPlace:number = Math.random();
+    for(let i=0; i < normalizedPopulation.length; i++) {
+      if(normalizedPopulation[i].score >= randomPlace) {
+        return normalizedPopulation[i];
+      }
+    }
+    return normalizedPopulation[normalizedPopulation.length-1];
+  }
+
+  private crossover(g1:Genome, g2:Genome): Genome {
+    return g1;
+  }
+
+  evolve(): void {
+    let oldGeneration:Unit[] = this._units;
+    oldGeneration = oldGeneration.sort((a, b) => b.score - a.score);
+    this._bestScore = oldGeneration[0].score;
+    let scoreSum: number = oldGeneration.reduce((sum, unit) => sum + unit.score, 0);
+    oldGeneration.forEach((unit) => unit.setScore(unit.score/scoreSum));
+    for(let i: number = 1; i < oldGeneration.length;i++) {
+      oldGeneration[i].setScore(oldGeneration[i-1].score+oldGeneration[i].score);
+    }
+    oldGeneration[oldGeneration.length-1].setScore(1);
+
+    let newGeneration: Unit[] = [];
+    while(newGeneration.length < oldGeneration.length) {
+      let parentA:Unit = this.pickFitUnit(oldGeneration);
+      let parentB:Unit = this.pickFitUnit(oldGeneration);
+      let childGenome: Genome = parentA.genome.crossover(parentB.genome);
+      if(Math.random() > 0.99) {
+        childGenome = childGenome.mutate();
+      }
+      newGeneration.push(new Unit('tank-' + this._unitIndex++, childGenome));
+    }
+
+    this._units = newGeneration;
+    this._generation++;
   }
 
   pickFree(): Unit {

@@ -23,7 +23,7 @@ export default class PopulationView {
         }
       }
       progress = 100*(progress / this._population.size)
-      this._domContainer.innerText = `population (${progress.toFixed(1)}%) ${result}`;
+      this._domContainer.innerText = `population (${progress.toFixed(1)}%) ${result}\ngeneration: ${this._population.generation}\nbest score: ${this._population.bestScore}`;
     }, 50);
   }
 

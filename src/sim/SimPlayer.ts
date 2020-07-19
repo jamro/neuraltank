@@ -62,23 +62,35 @@ export default class SimPlayer {
       this._simulation.setSpeed(5);
       this._simulation.init(900, 600);
       this._simulation.onFinish(() => {
-        this._simulation.tankList.forEach((tank) => {
-          population.units.find((unit) => unit.name == tank.name).setScore(tank.score);
-        })
+        this._simulation.tankList
+          .filter((tank) => tank.name != 'dummy')
+          .forEach((tank) => {
+            population.units.find((unit) => unit.name == tank.name).setScore(tank.score);
+          })
         this._onFinishCallbacks.forEach((c) => c());
       })
       if(!population.pickFree()) {
         return;
       }
 
-      for(let i:number = 0; i < 5 && population.pickFree(); i++) {
+      let dummyCode: string = `importScripts("lib/tank.js");var turnDirection,turnTimer;tank.init(function(n,r){n.SKIN="forest",turnDirection=Math.random()<.5?1:-1,turnTimer=Math.round(Math.randomRange(0,30))}),tank.loop(function(n,r){(n.collisions.wall||n.collisions.enemy||n.collisions.ally)&&(turnTimer=Math.round(Math.randomRange(20,50))),turnTimer>0?(turnTimer--,r.THROTTLE=0,r.TURN=turnDirection):(r.THROTTLE=1,r.TURN=0),n.radar.enemy&&(r.SHOOT=0)});`;
+
+      for(let i:number = 0; i < 3 && population.pickFree(); i++) {
         unit = population.pickFree();
         unit.startProcessing();
         ai = JsBattle.createAiDefinition();
-        ai.fromCode(unit.name, code, {braindump: unit.genome});
+        ai.fromCode(unit.name, code, {braindump: unit.genome.data});
         ai.disableSandbox();
         this._simulation.addTank(ai);
+        
       }
+
+      ai = JsBattle.createAiDefinition();
+      ai.fromCode('dummy', dummyCode);
+      ai.disableSandbox();
+      this._simulation.addTank(ai);
+
+
 
       this._simulation.start();
       this._isRunning = true;

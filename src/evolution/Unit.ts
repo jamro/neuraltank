@@ -1,16 +1,18 @@
+import Genome from "./Genome";
+
 export default class Unit {
   public _name: string;
-  public _genome: ArrayBuffer;
+  public _genome: Genome;
   public _score: number = 0;
   public _completed: boolean = false;
   public _inProgress: boolean = false;
 
-  constructor(name: string, genome: ArrayBuffer) {
+  constructor(name: string, genome: Genome) {
     this._name = name;
     this._genome = genome;
   }
 
-  public get genome(): ArrayBuffer {
+  public get genome(): Genome {
     return this._genome;
   }
   public get name(): string {
