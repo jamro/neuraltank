@@ -2,8 +2,12 @@ export default class Genome {
 
   private _data:Uint8Array;
 
-  constructor(buffer:ArrayBuffer) {
-    this._data = new Uint8Array(buffer);
+  constructor(buffer?:ArrayBuffer) {
+    if(buffer) {
+      this._data = new Uint8Array(buffer);
+    } else {
+      this._data = new Uint8Array(0);
+    }
   }
 
   public get data():ArrayBuffer {
@@ -35,5 +39,17 @@ export default class Genome {
     oputputData[index] = Math.round(Math.random()*0xff);
 
     return new Genome(oputputData.buffer);
+  }
+
+  public toJSON(): any {
+    return {
+      data: Array.from(this._data)
+    }
+  }
+
+  public static fromJSON(json:any): Genome {
+    let genome:Genome = new Genome();
+    genome._data = new Uint8Array(json.data);
+    return genome;
   }
 }

@@ -88,4 +88,37 @@ export default class Population {
     return !this._units.find((unit) => !unit.completed);
   }
 
+  public toJSON(): any {
+    return {
+      generation: this._generation,
+      unitIndex: this._unitIndex,
+      bestScore: this._bestScore,
+      units: this._units.map((u) => u.toJSON()),
+    }
+  }
+
+  public save(name:string):void {
+    localStorage.setItem(name + '-' + this._units.length, JSON.stringify(this.toJSON()))
+  }
+
+  public load(name:string):void {
+    let jsonString:string = localStorage.getItem(name + '-' + this._units.length);
+    if(!jsonString) {
+      return;
+    }
+    let json:any = JSON.parse(jsonString);
+    this._generation = json.generation;
+    this._unitIndex = json.unitIndex;
+    this._bestScore = json.bestScore;
+    this._units = json.units
+      .map((json: any): Unit => Unit.fromJSON(json))
+      .map((unit:Unit): Unit => {
+        if(unit.inProgress && !unit.completed) {
+          unit.reset();
+        }
+        return unit;
+      })
+
+  }
+
 }
