@@ -2,7 +2,7 @@ import SimPlayer from './sim/SimPlayer';
 import Population from './evolution/Population';
 import PopulationView from './evolution/PopulationView';
 
-const POPULATION_SIZE:number = 200;
+const POPULATION_SIZE:number = 100;
 const PLAYER_COUNT:number = 6;
 const POPULATION_NAME:string = 'alice-0.0.1';
 
