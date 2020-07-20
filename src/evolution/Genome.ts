@@ -1,6 +1,7 @@
 export default class Genome {
 
   private _data:Uint8Array;
+  private _hash:number;
 
   constructor(buffer?:ArrayBuffer) {
     if(buffer) {
@@ -8,12 +9,23 @@ export default class Genome {
     } else {
       this._data = new Uint8Array(0);
     }
+    this._hash = Genome.hash(this._data);
   }
 
   public get data():ArrayBuffer {
     return this._data.buffer;
   }
 
+  public get hash():number {
+    return this._hash;
+  }
+
+  private static hash(data: Uint8Array):number{
+    return data.reduce((a:number,b:number) => {
+      a=((a<<5)-a)+b;
+      return a&a
+    },0);
+  }
 
   public crossover(genome:Genome): Genome {
     let dataB: Uint8Array = new Uint8Array(genome.data);
@@ -50,6 +62,7 @@ export default class Genome {
   public static fromJSON(json:any): Genome {
     let genome:Genome = new Genome();
     genome._data = new Uint8Array(json.data);
+    genome._hash = Genome.hash(genome._data);
     return genome;
   }
 }

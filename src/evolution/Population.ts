@@ -8,6 +8,11 @@ export default class Population {
   private _unitIndex: number = 1;
   private _generation: number = 1;
   private _bestScore: number = 0;
+  private _diversity:number = 100;
+
+  get diversity():number {
+    return this._diversity;
+  }
 
   get size():number {
     return this._units.length;
@@ -33,6 +38,7 @@ export default class Population {
       }
       this._units.push(new Unit('tank-' + this._unitIndex++, new Genome(genome.buffer)));
     }
+    this.updateDiversity();
   }
 
   private pickFitUnit(normalizedPopulation: Unit[]): Unit {
@@ -45,8 +51,10 @@ export default class Population {
     return normalizedPopulation[normalizedPopulation.length-1];
   }
 
-  private crossover(g1:Genome, g2:Genome): Genome {
-    return g1;
+  private updateDiversity(): void {
+    let hashTable:number[] = this._units.map((u) => u.genome.hash);
+    let uniqueHash = hashTable.filter((v, i, a) => a.indexOf(v) === i);
+    this._diversity = Math.round(10000*uniqueHash.length/hashTable.length)/100;
   }
 
   evolve(): void {
@@ -73,6 +81,7 @@ export default class Population {
 
     this._units = newGeneration;
     this._generation++;
+    this.updateDiversity();
   }
 
   pickFree(): Unit {
