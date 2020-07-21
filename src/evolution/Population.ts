@@ -79,7 +79,6 @@ export default class Population {
     }
     this._scoreHistogram.push(oldGeneration.filter((unit:Unit) => unit.score >= 450).length);
 
-    console.log(this._scoreHistogram)
     let scoreSum: number = oldGeneration.reduce((sum, unit) => sum + unit.score, 0);
     oldGeneration.forEach((unit) => unit.setScore(unit.score/scoreSum));
     for(i = 1; i < oldGeneration.length;i++) {

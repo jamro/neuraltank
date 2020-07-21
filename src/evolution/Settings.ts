@@ -5,6 +5,7 @@ export default class Settings {
   private _domContainer: HTMLDivElement;
   private _popupContainer: HTMLDivElement;
   private _concurrency: number = 3;
+  private _battleDuration: number = 60000;
   private _saveCallbacks: (() => void)[] = [];
 
   public get concurrency():number {
@@ -14,6 +15,16 @@ export default class Settings {
   public set concurrency(v:number) {
     this._concurrency = v;
     let input: HTMLSelectElement = document.getElementById('concurrency') as HTMLSelectElement;
+    input.value = v.toString();
+  }
+
+  public get battleDuration():number {
+    return this._battleDuration;
+  }
+
+  public set battleDuration(v:number) {
+    this._battleDuration = v;
+    let input: HTMLSelectElement = document.getElementById('sim-time') as HTMLSelectElement;
     input.value = v.toString();
   }
 
@@ -39,6 +50,11 @@ export default class Settings {
       this._concurrency = Number(input.value);
     }
     this.concurrency = this._concurrency;
+    document.getElementById('sim-time').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._battleDuration = Number(input.value);
+    }
+    this.battleDuration = this._battleDuration;
     this.load();
   }
 
@@ -60,7 +76,12 @@ export default class Settings {
       return;
     }
     let data: any = JSON.parse(dataText);
-    this.concurrency = data.concurrency;
+    if(data.concurrency !== undefined) {
+      this.concurrency = data.concurrency;
+    }
+    if(data.battleDuration !== undefined) {
+      this.battleDuration = data.battleDuration;
+    }
   }
 
   private save():void {
@@ -68,7 +89,8 @@ export default class Settings {
     this.closePopup();
 
     let data:any = {
-      concurrency: this._concurrency
+      concurrency: this._concurrency,
+      battleDuration: this._battleDuration
     }
     localStorage.setItem('nn-sim-settings', JSON.stringify(data));
   }

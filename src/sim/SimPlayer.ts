@@ -13,6 +13,7 @@ export default class SimPlayer {
   private _renderer: Renderer;
   private _onFinishCallbacks: (() => void)[] = [];
   private _units: Unit[] = [];
+  public timeLimit: number = 60000;
 
   constructor(rootContainer: HTMLDivElement) {
     this._rootContainer = rootContainer;
@@ -81,7 +82,7 @@ export default class SimPlayer {
 
       this._simulation = JsBattle.createSimulation(this._renderer);
       this._simulation.setSpeed(5);
-      this._simulation.timeLimit = 60000;
+      this._simulation.timeLimit = this.timeLimit;
       this._simulation.init(900, 600);
       this._simulation.onFinish(() => {
         this._simulation.tankList

@@ -10,6 +10,7 @@ export class App {
 
   private _players: SimPlayer[] =[];
   private _population: Population;
+  private _battleDuration: number = 60000;
 
   constructor() {
     this._population = new Population();
@@ -19,12 +20,14 @@ export class App {
       this.onPopulationCompleted();
     }
     let populationView: PopulationHud = new PopulationHud('summary', this._population );
-
+    this._battleDuration = populationView.settings.battleDuration;
+    
     for(let i:number=0; i < populationView.settings.concurrency; i++) {
       this.createSimPlayer();
     }
 
     populationView.settings.onSave(():void => {
+      this._battleDuration = populationView.settings.battleDuration;
       while(this._players.length < populationView.settings.concurrency) {
         this.createSimPlayer();
       }
@@ -34,12 +37,16 @@ export class App {
         p.stop();
         p.destroy();
       }
+      this._players.forEach((p):void => {
+        p.timeLimit = this._battleDuration;
+      })
     })
   }
 
   private createSimPlayer():void {
     let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
     let sim: SimPlayer = new SimPlayer(simRoot);
+    sim.timeLimit = this._battleDuration;
     sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {
