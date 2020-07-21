@@ -1,24 +1,22 @@
 import Population from "./Population";
+import Settings from "./Settings";
 
-export default class PopulationView {
-
+export default class PopulationHud {
 
   private _domContainer: HTMLDivElement;
   private _population: Population;
   private _canvas: HTMLCanvasElement;
+  private _settings: Settings;
 
   constructor(containerName: string, population: Population) {
     this._domContainer = document.getElementById(containerName) as HTMLDivElement;
-    this._domContainer.style.width = '450px';
-    this._domContainer.style.display = 'inline-block';
 
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
     this._canvas.width = 900;
     this._canvas.height = 600;
-    this._canvas.style.width = '100%';
-    this._canvas.style.height = '100%';
     this._domContainer.appendChild(this._canvas);
 
+    this._settings = new Settings(this._domContainer);
 
     this._population = population;
 
@@ -37,8 +35,12 @@ export default class PopulationView {
         }
       }
       progress = 100*(progress / this._population.size)
-      //this._domContainer.innerText = `population (${progress.toFixed(1)}%) ${result}\ngeneration: ${this._population.generation}\nScore range: ${this._population.worstScore.toFixed(2)} - ${this._population.bestScore.toFixed(2)}\ndiversity: ${this._population.diversity}%`;
+
     }, 50);
+  }
+
+  get settings():Settings {
+    return this._settings;
   }
 
   refresh() {

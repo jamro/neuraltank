@@ -8,7 +8,31 @@
   </head>
   <body style="color: #fff; background-color: #000">
     <div style="border: 1px solid #0f0; padding: 1em; color: #0f0; text-align: center; background-color: #050">
-      <span id="summary"></span>
+      <span id="summary">
+        <div id="popup">
+          <h1>Settings <button id="close-button">X</button></h1>
+          <table>
+            <tbody>
+              <tr>
+                <td>Concurrency</td>
+                <td>
+                  <select id="concurrency">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                  </select>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button id="save-button">Save</button>
+        </div>
+      </span>
       <span id="sim"></span>
     </div>
   </body>

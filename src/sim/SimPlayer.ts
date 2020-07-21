@@ -7,16 +7,15 @@ export default class SimPlayer {
 
   private _canvas: HTMLCanvasElement;
   private _domContainer: HTMLDivElement;
+  private _rootContainer: HTMLDivElement;
   private _isRunning: boolean = false;
   private _simulation: Simulation;
   private _renderer: Renderer;
   private _onFinishCallbacks: (() => void)[] = [];
+  private _units: Unit[] = [];
 
   constructor(rootContainer: HTMLDivElement) {
-    this._domContainer = document.createElement('div') as HTMLDivElement;
-    this._domContainer.style.width = '450px';
-    this._domContainer.style.display = 'inline-block';
-    rootContainer.appendChild(this._domContainer);
+    this._rootContainer = rootContainer;
   }
 
   public onFinish(callback: () => void): void {
@@ -24,8 +23,9 @@ export default class SimPlayer {
   }
 
   public stop(): void {
-    while (this._domContainer.firstChild) {
-      this._domContainer.removeChild(this._domContainer.lastChild);
+    if(this._domContainer && this._domContainer.parentNode) {
+      this._domContainer.parentNode.removeChild(this._domContainer);
+      this._domContainer = null;
     }
     if(this._simulation) {
       this._simulation.stop();
@@ -38,6 +38,13 @@ export default class SimPlayer {
     }
     this._canvas = null;
     this._isRunning = false;
+    this._units = [];
+  }
+
+  public releaseUnits():void {
+    while(this._units.length) {
+      this._units.pop().reset();
+    }
   }
 
   public start(population:Population): void {
@@ -47,6 +54,11 @@ export default class SimPlayer {
     if(!population.pickFree()) {
       return;
     }
+    this._domContainer = document.createElement('div') as HTMLDivElement;
+    this._domContainer.style.width = '450px';
+    this._domContainer.style.display = 'inline-block';
+    this._rootContainer.appendChild(this._domContainer);
+
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
     this._canvas.style.width = '450px';
     this._canvas.style.height = '300px';
@@ -84,15 +96,14 @@ export default class SimPlayer {
         ai.fromCode(unit.name, code, {braindump: unit.genome.data});
         ai.disableSandbox();
         this._simulation.addTank(ai);
+        this._units.push(unit);
       }
-      for(i = 0; i < 1; i++) {
+      for(i = 0; i < 0; i++) {
         ai = JsBattle.createAiDefinition();
         ai.fromCode('dummy', dummyCode);
         ai.disableSandbox();
         this._simulation.addTank(ai);
       }
-
-
 
       this._simulation.start();
       this._isRunning = true;

@@ -1,7 +1,9 @@
 import Brain from '../network/Brain';
 
-const RADAR_RANGE = 300;
-const RADAR_ANGLE = 8;
+const RADAR_RANGE:number = 300;
+const RADAR_ANGLE:number = 8;
+const BOOST_MAX:number = 400;
+const COLLISION_COUNTER_MAX:number = 30;
 
 export default class TankAI {
 
@@ -14,14 +16,19 @@ export default class TankAI {
     // - enemyDistance
     // - enemyAngle
     // - collision
+    // - boost
+    // - targetting alarm
     //
     // Outputs:
     // - THROTTLE
     // - TURN
     // - SHOOT
+    // - BOOST
     this._brain = new Brain();
-    this._brain.createLayers([4, 5, 4, 3]);
+    this._brain.createLayers([6, 7, 6, 4]);
+    //console.log((this._brain.createSnapshot() as ArrayBuffer).byteLength)
     this._brain.restoreSnapshot(info.initData.braindump);
+
   }
 
   loop(state: TankState, control: TankControl): void {
@@ -48,8 +55,9 @@ export default class TankAI {
       }
       enemyAngle /= RADAR_ANGLE;
     }
+    enemyDistance = enemyDistance/(RADAR_RANGE/2)-1;
     if(state.collisions.ally || state.collisions.enemy || state.collisions.wall) {
-      this._collisionCounter = 30;
+      this._collisionCounter = COLLISION_COUNTER_MAX;
     }
 
     let input: number[];
@@ -57,7 +65,9 @@ export default class TankAI {
       wallDistance,
       enemyDistance,
       enemyAngle,
-      this._collisionCounter > 0 ? 1 : 0
+      this._collisionCounter > 0 ? 1 : 0,
+      state.radar.targetingAlarm ? 1 : 0,
+      state.boost/(BOOST_MAX/2)-1
     ];
 
     let output: number[] = this._brain.process(input);
@@ -65,6 +75,7 @@ export default class TankAI {
     control.THROTTLE = output[0];
     control.TURN = output[1];
     control.SHOOT = output[2] > 0 ? 0.1 : 0;
+    control.BOOST = output[3] > 0 ? 1 : 0;
 
   }
 

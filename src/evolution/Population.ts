@@ -1,7 +1,7 @@
 import Unit from "./Unit";
 import Genome from "./Genome";
 
-const GENOME_LENGTH: number = 336;
+const GENOME_LENGTH: number = 616;
 
 export default class Population {
   private _units: Unit[] = [];
