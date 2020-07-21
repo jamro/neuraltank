@@ -3,7 +3,7 @@ import Population from './evolution/Population';
 import PopulationView from './evolution/PopulationView';
 
 const POPULATION_SIZE:number = 200;
-const PLAYER_COUNT:number = 6;
+const PLAYER_COUNT:number = 5;
 const POPULATION_NAME:string = 'alice-0.0.1';
 
 export class App {
@@ -19,7 +19,7 @@ export class App {
     if(this._population.completed) {
       this.onPopulationCompleted();
     }
-    let populationView: PopulationView = new PopulationView('population', this._population );
+    let populationView: PopulationView = new PopulationView('summary', this._population );
 
     let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
     for(let i:number=0; i<PLAYER_COUNT; i++) {

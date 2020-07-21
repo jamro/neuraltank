@@ -10,6 +10,11 @@ export default class Population {
   private _bestScore: number = 0;
   private _worstScore: number = 0;
   private _diversity:number = 100;
+  private _scoreHistogram:number[] = [];
+
+  get scoreHistogram():number[] {
+    return this._scoreHistogram;
+  }
 
   get diversity():number {
     return this._diversity;
@@ -63,13 +68,21 @@ export default class Population {
   }
 
   evolve(): void {
+    let i:number;
     let oldGeneration:Unit[] = this._units;
     oldGeneration = oldGeneration.sort((a, b) => b.score - a.score);
     this._bestScore = oldGeneration[0].score;
     this._worstScore = oldGeneration[oldGeneration.length-1].score;
+    this._scoreHistogram = [];
+    for(i=0; i<450; i+=5) {
+      this._scoreHistogram.push(oldGeneration.filter((unit:Unit) => unit.score >= i && unit.score < i+5).length);
+    }
+    this._scoreHistogram.push(oldGeneration.filter((unit:Unit) => unit.score >= 450).length);
+
+    console.log(this._scoreHistogram)
     let scoreSum: number = oldGeneration.reduce((sum, unit) => sum + unit.score, 0);
     oldGeneration.forEach((unit) => unit.setScore(unit.score/scoreSum));
-    for(let i: number = 1; i < oldGeneration.length;i++) {
+    for(i = 1; i < oldGeneration.length;i++) {
       oldGeneration[i].setScore(oldGeneration[i-1].score+oldGeneration[i].score);
     }
     oldGeneration[oldGeneration.length-1].setScore(1);
@@ -109,6 +122,7 @@ export default class Population {
       unitIndex: this._unitIndex,
       bestScore: this._bestScore,
       worstScore: this._worstScore,
+      scoreHistogram: this._scoreHistogram,
       units: this._units.map((u) => u.toJSON()),
     }
   }
@@ -127,6 +141,7 @@ export default class Population {
     this._unitIndex = json.unitIndex;
     this._bestScore = json.bestScore;
     this._worstScore = json.worstScore;
+    this._scoreHistogram = json.scoreHistogram;
     this._units = json.units
       .map((json: any): Unit => Unit.fromJSON(json))
       .map((unit:Unit): Unit => {

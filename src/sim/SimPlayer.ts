@@ -76,7 +76,8 @@ export default class SimPlayer {
 
       let dummyCode: string = `importScripts("lib/tank.js");var turnDirection,turnTimer;tank.init(function(n,r){n.SKIN="forest",turnDirection=Math.random()<.5?1:-1,turnTimer=Math.round(Math.randomRange(0,30))}),tank.loop(function(n,r){(n.collisions.wall||n.collisions.enemy||n.collisions.ally)&&(turnTimer=Math.round(Math.randomRange(20,50))),turnTimer>0?(turnTimer--,r.THROTTLE=0,r.TURN=turnDirection):(r.THROTTLE=1,r.TURN=0),n.radar.enemy&&(r.SHOOT=0)});`;
 
-      for(let i:number = 0; i < 4 && population.pickFree(); i++) {
+      let i:number;
+      for(i = 0; i < 5 && population.pickFree(); i++) {
         unit = population.pickFree();
         unit.startProcessing();
         ai = JsBattle.createAiDefinition();
@@ -84,11 +85,14 @@ export default class SimPlayer {
         ai.disableSandbox();
         this._simulation.addTank(ai);
       }
+      for(i = 0; i < 1; i++) {
+        ai = JsBattle.createAiDefinition();
+        ai.fromCode('dummy', dummyCode);
+        ai.disableSandbox();
+        this._simulation.addTank(ai);
+      }
 
-      ai = JsBattle.createAiDefinition();
-      ai.fromCode('dummy', dummyCode);
-      ai.disableSandbox();
-      this._simulation.addTank(ai);
+
 
       this._simulation.start();
       this._isRunning = true;
