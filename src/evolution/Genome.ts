@@ -22,7 +22,7 @@ export default class Genome {
 
   private static hash(data: Uint8Array):number{
     return data.reduce((a:number,b:number) => {
-      a=((a<<5)-a)+b;
+      a=((a<<5)-a)+Math.round(b/10);
       return a&a
     },0);
   }
