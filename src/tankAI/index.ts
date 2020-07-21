@@ -74,7 +74,7 @@ export default class TankAI {
 
     control.THROTTLE = output[0];
     control.TURN = output[1];
-    control.SHOOT = output[2] > 0 ? 0.1 : 0;
+    control.SHOOT = output[2] > 0 ? output[2] : 0;
     control.BOOST = output[3] > 0 ? 1 : 0;
 
   }

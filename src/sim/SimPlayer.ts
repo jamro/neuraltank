@@ -22,10 +22,23 @@ export default class SimPlayer {
     this._onFinishCallbacks.push(callback);
   }
 
-  public stop(): void {
+  public create():void {
+    this._domContainer = document.createElement('div') as HTMLDivElement;
+    this._domContainer.style.width = '450px';
+    this._domContainer.style.display = 'inline-block';
+    this._rootContainer.appendChild(this._domContainer);
+  }
+
+  public destroy():void {
     if(this._domContainer && this._domContainer.parentNode) {
       this._domContainer.parentNode.removeChild(this._domContainer);
       this._domContainer = null;
+    }
+  }
+
+  public stop(): void {
+    while(this._domContainer.firstChild) {
+      this._domContainer.removeChild(this._domContainer.lastChild);
     }
     if(this._simulation) {
       this._simulation.stop();
@@ -54,10 +67,6 @@ export default class SimPlayer {
     if(!population.pickFree()) {
       return;
     }
-    this._domContainer = document.createElement('div') as HTMLDivElement;
-    this._domContainer.style.width = '450px';
-    this._domContainer.style.display = 'inline-block';
-    this._rootContainer.appendChild(this._domContainer);
 
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
     this._canvas.style.width = '450px';

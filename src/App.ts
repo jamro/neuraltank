@@ -32,6 +32,7 @@ export class App {
         let p:SimPlayer = this._players.pop();
         p.releaseUnits();
         p.stop();
+        p.destroy();
       }
     })
   }
@@ -39,6 +40,7 @@ export class App {
   private createSimPlayer():void {
     let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
     let sim: SimPlayer = new SimPlayer(simRoot);
+    sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {
         sim.stop();
