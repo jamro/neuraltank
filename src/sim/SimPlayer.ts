@@ -78,7 +78,7 @@ export default class SimPlayer {
     this._canvas.style.height = '300px';
     this._domContainer.appendChild(this._canvas);
 
-    this._renderer = JsBattle.createRenderer('debug') as PixiRenderer;
+    this._renderer = JsBattle.createRenderer('void') as PixiRenderer;
     this._renderer.init(this._canvas);
     this._renderer.loadAssets(() => {
       let unit:Unit;
@@ -93,6 +93,7 @@ export default class SimPlayer {
           .filter((tank) => tank.name != 'dummy')
           .forEach((tank) => {
             population.units.find((unit) => unit.name == tank.name).setScore(tank.score);
+            population.notifyCompleted();
           })
         this._onFinishCallbacks.forEach((c) => c());
       })

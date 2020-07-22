@@ -78,6 +78,8 @@ export default class PopulationHud {
     ctx.fillText(`Generation: ${this._population.generation}`, 10, 130);
     ctx.fillText(`Diversity: ${this._population.diversity}%`, 10, 180);
     ctx.fillText(`Scores: ${this._population.worstScore.toFixed(2)} - ${this._population.bestScore.toFixed(2)}`, 10, 330);
+    let processRate:number = this._population.getUnitProcessingRate();
+    ctx.fillText(`Processing Rate: ${processRate ? processRate.toFixed(2) : '???'} units / minute`, 10, 230);
 
     let topValue: number = this._population.scoreHistogram.reduce((max:number, val:number) => Math.max(max, val), 1);
     let barWidth: number = 860/this._population.scoreHistogram.length;

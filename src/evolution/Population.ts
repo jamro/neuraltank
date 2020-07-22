@@ -4,6 +4,7 @@ import Genome from "./Genome";
 const GENOME_LENGTH: number = 616;
 
 export default class Population {
+
   private _units: Unit[] = [];
   private _unitIndex: number = 1;
   private _generation: number = 1;
@@ -11,6 +12,8 @@ export default class Population {
   private _worstScore: number = 0;
   private _diversity:number = 100;
   private _scoreHistogram:number[] = [];
+  private _lastCompleteTime:number = (new Date()).getTime();
+  private _completeTimes:number[] = [];
 
   get scoreHistogram():number[] {
     return this._scoreHistogram;
@@ -67,7 +70,7 @@ export default class Population {
     this._diversity = Math.round(10000*uniqueHash.length/hashTable.length)/100;
   }
 
-  evolve(): void {
+  public evolve(): void {
     let i:number;
     let oldGeneration:Unit[] = this._units;
     oldGeneration = oldGeneration.sort((a, b) => b.score - a.score);
@@ -102,7 +105,7 @@ export default class Population {
     this.updateDiversity();
   }
 
-  pickFree(): Unit {
+  public pickFree(): Unit {
     for(let i:number=0; i<this._units.length;i++) {
       if(!this._units[i].completed && !this._units[i].inProgress) {
         return this._units[i];
@@ -111,7 +114,7 @@ export default class Population {
     return null;
   }
 
-  get completed(): boolean {
+  public get completed(): boolean {
     return !this._units.find((unit) => !unit.completed);
   }
 
@@ -149,7 +152,25 @@ export default class Population {
         }
         return unit;
       })
+  }
 
+  public notifyCompleted() {
+    let now: number = (new Date()).getTime();
+    this._completeTimes.push(now - this._lastCompleteTime);
+    this._lastCompleteTime = now;
+    while(this._completeTimes.length > this._units.length) {
+      this._completeTimes.shift();
+    }
+  }
+
+  public getUnitProcessingRate():number {
+    let count:number = this._completeTimes.length;
+    if(count == 0) {
+      return 0;
+    }
+    let averageTime:number = this._completeTimes.reduce((sum:number, val:number):number => sum + val, 0)/count;
+
+    return 60000/averageTime;
   }
 
 }
