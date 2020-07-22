@@ -18,6 +18,7 @@ export default class SimPlayer {
   public trainingUnits: number = 4;
   public dummyUnits: number = 1;
   public dummyType: string = 'crawler';
+  public renderer: string = 'debug';
 
   constructor(rootContainer: HTMLDivElement) {
     this._rootContainer = rootContainer;
@@ -78,7 +79,7 @@ export default class SimPlayer {
     this._canvas.style.height = '300px';
     this._domContainer.appendChild(this._canvas);
 
-    this._renderer = JsBattle.createRenderer('void') as PixiRenderer;
+    this._renderer = JsBattle.createRenderer(this.renderer) as PixiRenderer;
     this._renderer.init(this._canvas);
     this._renderer.loadAssets(() => {
       let unit:Unit;

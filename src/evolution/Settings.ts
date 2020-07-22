@@ -9,6 +9,7 @@ export default class Settings {
   private _trainingUnits: number = 4;
   private _dummyUnits: number = 1;
   private _dummyType: string = 'crawler';
+  private _renderer: string = 'debug';
   private _battleDuration: number = 60000;
   private _saveCallbacks: (() => void)[] = [];
 
@@ -72,6 +73,16 @@ export default class Settings {
     input.value = v;
   }
 
+  public get renderer():string {
+    return this._renderer;
+  }
+
+  public set renderer(v:string) {
+    this._renderer = v;
+    let input: HTMLSelectElement = document.getElementById('renderer') as HTMLSelectElement;
+    input.value = v;
+  }
+
   constructor(container: HTMLDivElement) {
     this._domContainer = container;
 
@@ -120,6 +131,12 @@ export default class Settings {
       this._dummyType = input.value;
     }
     this.dummyType = this._dummyType;
+
+    document.getElementById('renderer').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._renderer = input.value;
+    }
+    this.renderer = this._renderer;
     this.load();
   }
 
@@ -159,6 +176,9 @@ export default class Settings {
     if(data.dummyType !== undefined) {
       this.dummyType = data.dummyType;
     }
+    if(data.renderer !== undefined) {
+      this.renderer = data.renderer;
+    }
   }
 
   private save():void {
@@ -172,6 +192,7 @@ export default class Settings {
       dummyUnits: this._dummyUnits,
       trainingUnits: this._trainingUnits,
       dummyType: this.dummyType,
+      renderer: this.renderer,
     }
     localStorage.setItem('nn-sim-settings', JSON.stringify(data));
   }

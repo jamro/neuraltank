@@ -42,6 +42,7 @@ export class App {
         p.trainingUnits = this._populationHud.settings.trainingUnits;
         p.dummyUnits = this._populationHud.settings.dummyUnits;
         p.dummyType = this._populationHud.settings.dummyType;
+        p.renderer = this._populationHud.settings.renderer;
       })
     })
   }
@@ -54,6 +55,8 @@ export class App {
     sim.trainingUnits = this._populationHud.settings.trainingUnits;
     sim.dummyUnits = this._populationHud.settings.dummyUnits;
     sim.dummyType = this._populationHud.settings.dummyType;
+    sim.renderer = this._populationHud.settings.renderer;
+    
     sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {
