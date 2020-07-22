@@ -5,6 +5,7 @@ export default class Settings {
   private _domContainer: HTMLDivElement;
   private _popupContainer: HTMLDivElement;
   private _concurrency: number = 3;
+  private _simSpeed: number = 2;
   private _battleDuration: number = 60000;
   private _saveCallbacks: (() => void)[] = [];
 
@@ -25,6 +26,16 @@ export default class Settings {
   public set battleDuration(v:number) {
     this._battleDuration = v;
     let input: HTMLSelectElement = document.getElementById('sim-time') as HTMLSelectElement;
+    input.value = v.toString();
+  }
+
+  public get simSpeed():number {
+    return this._simSpeed;
+  }
+
+  public set simSpeed(v:number) {
+    this._simSpeed = v;
+    let input: HTMLSelectElement = document.getElementById('sim-speed') as HTMLSelectElement;
     input.value = v.toString();
   }
 
@@ -55,6 +66,11 @@ export default class Settings {
       this._battleDuration = Number(input.value);
     }
     this.battleDuration = this._battleDuration;
+    document.getElementById('sim-speed').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._simSpeed = Number(input.value);
+    }
+    this.simSpeed = this._simSpeed;
     this.load();
   }
 
@@ -82,6 +98,9 @@ export default class Settings {
     if(data.battleDuration !== undefined) {
       this.battleDuration = data.battleDuration;
     }
+    if(data.simSpeed !== undefined) {
+      this.simSpeed = data.simSpeed;
+    }
   }
 
   private save():void {
@@ -90,7 +109,8 @@ export default class Settings {
 
     let data:any = {
       concurrency: this._concurrency,
-      battleDuration: this._battleDuration
+      battleDuration: this._battleDuration,
+      simSpeed: this._simSpeed,
     }
     localStorage.setItem('nn-sim-settings', JSON.stringify(data));
   }

@@ -10,7 +10,7 @@ export class App {
 
   private _players: SimPlayer[] =[];
   private _population: Population;
-  private _battleDuration: number = 60000;
+  private _populationHud: PopulationHud;
 
   constructor() {
     this._population = new Population();
@@ -19,26 +19,26 @@ export class App {
     if(this._population.completed) {
       this.onPopulationCompleted();
     }
-    let populationView: PopulationHud = new PopulationHud('summary', this._population );
-    this._battleDuration = populationView.settings.battleDuration;
-    
-    for(let i:number=0; i < populationView.settings.concurrency; i++) {
+    this._populationHud = new PopulationHud('summary', this._population );
+
+    for(let i:number=0; i < this._populationHud.settings.concurrency; i++) {
       this.createSimPlayer();
     }
 
-    populationView.settings.onSave(():void => {
-      this._battleDuration = populationView.settings.battleDuration;
-      while(this._players.length < populationView.settings.concurrency) {
-        this.createSimPlayer();
-      }
-      while(this._players.length > populationView.settings.concurrency) {
+    this._populationHud.settings.onSave(():void => {
+      while(this._players.length > 0) {
         let p:SimPlayer = this._players.pop();
         p.releaseUnits();
         p.stop();
         p.destroy();
       }
+      while(this._players.length < this._populationHud.settings.concurrency) {
+        this.createSimPlayer();
+      }
+
       this._players.forEach((p):void => {
-        p.timeLimit = this._battleDuration;
+        p.timeLimit = this._populationHud.settings.battleDuration;
+        p.simSpeed = this._populationHud.settings.simSpeed;
       })
     })
   }
@@ -46,7 +46,8 @@ export class App {
   private createSimPlayer():void {
     let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
     let sim: SimPlayer = new SimPlayer(simRoot);
-    sim.timeLimit = this._battleDuration;
+    sim.timeLimit = this._populationHud.settings.battleDuration;
+    sim.simSpeed = this._populationHud.settings.simSpeed;
     sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {

@@ -14,6 +14,7 @@ export default class SimPlayer {
   private _onFinishCallbacks: (() => void)[] = [];
   private _units: Unit[] = [];
   public timeLimit: number = 60000;
+  public simSpeed: number = 2;
 
   constructor(rootContainer: HTMLDivElement) {
     this._rootContainer = rootContainer;
@@ -81,7 +82,7 @@ export default class SimPlayer {
       let ai: AiDefinition;
 
       this._simulation = JsBattle.createSimulation(this._renderer);
-      this._simulation.setSpeed(5);
+      this._simulation.setSpeed(this.simSpeed);
       this._simulation.timeLimit = this.timeLimit;
       this._simulation.init(900, 600);
       this._simulation.onFinish(() => {
@@ -99,7 +100,7 @@ export default class SimPlayer {
       let dummyCode: string = `importScripts("lib/tank.js");var turnDirection,turnTimer;tank.init(function(n,r){n.SKIN="forest",turnDirection=Math.random()<.5?1:-1,turnTimer=Math.round(Math.randomRange(0,30))}),tank.loop(function(n,r){(n.collisions.wall||n.collisions.enemy||n.collisions.ally)&&(turnTimer=Math.round(Math.randomRange(20,50))),turnTimer>0?(turnTimer--,r.THROTTLE=0,r.TURN=turnDirection):(r.THROTTLE=1,r.TURN=0),n.radar.enemy&&(r.SHOOT=0)});`;
 
       let i:number;
-      for(i = 0; i < 5 && population.pickFree(); i++) {
+      for(i = 0; i < 4 && population.pickFree(); i++) {
         unit = population.pickFree();
         unit.startProcessing();
         ai = JsBattle.createAiDefinition();
@@ -108,7 +109,7 @@ export default class SimPlayer {
         this._simulation.addTank(ai);
         this._units.push(unit);
       }
-      for(i = 0; i < 0; i++) {
+      for(i = 0; i < 2; i++) {
         ai = JsBattle.createAiDefinition();
         ai.fromCode('dummy', dummyCode);
         ai.disableSandbox();
