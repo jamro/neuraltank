@@ -39,6 +39,9 @@ export class App {
       this._players.forEach((p):void => {
         p.timeLimit = this._populationHud.settings.battleDuration;
         p.simSpeed = this._populationHud.settings.simSpeed;
+        p.trainingUnits = this._populationHud.settings.trainingUnits;
+        p.dummyUnits = this._populationHud.settings.dummyUnits;
+        p.dummyType = this._populationHud.settings.dummyType;
       })
     })
   }
@@ -48,6 +51,9 @@ export class App {
     let sim: SimPlayer = new SimPlayer(simRoot);
     sim.timeLimit = this._populationHud.settings.battleDuration;
     sim.simSpeed = this._populationHud.settings.simSpeed;
+    sim.trainingUnits = this._populationHud.settings.trainingUnits;
+    sim.dummyUnits = this._populationHud.settings.dummyUnits;
+    sim.dummyType = this._populationHud.settings.dummyType;
     sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {

@@ -6,6 +6,9 @@ export default class Settings {
   private _popupContainer: HTMLDivElement;
   private _concurrency: number = 3;
   private _simSpeed: number = 2;
+  private _trainingUnits: number = 4;
+  private _dummyUnits: number = 1;
+  private _dummyType: string = 'crawler';
   private _battleDuration: number = 60000;
   private _saveCallbacks: (() => void)[] = [];
 
@@ -37,6 +40,36 @@ export default class Settings {
     this._simSpeed = v;
     let input: HTMLSelectElement = document.getElementById('sim-speed') as HTMLSelectElement;
     input.value = v.toString();
+  }
+
+  public get dummyUnits():number {
+    return this._dummyUnits;
+  }
+
+  public set dummyUnits(v:number) {
+    this._dummyUnits = v;
+    let input: HTMLSelectElement = document.getElementById('units-dummy') as HTMLSelectElement;
+    input.value = v.toString();
+  }
+
+  public get trainingUnits():number {
+    return this._trainingUnits;
+  }
+
+  public set trainingUnits(v:number) {
+    this._trainingUnits = v;
+    let input: HTMLSelectElement = document.getElementById('units-training') as HTMLSelectElement;
+    input.value = v.toString();
+  }
+
+  public get dummyType():string {
+    return this._dummyType;
+  }
+
+  public set dummyType(v:string) {
+    this._dummyType = v;
+    let input: HTMLSelectElement = document.getElementById('dummy-type') as HTMLSelectElement;
+    input.value = v;
   }
 
   constructor(container: HTMLDivElement) {
@@ -71,6 +104,22 @@ export default class Settings {
       this._simSpeed = Number(input.value);
     }
     this.simSpeed = this._simSpeed;
+    document.getElementById('units-dummy').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._dummyUnits = Number(input.value);
+    }
+    this.dummyUnits = this._dummyUnits;
+    document.getElementById('units-training').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._trainingUnits = Number(input.value);
+    }
+    this.trainingUnits = this._trainingUnits;
+
+    document.getElementById('dummy-type').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._dummyType = input.value;
+    }
+    this.dummyType = this._dummyType;
     this.load();
   }
 
@@ -101,6 +150,15 @@ export default class Settings {
     if(data.simSpeed !== undefined) {
       this.simSpeed = data.simSpeed;
     }
+    if(data.dummyUnits !== undefined) {
+      this.dummyUnits = data.dummyUnits;
+    }
+    if(data.trainingUnits !== undefined) {
+      this.trainingUnits = data.trainingUnits;
+    }
+    if(data.dummyType !== undefined) {
+      this.dummyType = data.dummyType;
+    }
   }
 
   private save():void {
@@ -111,6 +169,9 @@ export default class Settings {
       concurrency: this._concurrency,
       battleDuration: this._battleDuration,
       simSpeed: this._simSpeed,
+      dummyUnits: this._dummyUnits,
+      trainingUnits: this._trainingUnits,
+      dummyType: this.dummyType,
     }
     localStorage.setItem('nn-sim-settings', JSON.stringify(data));
   }
