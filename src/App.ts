@@ -56,7 +56,7 @@ export class App {
     sim.dummyUnits = this._populationHud.settings.dummyUnits;
     sim.dummyType = this._populationHud.settings.dummyType;
     sim.renderer = this._populationHud.settings.renderer;
-    
+
     sim.create();
     sim.onFinish(() => {
       if(this._population.completed) {

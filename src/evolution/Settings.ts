@@ -4,10 +4,10 @@ export default class Settings {
   private _saveButton: HTMLButtonElement;
   private _domContainer: HTMLDivElement;
   private _popupContainer: HTMLDivElement;
-  private _concurrency: number = 3;
-  private _simSpeed: number = 2;
+  private _concurrency: number = 1;
+  private _simSpeed: number = 1;
   private _trainingUnits: number = 4;
-  private _dummyUnits: number = 1;
+  private _dummyUnits: number = 0;
   private _dummyType: string = 'crawler';
   private _renderer: string = 'debug';
   private _battleDuration: number = 60000;
