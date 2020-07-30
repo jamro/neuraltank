@@ -1,7 +1,6 @@
 import Unit from "./Unit";
 import Genome from "./Genome";
-
-const GENOME_LENGTH: number = 616;
+import config from '../config';
 
 export default class Population {
 
@@ -9,6 +8,7 @@ export default class Population {
   private _unitIndex: number = 1;
   private _generation: number = 1;
   private _bestScore: number = 0;
+  private _bestGenome: Genome;
   private _worstScore: number = 0;
   private _diversity:number = 100;
   private _scoreHistogram:number[] = [];
@@ -31,6 +31,10 @@ export default class Population {
     return this._bestScore;
   }
 
+  get bestGenome():Genome {
+    return this._bestGenome;
+  }
+
   get worstScore():number {
     return this._worstScore;
   }
@@ -45,8 +49,8 @@ export default class Population {
 
   create(size: number):void {
     while(this.size < size) {
-      let genome: Uint8Array = new Uint8Array(GENOME_LENGTH);
-      for(let i:number = 0; i < GENOME_LENGTH; i++) {
+      let genome: Uint8Array = new Uint8Array(config.genomeLength);
+      for(let i:number = 0; i < config.genomeLength; i++) {
         genome[i] = Math.round(Math.random()*0xff);
       }
       this._units.push(new Unit('tank-' + this._unitIndex++, new Genome(genome.buffer)));
@@ -75,6 +79,7 @@ export default class Population {
     let oldGeneration:Unit[] = this._units;
     oldGeneration = oldGeneration.sort((a, b) => b.score - a.score);
     this._bestScore = oldGeneration[0].score;
+    this._bestGenome = oldGeneration[0].genome;
     this._worstScore = oldGeneration[oldGeneration.length-1].score;
     this._scoreHistogram = [];
     for(i=0; i<450; i+=5) {
@@ -123,6 +128,7 @@ export default class Population {
       generation: this._generation,
       unitIndex: this._unitIndex,
       bestScore: this._bestScore,
+      bestGenome: this._bestGenome ? this._bestGenome.toJSON() : null,
       worstScore: this._worstScore,
       scoreHistogram: this._scoreHistogram,
       units: this._units.map((u) => u.toJSON()),
@@ -144,6 +150,9 @@ export default class Population {
     this._bestScore = json.bestScore;
     this._worstScore = json.worstScore;
     this._scoreHistogram = json.scoreHistogram;
+    if(json.bestGenome) {
+      this._bestGenome = Genome.fromJSON(json.bestGenome);
+    }
     this._units = json.units
       .map((json: any): Unit => Unit.fromJSON(json))
       .map((unit:Unit): Unit => {

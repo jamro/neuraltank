@@ -1,4 +1,11 @@
-import { App } from './App'
+import { SimApp } from './SimApp'
+import { PreviewApp } from './PreviewApp'
 import './sass/hud.scss';
 
-new App();
+
+
+if(window.location.hash == '#preview') {
+  new PreviewApp();
+} else {
+  new SimApp();
+}

@@ -1,12 +1,9 @@
 import SimPlayer from './sim/SimPlayer';
 import Population from './evolution/Population';
 import PopulationHud from './evolution/PopulationHud';
+import config from './config';
 
-const POPULATION_SIZE:number = 200;
-const PLAYER_COUNT:number = 5;
-const POPULATION_NAME:string = 'alice-0.0.1';
-
-export class App {
+export class SimApp {
 
   private _players: SimPlayer[] =[];
   private _population: Population;
@@ -14,8 +11,8 @@ export class App {
 
   constructor() {
     this._population = new Population();
-    this._population.create(POPULATION_SIZE);
-    this._population.load(POPULATION_NAME);
+    this._population.create(config.populationSize);
+    this._population.load(config.populationName);
     if(this._population.completed) {
       this.onPopulationCompleted();
     }
@@ -65,7 +62,7 @@ export class App {
       } else {
         sim.start(this._population)
       }
-      this._population.save(POPULATION_NAME);
+      this._population.save(config.populationName);
     });
     sim.start(this._population);
     this._players.push(sim);

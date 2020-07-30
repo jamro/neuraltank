@@ -7,6 +7,7 @@ export default class PopulationHud {
   private _population: Population;
   private _canvas: HTMLCanvasElement;
   private _settings: Settings;
+  private _previewButton: HTMLButtonElement;
 
   constructor(containerName: string, population: Population) {
     this._domContainer = document.getElementById(containerName) as HTMLDivElement;
@@ -16,26 +17,21 @@ export default class PopulationHud {
     this._canvas.height = 600;
     this._domContainer.appendChild(this._canvas);
 
+    this._previewButton = document.createElement('button') as HTMLButtonElement;
+    this._previewButton.classList.add('preview');
+    this._previewButton.innerText = "Preview The Best Unit";
+    this._domContainer.appendChild(this._previewButton);
+    this._previewButton.onclick = ():void => {
+      window.location.replace('/#preview');
+      window.location.reload();
+    };
+
     this._settings = new Settings(this._domContainer);
 
     this._population = population;
 
     setInterval(() => {
       this.refresh();
-      let result = '';
-      let progress:number = 0;
-      for(let i=0; i<this._population.size; i++) {
-        if(this._population.units[i].completed) {
-          result += "#";
-          progress++;
-        } else if(this._population.units[i].inProgress) {
-          result += "+";
-        } else  {
-          result += "-";
-        }
-      }
-      progress = 100*(progress / this._population.size)
-
     }, 50);
   }
 
@@ -83,11 +79,13 @@ export default class PopulationHud {
 
     let topValue: number = this._population.scoreHistogram.reduce((max:number, val:number) => Math.max(max, val), 1);
     let barWidth: number = 860/this._population.scoreHistogram.length;
-    let barHeights: number[] = this._population.scoreHistogram.map((v) => 200*v/topValue);
+    let barHeights: number[] = this._population.scoreHistogram.map((v) => 120*v/topValue);
     ctx.fillStyle = "#0f0";
     for(i=0; i<this._population.scoreHistogram.length; i++) {
-      ctx.fillRect(20+i*barWidth, 370+200- barHeights[i], barWidth-1, barHeights[i]);
+      ctx.fillRect(20+i*barWidth, 360+120- barHeights[i], barWidth-1, barHeights[i]);
     }
+
+    this._previewButton.style.display = this._population.bestGenome ? 'inline-block' : 'none';
   }
 
 }
