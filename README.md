@@ -1,6 +1,8 @@
 # NeuralTank
 The project is about evolving a [neural network](https://en.wikipedia.org/wiki/Neural_network) that successfully controls a tank and fights in [JsBattle](https://jsbattle.jmrlab.com) coding game.
 
+![Screenshot](./screenshot.png)
+
 ## Neural Network
 ### Inputs
 - **wallDistance** - distance to the nearest wall in radar range. The value is in range of `-1` to `1`. The input is set to `1` if there is no wall in radar range.
