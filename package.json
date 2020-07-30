@@ -12,7 +12,8 @@
     "build-app": "npm run prebuild && webpack --mode production",
     "build-ai": "webpack --mode production --config webpack.tank.config.js",
     "test": "mocha -r './tsnode.js' test/**/*.test.ts",
-    "commit": "npx git-cz"
+    "commit": "npx git-cz",
+    "version": "conventional-changelog -p neuraltank -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "repository": {
     "type": "git",
