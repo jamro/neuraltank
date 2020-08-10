@@ -21,37 +21,33 @@ button.back {
     height: 100%;
   }
 
-  button.settings {
-    font-family: Courier;
+  .controls {
+    $margin: 0.2em;
     position: absolute;
     bottom: 0;
-    right: 0;
-    margin: 1em;
-    padding: 1em;
-    color: $color;
-    border: 1px $color solid;
-    cursor: pointer;
-    background-color: $bgcolor;
-    outline: 0;
-  }
-
-  button.preview {
-    font-family: Courier;
-    position: absolute;
-    bottom: 0em;
     left: 0;
-    margin: 1em;
-    padding: 1em;
-    color: $color;
-    border: 1px $color solid;
-    cursor: pointer;
-    background-color: $bgcolor;
-    outline: 0;
-  }
+    padding: $margin;
+    margin: 0;
+    height: 3em;
+    width: calc(100% - #{2 * $margin});
 
-  button.settings:active {
-    color: $bgcolor;
-    background-color: $color;
+    button {
+      font-family: Courier;
+      padding: auto;
+      height: 3em;
+      color: $color;
+      border: 1px $color solid;
+      cursor: pointer;
+      background-color: $bgcolor;
+      outline: 0;
+      margin: 0 $margin;
+      width: calc(50% - #{2 * $margin});
+    }
+
+    button:active {
+      color: $bgcolor;
+      background-color: $color;
+    }
   }
 
   #popup {

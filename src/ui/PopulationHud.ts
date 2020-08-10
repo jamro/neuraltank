@@ -1,5 +1,6 @@
-import Population from "./Population";
+import Population from "../evolution/Population";
 import Settings from "./Settings";
+import SimControl from "./SimControl";
 
 export default class PopulationHud {
 
@@ -7,26 +8,26 @@ export default class PopulationHud {
   private _population: Population;
   private _canvas: HTMLCanvasElement;
   private _settings: Settings;
-  private _previewButton: HTMLButtonElement;
+  private _controls: SimControl;
 
   constructor(containerName: string, population: Population) {
     this._domContainer = document.getElementById(containerName) as HTMLDivElement;
+    this._controls = new SimControl();
 
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
     this._canvas.width = 900;
     this._canvas.height = 600;
     this._domContainer.appendChild(this._canvas);
 
-    this._previewButton = document.createElement('button') as HTMLButtonElement;
-    this._previewButton.classList.add('preview');
-    this._previewButton.innerText = "Preview The Best Unit";
-    this._domContainer.appendChild(this._previewButton);
-    this._previewButton.onclick = ():void => {
+    this._domContainer.appendChild(this._controls.container);
+
+    this._controls.preview.onclick = ():void => {
       window.location.replace('/#preview');
       window.location.reload();
     };
 
     this._settings = new Settings(this._domContainer);
+    this._controls.settings.onclick = ():void => this._settings.showPopup();
 
     this._population = population;
 
@@ -79,13 +80,13 @@ export default class PopulationHud {
 
     let topValue: number = this._population.scoreHistogram.reduce((max:number, val:number) => Math.max(max, val), 1);
     let barWidth: number = 860/this._population.scoreHistogram.length;
-    let barHeights: number[] = this._population.scoreHistogram.map((v) => 120*v/topValue);
+    let barHeights: number[] = this._population.scoreHistogram.map((v:number) => 120*v/topValue);
     ctx.fillStyle = "#0f0";
     for(i=0; i<this._population.scoreHistogram.length; i++) {
       ctx.fillRect(20+i*barWidth, 360+120- barHeights[i], barWidth-1, barHeights[i]);
     }
 
-    this._previewButton.style.display = this._population.bestGenome ? 'inline-block' : 'none';
+    this._controls.preview.style.display = this._population.bestGenome ? 'inline-block' : 'none';
   }
 
 }

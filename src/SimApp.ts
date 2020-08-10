@@ -1,6 +1,6 @@
-import SimPlayer from './sim/SimPlayer';
+import SimPlayer from './ui/SimPlayer';
 import Population from './evolution/Population';
-import PopulationHud from './evolution/PopulationHud';
+import PopulationHud from './ui/PopulationHud';
 import config from './config';
 
 export class SimApp {

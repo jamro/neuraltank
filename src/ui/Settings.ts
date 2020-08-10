@@ -1,6 +1,5 @@
 export default class Settings {
 
-  private _settingsButton: HTMLButtonElement;
   private _saveButton: HTMLButtonElement;
   private _domContainer: HTMLDivElement;
   private _popupContainer: HTMLDivElement;
@@ -85,12 +84,6 @@ export default class Settings {
 
   constructor(container: HTMLDivElement) {
     this._domContainer = container;
-
-    this._settingsButton = document.createElement('button') as HTMLButtonElement;
-    this._settingsButton.classList.add('settings');
-    this._settingsButton.innerText = "Settings";
-    this._domContainer.appendChild(this._settingsButton);
-    this._settingsButton.onclick = ():void => this.showPopup();
 
     this._popupContainer = document.getElementById('popup') as HTMLDivElement;
     this._domContainer.appendChild(this._popupContainer);
