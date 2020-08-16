@@ -1,6 +1,6 @@
 import { SimApp } from './SimApp'
 import { PreviewApp } from './PreviewApp'
-import './sass/hud.scss';
+import './sass/ui.scss';
 
 
 

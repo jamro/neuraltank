@@ -30,3 +30,6 @@ The neural network is evolved by a [genetic algorithm](https://en.wikipedia.org/
 1. Download sources from GitHub
 2. Install all dependencies by executing `npm i` in the project folder
 3. Run `npm start` and visit [http://localhost:9000](http://localhost:9000)
+
+# Import population
+Evolving neural network takes time. There is a snapshot of 1000th generation for the impatient. Download the [neuraltank-gen1000-size200.json](neuraltank-gen1000-size200.json) file and import it to skip 1K of generation steps.

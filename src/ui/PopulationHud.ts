@@ -1,13 +1,15 @@
 import Population from "../evolution/Population";
-import Settings from "./Settings";
+import SettingsPopup from "./SettingsPopup";
 import SimControl from "./SimControl";
+import ImportPopup from "./importPopup";
 
 export default class PopulationHud {
 
   private _domContainer: HTMLDivElement;
   private _population: Population;
   private _canvas: HTMLCanvasElement;
-  private _settings: Settings;
+  private _settings: SettingsPopup;
+  private _import: ImportPopup;
   private _controls: SimControl;
 
   constructor(containerName: string, population: Population) {
@@ -26,8 +28,12 @@ export default class PopulationHud {
       window.location.reload();
     };
 
-    this._settings = new Settings(this._domContainer);
+    this._settings = new SettingsPopup(this._domContainer);
+    this._import = new ImportPopup(this._domContainer);
     this._controls.settings.onclick = ():void => this._settings.showPopup();
+    this._controls.import.onclick = ():void => this._import.showPopup();
+
+    this._controls.export.onclick = ():void => this.export();
 
     this._population = population;
 
@@ -36,11 +42,32 @@ export default class PopulationHud {
     }, 50);
   }
 
-  get settings():Settings {
+  public get settingsPopup():SettingsPopup {
     return this._settings;
   }
 
-  refresh() {
+  public get importPopup():ImportPopup {
+    return this._import;
+  }
+
+  public export():void {
+    let element: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(this._population.toJSON())));
+    element.setAttribute('download', `neuraltank-gen${this._population.generation}-size${this._population.size}.json`);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
+  public import():void {
+
+  }
+
+  public refresh() {
     let completed:number = 0;
     let inProgress:number = 0;
     let i:number;

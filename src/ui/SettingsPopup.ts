@@ -1,8 +1,8 @@
-export default class Settings {
+import Popup from "./Popup";
+
+export default class SettingsPopup extends Popup {
 
   private _saveButton: HTMLButtonElement;
-  private _domContainer: HTMLDivElement;
-  private _popupContainer: HTMLDivElement;
   private _concurrency: number = 1;
   private _simSpeed: number = 1;
   private _trainingUnits: number = 4;
@@ -83,13 +83,8 @@ export default class Settings {
   }
 
   constructor(container: HTMLDivElement) {
-    this._domContainer = container;
+    super(container, 'settings');
 
-    this._popupContainer = document.getElementById('popup') as HTMLDivElement;
-    this._domContainer.appendChild(this._popupContainer);
-    this.closePopup();
-
-    document.getElementById('close-button').onclick = () => this.closePopup();
     this._saveButton = document.getElementById('save-button') as HTMLButtonElement;
     this._saveButton.onclick = ():void => this.save();
 
@@ -135,14 +130,6 @@ export default class Settings {
 
   public onSave(callback: () => void):void {
     this._saveCallbacks.push(callback);
-  }
-
-  public showPopup():void {
-    this._popupContainer.style.display = 'block';
-  }
-
-  public closePopup():void {
-    this._popupContainer.style.display = 'none';
   }
 
   private load():void {

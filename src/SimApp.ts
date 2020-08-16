@@ -18,41 +18,53 @@ export class SimApp {
     }
     this._populationHud = new PopulationHud('summary', this._population );
 
-    for(let i:number=0; i < this._populationHud.settings.concurrency; i++) {
+    for(let i:number=0; i < this._populationHud.settingsPopup.concurrency; i++) {
       this.createSimPlayer();
     }
 
-    this._populationHud.settings.onSave(():void => {
+    this._populationHud.settingsPopup.onSave(():void => {
       while(this._players.length > 0) {
         let p:SimPlayer = this._players.pop();
         p.releaseUnits();
         p.stop();
         p.destroy();
       }
-      while(this._players.length < this._populationHud.settings.concurrency) {
+      while(this._players.length < this._populationHud.settingsPopup.concurrency) {
         this.createSimPlayer();
       }
 
       this._players.forEach((p):void => {
-        p.timeLimit = this._populationHud.settings.battleDuration;
-        p.simSpeed = this._populationHud.settings.simSpeed;
-        p.trainingUnits = this._populationHud.settings.trainingUnits;
-        p.dummyUnits = this._populationHud.settings.dummyUnits;
-        p.dummyType = this._populationHud.settings.dummyType;
-        p.renderer = this._populationHud.settings.renderer;
+        p.timeLimit = this._populationHud.settingsPopup.battleDuration;
+        p.simSpeed = this._populationHud.settingsPopup.simSpeed;
+        p.trainingUnits = this._populationHud.settingsPopup.trainingUnits;
+        p.dummyUnits = this._populationHud.settingsPopup.dummyUnits;
+        p.dummyType = this._populationHud.settingsPopup.dummyType;
+        p.renderer = this._populationHud.settingsPopup.renderer;
       })
-    })
+    });
+    this._populationHud.importPopup.onLoad((json:any):void => {
+      this._population.restoreFromJSON(json);
+      while(this._players.length > 0) {
+        let p:SimPlayer = this._players.pop();
+        p.releaseUnits();
+        p.stop();
+        p.destroy();
+      }
+      while(this._players.length < this._populationHud.settingsPopup.concurrency) {
+        this.createSimPlayer();
+      }
+    });
   }
 
   private createSimPlayer():void {
     let simRoot:HTMLDivElement = document.getElementById('sim') as HTMLDivElement;
     let sim: SimPlayer = new SimPlayer(simRoot);
-    sim.timeLimit = this._populationHud.settings.battleDuration;
-    sim.simSpeed = this._populationHud.settings.simSpeed;
-    sim.trainingUnits = this._populationHud.settings.trainingUnits;
-    sim.dummyUnits = this._populationHud.settings.dummyUnits;
-    sim.dummyType = this._populationHud.settings.dummyType;
-    sim.renderer = this._populationHud.settings.renderer;
+    sim.timeLimit = this._populationHud.settingsPopup.battleDuration;
+    sim.simSpeed = this._populationHud.settingsPopup.simSpeed;
+    sim.trainingUnits = this._populationHud.settingsPopup.trainingUnits;
+    sim.dummyUnits = this._populationHud.settingsPopup.dummyUnits;
+    sim.dummyType = this._populationHud.settingsPopup.dummyType;
+    sim.renderer = this._populationHud.settingsPopup.renderer;
 
     sim.create();
     sim.onFinish(() => {

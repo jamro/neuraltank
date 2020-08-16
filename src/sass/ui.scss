@@ -23,7 +23,10 @@ button.back {
 
   .controls {
     $margin: 0.2em;
+    $buttonWidth: 25%;
+
     position: absolute;
+    text-align: left;
     bottom: 0;
     left: 0;
     padding: $margin;
@@ -41,7 +44,7 @@ button.back {
       background-color: $bgcolor;
       outline: 0;
       margin: 0 $margin;
-      width: calc(50% - #{2 * $margin});
+      width: calc(#{$buttonWidth} - #{2 * $margin});
     }
 
     button:active {
@@ -50,13 +53,23 @@ button.back {
     }
   }
 
-  #popup {
-    position: fixed;
-    top: 0;
-    left: 0;
+  #settings {
     width: 70%;
     height: 90%;
     margin: 2% 15%;
+  }
+
+  #import {
+    width: 50%;
+    height: 50%;
+    margin: 10% 25%;
+  }
+
+  .popup {
+    font-family: Courier;
+    position: fixed;
+    top: 0;
+    left: 0;
     background-color: $bgcolor;
     border: 3px $color solid;
     color: $color;
@@ -79,7 +92,7 @@ button.back {
       padding: 0.2em 0.5em;
       margin-top: 0;
 
-      #close-button {
+      .close-button {
         float: right;
         font-size: 1em;
         cursor: pointer;

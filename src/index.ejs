@@ -9,8 +9,13 @@
   <body style="color: #fff; background-color: #000">
     <div style="border: 1px solid #0f0; padding: 1em; color: #0f0; text-align: center; background-color: #050">
       <span id="summary">
-        <div id="popup">
-          <h1>Settings <button id="close-button">X</button></h1>
+        <div id="import" class="popup">
+          <h1>Import Population <button class="close-button">X</button></h1>
+          <p>Choose population file from your local drive:</p>
+          <p><input type="file" id="import-file" accept=".json"/></p>
+        </div>
+        <div id="settings" class="popup">
+          <h1>Settings <button class="close-button">X</button></h1>
           <table>
             <tbody>
               <tr>

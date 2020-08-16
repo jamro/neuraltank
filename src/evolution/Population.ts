@@ -145,6 +145,10 @@ export default class Population {
       return;
     }
     let json:any = JSON.parse(jsonString);
+    this.restoreFromJSON(json);
+  }
+
+  public restoreFromJSON(json:any):void {
     this._generation = json.generation;
     this._unitIndex = json.unitIndex;
     this._bestScore = json.bestScore;
