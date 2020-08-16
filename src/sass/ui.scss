@@ -1,5 +1,18 @@
 @import 'theme.scss';
 
+footer {
+  font-family: Courier;
+  font-size: 0.8em;
+  color: #0f0;
+  margin: 1em;
+  text-align: center;
+
+  a {
+    color: #ff0;
+    font-weight: bold;
+  }
+}
+
 button.back {
   font-family: Courier;
   margin: 1em;
