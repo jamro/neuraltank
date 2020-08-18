@@ -11,6 +11,7 @@ export default class PopulationHud {
   private _settings: SettingsPopup;
   private _import: ImportPopup;
   private _controls: SimControl;
+  private _changeCallbacks: (() => void)[] = [];
 
   constructor(containerName: string, population: Population) {
     this._domContainer = document.getElementById(containerName) as HTMLDivElement;
@@ -31,9 +32,11 @@ export default class PopulationHud {
     this._settings = new SettingsPopup(this._domContainer);
     this._import = new ImportPopup(this._domContainer);
     this._controls.settings.onclick = ():void => this._settings.showPopup();
+    this._settings.onSave(():void => this._changeCallbacks.forEach((c) => c()));
     this._controls.import.onclick = ():void => this._import.showPopup();
 
     this._controls.export.onclick = ():void => this.export();
+    this._controls.clear.onclick = ():void => this.clearPopulation();
 
     this._population = population;
 
@@ -63,8 +66,13 @@ export default class PopulationHud {
     document.body.removeChild(element);
   }
 
-  public import():void {
-
+  clearPopulation(): void {
+    const confirmed: boolean = confirm('Are you sure? This action will result in removing your population progress and starting with a new, random population from scratch');
+    if(!confirmed) {
+      return;
+    }
+    this._population.reset();
+    this._changeCallbacks.forEach((c) => c());
   }
 
   public refresh() {
@@ -114,6 +122,10 @@ export default class PopulationHud {
     }
 
     this._controls.preview.style.display = this._population.bestGenome ? 'inline-block' : 'none';
+  }
+
+  public onChange(callback: () => void):void {
+    this._changeCallbacks.push(callback);
   }
 
 }

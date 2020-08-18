@@ -36,8 +36,7 @@ button.back {
 
   .controls {
     $margin: 0.2em;
-    $buttonWidth: 25%;
-
+    $buttonWidth: 20%;
     position: absolute;
     text-align: left;
     bottom: 0;
@@ -48,6 +47,7 @@ button.back {
     width: calc(100% - #{2 * $margin});
 
     button {
+      font-size: 0.7em;
       font-family: Courier;
       padding: auto;
       height: 3em;

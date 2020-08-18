@@ -22,7 +22,7 @@ export class SimApp {
       this.createSimPlayer();
     }
 
-    this._populationHud.settingsPopup.onSave(():void => {
+    this._populationHud.onChange(():void => {
       while(this._players.length > 0) {
         let p:SimPlayer = this._players.pop();
         p.releaseUnits();

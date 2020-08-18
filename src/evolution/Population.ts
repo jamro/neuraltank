@@ -48,6 +48,17 @@ export default class Population {
   }
 
   create(size: number):void {
+
+    this._units = [];
+    this._unitIndex = 1;
+    this._generation = 1;
+    this._bestScore = 0;
+    this._worstScore = 0;
+    this._diversity = 100;
+    this._scoreHistogram = [];
+    this._lastCompleteTime = (new Date()).getTime();
+    this._completeTimes = [];
+
     while(this.size < size) {
       let genome: Uint8Array = new Uint8Array(config.genomeLength);
       for(let i:number = 0; i < config.genomeLength; i++) {
@@ -184,6 +195,11 @@ export default class Population {
     let averageTime:number = this._completeTimes.reduce((sum:number, val:number):number => sum + val, 0)/count;
 
     return 60000/averageTime;
+  }
+
+  reset() {
+    const size:number = this.size;
+    this.create(size);
   }
 
 }
