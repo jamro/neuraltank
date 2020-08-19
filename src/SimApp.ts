@@ -41,6 +41,8 @@ export class SimApp {
         p.dummyType = this._populationHud.settingsPopup.dummyType;
         p.renderer = this._populationHud.settingsPopup.renderer;
       })
+
+      this._population.mutationProbability = this._populationHud.settingsPopup.mutation;
     });
     this._populationHud.importPopup.onLoad((json:any):void => {
       this._population.restoreFromJSON(json);

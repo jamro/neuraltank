@@ -14,6 +14,7 @@ export default class Population {
   private _scoreHistogram:number[] = [];
   private _lastCompleteTime:number = (new Date()).getTime();
   private _completeTimes:number[] = [];
+  private _mutationProbability: number = 0.01;
 
   get scoreHistogram():number[] {
     return this._scoreHistogram;
@@ -45,6 +46,14 @@ export default class Population {
 
   get units():Unit[] {
     return this._units;
+  }
+
+  get mutationProbability():number {
+    return this._mutationProbability;
+  }
+
+  set mutationProbability(v:number) {
+    this._mutationProbability = v;
   }
 
   create(size: number):void {
@@ -111,7 +120,8 @@ export default class Population {
       let parentA:Unit = this.pickFitUnit(oldGeneration);
       let parentB:Unit = this.pickFitUnit(oldGeneration);
       let childGenome: Genome = parentA.genome.crossover(parentB.genome);
-      if(Math.random() > 0.99) {
+      if(Math.random() > (1-this._mutationProbability)) {
+        console.log('mutate')
         childGenome = childGenome.mutate();
       }
       newGeneration.push(new Unit('tank-' + this._unitIndex++, childGenome));

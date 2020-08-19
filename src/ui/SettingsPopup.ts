@@ -9,6 +9,7 @@ export default class SettingsPopup extends Popup {
   private _dummyUnits: number = 0;
   private _dummyType: string = 'crawler';
   private _renderer: string = 'debug';
+  private _mutation: number = 0.01;
   private _battleDuration: number = 60000;
   private _saveCallbacks: (() => void)[] = [];
 
@@ -59,6 +60,16 @@ export default class SettingsPopup extends Popup {
   public set trainingUnits(v:number) {
     this._trainingUnits = v;
     let input: HTMLSelectElement = document.getElementById('units-training') as HTMLSelectElement;
+    input.value = v.toString();
+  }
+
+  public get mutation():number {
+    return this._mutation;
+  }
+
+  public set mutation(v:number) {
+    this._mutation = v;
+    let input: HTMLSelectElement = document.getElementById('mutation') as HTMLSelectElement;
     input.value = v.toString();
   }
 
@@ -125,6 +136,12 @@ export default class SettingsPopup extends Popup {
       this._renderer = input.value;
     }
     this.renderer = this._renderer;
+
+    document.getElementById('mutation').onchange = (e:Event): void => {
+      let input: HTMLSelectElement = e.target as HTMLSelectElement;
+      this._mutation = Number(input.value);
+    }
+    this.mutation = this._mutation;
     this.load();
   }
 
@@ -159,6 +176,9 @@ export default class SettingsPopup extends Popup {
     if(data.renderer !== undefined) {
       this.renderer = data.renderer;
     }
+    if(data.mutation !== undefined) {
+      this.mutation = data.mutation;
+    }
   }
 
   private save():void {
@@ -173,6 +193,7 @@ export default class SettingsPopup extends Popup {
       trainingUnits: this._trainingUnits,
       dummyType: this.dummyType,
       renderer: this.renderer,
+      mutation: this.mutation,
     }
     localStorage.setItem('nn-sim-settings', JSON.stringify(data));
   }
