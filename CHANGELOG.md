@@ -1,3 +1,14 @@
+## 1.1.0 (2020-08-19)
+
+* fix: disable preview button when for 1st generation ([b36eb49](https://github.com/jamro/neuraltank/commit/b36eb49))
+* feat: add footer with github link ([ae6235d](https://github.com/jamro/neuraltank/commit/ae6235d))
+* feat: allow import/export of population ([ea89258](https://github.com/jamro/neuraltank/commit/ea89258))
+* feat: allow clear population to start from scratch ([ee56b48](https://github.com/jamro/neuraltank/commit/ee56b48))
+* feat: generate code of the best unit in the population ([a790152](https://github.com/jamro/neuraltank/commit/a790152))
+* refactor: refactor UI components ([1167b13](https://github.com/jamro/neuraltank/commit/1167b13))
+
+
+
 ## 1.0.0 (2020-07-30)
 
 * refactor: bootstrap typescript AiScript project ([8b18ba9](https://github.com/jamro/neuraltank/commit/8b18ba9))
@@ -26,6 +37,3 @@
 * feat: track diversity of the population ([89554c6](https://github.com/jamro/neuraltank/commit/89554c6))
 * fix: keep players at the same position when restart ([09fe3dd](https://github.com/jamro/neuraltank/commit/09fe3dd))
 * Initial commit ([3368247](https://github.com/jamro/neuraltank/commit/3368247))
-
-
-
