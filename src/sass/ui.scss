@@ -67,6 +67,13 @@ button.back, button.copy {
       width: calc(#{$buttonWidth} - #{2 * $margin});
     }
 
+    button:disabled {
+      color: $color2;
+      border-color: $color2;
+      background-color: $bgcolor2;
+      cursor: not-allowed;
+    }
+
     button:active {
       color: $bgcolor;
       background-color: $color;

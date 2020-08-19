@@ -53,6 +53,7 @@ export default class Population {
     this._unitIndex = 1;
     this._generation = 1;
     this._bestScore = 0;
+    this._bestGenome = null;
     this._worstScore = 0;
     this._diversity = 100;
     this._scoreHistogram = [];

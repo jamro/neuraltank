@@ -121,7 +121,7 @@ export default class PopulationHud {
       ctx.fillRect(20+i*barWidth, 360+120- barHeights[i], barWidth-1, barHeights[i]);
     }
 
-    this._controls.preview.style.display = this._population.bestGenome ? 'inline-block' : 'none';
+    this._controls.preview.disabled = (this._population.bestGenome == null);
   }
 
   public onChange(callback: () => void):void {
