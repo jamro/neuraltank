@@ -4,6 +4,9 @@ The project is about evolving a [neural network](https://en.wikipedia.org/wiki/N
 ![Screenshot](./screenshot.png)
 
 ## Neural Network
+
+![Network Structure](./nn.png)
+
 ### Inputs
 - **wallDistance** - distance to the nearest wall in radar range. The value is in range of `-1` to `1`. The input is set to `1` if there is no wall in radar range.
 - **enemyDistance** - distance to the nearest enemy in radar range. The value is in range of `-1` to `1`. The input is set to `1` if there is no enemy in radar range.
