@@ -12,6 +12,7 @@ export enum ActivationType {
 export default class Activation {
 
   private _type: ActivationType = ActivationType.Linear;
+  
   public get type() : ActivationType {
     return this._type;
   }
@@ -47,7 +48,7 @@ export default class Activation {
         if(value > 100 || value < -100) return 0;
         return Math.exp(-value*value);
       default:
-        throw new Error('Unsupported  activation type: ' + this._type);
+        throw new Error('Unsupported activation type: ' + this._type);
     }
   }
 

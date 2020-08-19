@@ -13,7 +13,14 @@ footer {
   }
 }
 
-button.back {
+#aiscript {
+  background-color: #000;
+  color: #0f0;
+  border-color: #050;
+  margin-top: 1em;
+}
+
+button.back, button.copy {
   font-family: Courier;
   margin: 1em;
   padding: 1em;

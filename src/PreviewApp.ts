@@ -1,6 +1,7 @@
 import Population from "./evolution/Population";
 import config from './config';
 import code from './tankAI/aiScript';
+
 declare const JsBattle: JsBattleModule;
 
 export class PreviewApp {
@@ -12,6 +13,8 @@ export class PreviewApp {
   private _renderer: Renderer;
   private _canvas: HTMLCanvasElement;
   private _backButton: HTMLButtonElement;
+  private _copyButton: HTMLButtonElement;
+  private _codeContainer: HTMLTextAreaElement;
 
   constructor() {
     document.body.innerHTML = '';
@@ -27,6 +30,14 @@ export class PreviewApp {
     this._backButton.onclick = ():void => {
       window.location.replace('/#sim');
       window.location.reload();
+    };
+    this._copyButton = document.createElement('button') as HTMLButtonElement;
+    this._copyButton.classList.add('copy');
+    this._copyButton.innerText = "Copy Script to the Clipboard";
+    document.body.appendChild(this._copyButton);
+    this._copyButton.onclick = ():void => {
+      this._codeContainer.select();
+      document.execCommand('copy');
     };
     document.body.appendChild(document.createElement('br'));
 
@@ -61,9 +72,18 @@ export class PreviewApp {
     }
 
     this._canvas = document.createElement('canvas') as HTMLCanvasElement;
-    this._canvas.style.width = '900px';
-    this._canvas.style.height = '600px';
+    this._canvas.style.width = '600px';
+    this._canvas.style.height = '400px';
     this._domContainer.appendChild(this._canvas);
+
+    this._codeContainer = document.createElement('textarea') as HTMLTextAreaElement;
+    this._domContainer.appendChild(this._codeContainer);
+    let brainData:string = JSON.stringify(Array.from(new Uint8Array(this._population.bestGenome.data)))
+    brainData = `new Uint8Array(${brainData}).buffer`;
+    this._codeContainer.innerText = code.replace(/ai\.init\(settings, info\)/, 'ai.init(settings, {initData: { braindump: ' + brainData + '}})');
+    this._codeContainer.style.width = '600px'
+    this._codeContainer.style.height = '400px'
+    this._codeContainer.id = 'aiscript'
 
     this._renderer = JsBattle.createRenderer('debug') as PixiRenderer;
     this._renderer.init(this._canvas);
