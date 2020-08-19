@@ -26,7 +26,7 @@ export default class TankAI {
     // - BOOST
     this._brain = new Brain();
     this._brain.createLayers([6, 7, 6, 4]);
-    //console.log((this._brain.createSnapshot() as ArrayBuffer).byteLength)
+
     this._brain.restoreSnapshot(info.initData.braindump);
 
   }
