@@ -1,64 +1,32 @@
 {
   "name": "neuraltank",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "clean": "rimraf dist",
-    "start": "concurrently \"npm run watch-ai\" \"npm run watch-app\"",
-    "watch-app": "webpack-dev-server --mode development",
-    "watch-ai": "webpack --mode production --config webpack.tank.config.js --watch",
-    "build": "npm run build-ai && npm run build-app",
-    "build-app": "webpack --mode production",
-    "build-ai": "webpack --mode production --config webpack.tank.config.js",
-    "test": "mocha -r './tsnode.js' test/**/*.test.ts",
-    "commit": "npx git-cz",
-    "version": "conventional-changelog -p neuraltank -i CHANGELOG.md -s && git add CHANGELOG.md"
+    "build": "webpack --mode production",
+    "postinstall": "cpx node_modules/jsbattle-engine/dist/js/jsbattle.min.js dist/js/ && cpx node_modules/jsbattle-engine/dist/tanks/lib/tank.js dist/tanks/lib/",
+    "serve": "webpack serve --mode development"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jamro/neuraltank.git"
   },
-  "author": "Krzysztof Jamroz <jamro@jamro.net>",
-  "license": "MIT",
+  "author": "",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/jamro/neuraltank/issues"
   },
   "homepage": "https://github.com/jamro/neuraltank#readme",
   "dependencies": {
-    "@types/npm": "^2.0.31",
-    "jsbattle-engine": "^3.4.0"
+    "@tensorflow/tfjs": "^4.10.0",
+    "jsbattle-engine": "^3.7.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^8.0.0",
-    "@types/node-sass": "^4.11.1",
-    "@types/sinon": "^9.0.4",
-    "chai": "^4.2.0",
-    "commitizen": "^4.1.2",
-    "concurrently": "^5.2.0",
-    "copy-webpack-plugin": "^6.0.3",
-    "css-loader": "^3.6.0",
-    "css-modules-typescript-loader": "^4.0.0",
-    "cz-conventional-changelog": "^3.2.0",
-    "html-webpack-plugin": "^4.3.0",
-    "mocha": "^8.0.1",
-    "rimraf": "^3.0.2",
-    "sass": "^1.26.10",
-    "sass-loader": "^9.0.2",
-    "sinon": "^9.0.2",
-    "style-loader": "^1.2.1",
-    "ts-auto-mock": "^2.3.3",
-    "ts-loader": "^8.0.1",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.6",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+    "copy-webpack-plugin": "^11.0.0",
+    "cpx": "^1.5.0",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
   }
 }
