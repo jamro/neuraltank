@@ -14,10 +14,21 @@ module.exports = {
     compress: true,
     port: 9000,
   },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  },
   plugins: [
     new CopyPlugin({
       patterns: [
         { from: "src/public" },
+        { from: "node_modules/jsbattle-engine/dist/js/jsbattle.min.js", to: "js/" },
+        { from: "node_modules/jsbattle-engine/dist/tanks/lib/tank.js", to: "tanks/lib/" },
+        { from: "node_modules/jsbattle-engine/dist/img", to: 'img'},
       ],
     }),
   ],

@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
-    "postinstall": "cpx node_modules/jsbattle-engine/dist/js/jsbattle.min.js dist/js/ && cpx node_modules/jsbattle-engine/dist/tanks/lib/tank.js dist/tanks/lib/",
+    "postinstall": "#cpx node_modules/jsbattle-engine/dist/js/jsbattle.min.js dist/js/ && cpx node_modules/jsbattle-engine/dist/tanks/lib/tank.js dist/tanks/lib/",
     "serve": "webpack serve --mode development"
   },
   "repository": {
@@ -20,11 +20,18 @@
   "homepage": "https://github.com/jamro/neuraltank#readme",
   "dependencies": {
     "@tensorflow/tfjs": "^4.10.0",
+    "@tensorflow/tfjs-backend-wasm": "^4.10.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.10.0",
+    "bootstrap": "^5.3.1",
+    "chart.js": "^4.3.3",
+    "jquery": "^3.7.0",
     "jsbattle-engine": "^3.7.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",
     "cpx": "^1.5.0",
+    "css-loader": "^6.8.1",
+    "style-loader": "^3.3.3",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"

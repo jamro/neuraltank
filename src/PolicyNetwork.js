@@ -82,12 +82,6 @@ export default class PolicyNetwork {
     this.allGradients = [];
     this.allRewards = [];
     this.gameScores = [];
-
-    console.log(
-      "Network outputs",
-      this.policyNet.predict(tf.tensor2d([[-1]])).dataSync()[0],
-      this.policyNet.predict(tf.tensor2d([[1]])).dataSync()[0],
-    )
   }
 
   onBatchFinish() {
