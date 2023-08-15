@@ -68,9 +68,8 @@ export default class PolicyNetwork extends EventTarget {
     this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
 
     this.policyNet = tf.sequential();
-    this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu', inputShape: [1] }));
+    this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu', inputShape: [2] }));
     this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu' }));
-    this.policyNet.add(tf.layers.dense({ units: 8, activation: 'elu' }));
     this.policyNet.add(tf.layers.dense({units: 1}));
 
     this.allGradients = [];

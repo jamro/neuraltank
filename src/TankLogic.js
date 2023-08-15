@@ -49,7 +49,7 @@ export default class TankLogic {
     
     const input = [
       state.radar.enemy ? 1 : -1,
-      //_this.lastEnemyPosBeamAngle
+      _this.lastEnemyPosBeamAngle
     ]
 
     const action = policy.train(input, score.getScore())
