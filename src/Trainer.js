@@ -1,3 +1,5 @@
+const INIT_EPOCH_SIZE = 15
+
 export default class Trainer extends EventTarget {
 
   constructor(policy, tankLogic, jsBattle) {
@@ -6,7 +8,7 @@ export default class Trainer extends EventTarget {
     this.canvas = document.getElementById('battlefield');
     this.policy = policy
     this.tankLogic = tankLogic
-    this.epochSize = 10
+    this.epochSize = INIT_EPOCH_SIZE
     this.epochIndex = 0
     this._simSpeed = 1
     this._simulation = null
@@ -42,7 +44,12 @@ export default class Trainer extends EventTarget {
       this.episodeIndex = i
       await this.runEpisode()   
     }
-    this.scoreHistory.push({x: this.epochIndex+1, y: mean(this.policy.gameScores)})
+    this.scoreHistory.push({
+      x: this.epochIndex+1, 
+      mean: mean(this.policy.gameScores), 
+      min: Math.min(...this.policy.gameScores), 
+      max: Math.max(...this.policy.gameScores)
+    })
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()
     }
@@ -118,7 +125,7 @@ export default class Trainer extends EventTarget {
 
     const trainerState = JSON.parse(rawTrainerState)
 
-    this.epochSize = 10
+    this.epochSize = INIT_EPOCH_SIZE
     this.epochIndex = trainerState.epochIndex
     this._simSpeed = 1
     this._simulation = null

@@ -1,5 +1,8 @@
 import * as tf from '@tensorflow/tfjs';
 
+const INIT_DISCOUNT_RATE = 0.98
+const INIT_LEARNING_RATE = 0.01
+
 const MODEL_SAVE_PATH = 'indexeddb://neural-tank';
 
 function discountRewards(rewards, discountRate) {
@@ -61,8 +64,8 @@ function scaleAndAverageGradients(allGradients, normalizedRewards) {
 export default class PolicyNetwork extends EventTarget {
   constructor() {
     super()
-    this.discountRate = 0.95
-    this.optimizer = tf.train.adam(0.05);
+    this.discountRate = INIT_DISCOUNT_RATE
+    this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
 
     this.policyNet = tf.sequential();
     this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu', inputShape: [1] }));
@@ -185,8 +188,8 @@ export default class PolicyNetwork extends EventTarget {
 
       this.dateSaved = modelsInfo[MODEL_SAVE_PATH].dateSaved
 
-      this.discountRate = 0.95
-      this.optimizer = tf.train.adam(0.05);
+      this.discountRate = INIT_DISCOUNT_RATE
+      this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
       return true
     } else {
       return false

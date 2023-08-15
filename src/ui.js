@@ -18,11 +18,11 @@ export default function initUI(trainer, tankLogic, policy) {
   const ctx = document.getElementById('score-chart');
 
   const scoreChartData = {
-    labels : trainer.scoreHistory.map(e => e.x),
+    labels : trainer.scoreHistory.map(e => 'epoch ' + e.x),
     datasets : [
-      {
-        data : trainer.scoreHistory.map(e => e.y),
-      }
+      { data : trainer.scoreHistory.map(e => e.min), label: "min", borderColor: '#bbbbbb' },
+      { data : trainer.scoreHistory.map(e => e.mean), label: "mean", borderColor: '#0d6efd' },
+      { data : trainer.scoreHistory.map(e => e.max), label: "max", borderColor: '#bbbbbb' }
     ]
   }
 
@@ -31,10 +31,18 @@ export default function initUI(trainer, tankLogic, policy) {
 		data: scoreChartData,
     options: {
       animation: false, 
-      plugins: {
-        legend: {
-          display: false
+      scales:{
+        x: {
+          ticks: false
         }
+      },
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: false
       }
     }
 	});
@@ -66,7 +74,7 @@ export default function initUI(trainer, tankLogic, policy) {
   episodeNumber.text(`${trainer.episodeIndex} / ${trainer.epochSize}`)
   epochNumber.text(trainer.epochIndex+1)
   policySaveDate.text((trainer.policy.dateSaved || '-').toString())
-  bestScore.text(trainer.scoreHistory.length ? trainer.scoreHistory[trainer.scoreHistory.length-1].y.toFixed(2) : '-')
+  bestScore.text(trainer.scoreHistory.length ? trainer.scoreHistory[trainer.scoreHistory.length-1].mean.toFixed(2) : '-')
   epochDuration.text(ms2txt(trainer.epochDuration))
 
   trainer.addEventListener('save', () => {
@@ -82,16 +90,16 @@ export default function initUI(trainer, tankLogic, policy) {
   trainer.addEventListener('epochComplete', () => {
     epochNumber.text(trainer.epochIndex+1)
     epochDuration.text(ms2txt(trainer.epochDuration))
-    bestScore.text(trainer.scoreHistory[trainer.scoreHistory.length-1].y.toFixed(2))
+    bestScore.text(trainer.scoreHistory[trainer.scoreHistory.length-1].mean.toFixed(2))
     epochProgressBar.css('width', '0%')
     episodeProgressBar.css('width', '0%')
     episodeNumber.text(`0 / ${trainer.epochSize}`)
 
-    scoreChartData.labels = trainer.scoreHistory.map(e => e.x)
-    scoreChartData.datasets[0].data = trainer.scoreHistory.map(e => e.y)
+    scoreChartData.labels = trainer.scoreHistory.map(e => 'epoch ' + e.x)
+    scoreChartData.datasets[0].data = trainer.scoreHistory.map(e => e.min)
+    scoreChartData.datasets[1].data = trainer.scoreHistory.map(e => e.mean)
+    scoreChartData.datasets[2].data = trainer.scoreHistory.map(e => e.max)
     scoreChart.update()
-
-    console.log("Best score:", trainer.scoreHistory[trainer.scoreHistory.length-1].y.toFixed(2))
   })
 
   trainer.addEventListener('episodeComplete', () => {
