@@ -16,7 +16,13 @@
     <div class="container">
       <div class="row">
         <div class="col-6">
-          <div class="row" style="margin-bottom: 1em">
+          <div class="card">
+            <h5 class="card-header">Persistency <button id="btn-remove-stored-model" type="button" class="btn btn-danger btn-sm float-end">Delete</button></h5>
+            <div class="card-body">
+              Last saved: <em id="policy-save-date" class="small">-</em>
+            </div>
+          </div>
+          <div class="row mt-3" style="margin-bottom: 1em">
             <div class="col-12">
               <button id="btn-preview" type="button" class="btn btn-success col-6" style="width: 100%; display: none">Preview Training</button>
               <button id="btn-train" type="button" class="btn btn-primary col-6" style="width: 100%">Fast Training</button>
@@ -62,10 +68,10 @@
         </div>
         <div class="col-6">
           <div class="card">
-            <h5 class="card-header">Best score</h5>
+            <h5 class="card-header">Scoring</h5>
             <div class="card-body" style="text-align: right;">
               <h1 class="card-title" id="best-score">-</h1>
-              <canvas id="score-chart" style="width: 100%"></canvas>
+              <canvas id="score-chart" style="width: 100%; height: 15em"></canvas>
             </div>
           </div>
         </div>

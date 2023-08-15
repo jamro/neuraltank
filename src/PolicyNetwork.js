@@ -1,5 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 
+const MODEL_SAVE_PATH = 'indexeddb://neural-tank';
+
 function discountRewards(rewards, discountRate) {
   const discountedBuffer = tf.buffer([rewards.length]);
   let prev = 0;
@@ -56,15 +58,16 @@ function scaleAndAverageGradients(allGradients, normalizedRewards) {
   });
 }
 
-export default class PolicyNetwork {
+export default class PolicyNetwork extends EventTarget {
   constructor() {
+    super()
     this.discountRate = 0.95
     this.optimizer = tf.train.adam(0.05);
 
     this.policyNet = tf.sequential();
     this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu', inputShape: [1] }));
     this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu' }));
-    //this.policyNet.add(tf.layers.dense({ units: 8, activation: 'elu' }));
+    this.policyNet.add(tf.layers.dense({ units: 8, activation: 'elu' }));
     this.policyNet.add(tf.layers.dense({units: 1}));
 
     this.allGradients = [];
@@ -76,6 +79,7 @@ export default class PolicyNetwork {
 
     this.currentActions = null
     this.totalReward = 0
+    this.dateSaved = null
   }
 
   onBatchStart() {
@@ -146,6 +150,46 @@ export default class PolicyNetwork {
       } else {
         record[key] = [gradients[key]];
       }
+    }
+  }
+
+  async saveModel() {
+    await this.policyNet.save(MODEL_SAVE_PATH);
+    const modelsInfo = await tf.io.listModels();
+    this.dateSaved = modelsInfo[MODEL_SAVE_PATH].dateSaved
+    this.dispatchEvent(new Event('save'))
+  }
+
+  async removeModel() {
+    this.dispatchEvent(new Event('remove'))
+    await tf.io.removeModel(MODEL_SAVE_PATH);
+    this.dateSaved = null
+    this.dispatchEvent(new Event('remove'))
+  }
+
+  async restoreModel() {
+    const modelsInfo = await tf.io.listModels();
+    if(!modelsInfo) return false
+    if (MODEL_SAVE_PATH in modelsInfo) {
+      this.policyNet = await tf.loadLayersModel(MODEL_SAVE_PATH);
+
+      this.allGradients = [];
+      this.allRewards = [];
+      this.gameScores = [];
+  
+      this.gameRewards = [];
+      this.gameGradients = [];
+  
+      this.currentActions = null
+      this.totalReward = 0
+
+      this.dateSaved = modelsInfo[MODEL_SAVE_PATH].dateSaved
+
+      this.discountRate = 0.95
+      this.optimizer = tf.train.adam(0.05);
+      return true
+    } else {
+      return false
     }
   }
 

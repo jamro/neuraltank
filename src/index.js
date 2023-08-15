@@ -16,11 +16,15 @@ import initUI from './ui';
   await tf.ready()
   console.log("TF Backend:", tf.getBackend())
 
-
   const policy = new PolicyNetwork()
   const tankLogic = new TankLogic(JsBattle, policy)
   tankLogic.installCallbacks(window)
   const trainer = new Trainer(policy, tankLogic, JsBattle)
+
+  if(!(await trainer.restore())) {
+    console.log('Stored model not found. creating...')
+    await trainer.save()
+  }
 
   initUI(trainer, tankLogic, policy)
 

@@ -12,14 +12,16 @@ export default function initUI(trainer, tankLogic, policy) {
   const epochProgressBar = $('#epoch-progressbar')
   const episodeProgressBar = $('#episode-progressbar')
   const bestScore = $('#best-score')
+  const policySaveDate = $('#policy-save-date')
+  const removeModelButton = $('#btn-remove-stored-model')
 
   const ctx = document.getElementById('score-chart');
 
   const scoreChartData = {
-    labels : [],
+    labels : trainer.scoreHistory.map(e => e.x),
     datasets : [
       {
-        data : [],
+        data : trainer.scoreHistory.map(e => e.y),
       }
     ]
   }
@@ -54,8 +56,28 @@ export default function initUI(trainer, tankLogic, policy) {
     trainer.simSpeed = 1
   })
 
+  removeModelButton.on('click', async () => {
+    removeModelButton.prop('disabled',false)
+    await trainer.removeStored()
+    removeModelButton.prop('disabled', !trainer.policy.dateSaved)
+  })
+
+  removeModelButton.prop('disabled', !trainer.policy.dateSaved)
   episodeNumber.text(`${trainer.episodeIndex} / ${trainer.epochSize}`)
   epochNumber.text(trainer.epochIndex+1)
+  policySaveDate.text((trainer.policy.dateSaved || '-').toString())
+  bestScore.text(trainer.scoreHistory.length ? trainer.scoreHistory[trainer.scoreHistory.length-1].y.toFixed(2) : '-')
+  epochDuration.text(ms2txt(trainer.epochDuration))
+
+  trainer.addEventListener('save', () => {
+    policySaveDate.text(trainer.policy.dateSaved.toString())
+    removeModelButton.prop('disabled', !trainer.policy.dateSaved)
+  })
+
+  trainer.addEventListener('remove', () => {
+    policySaveDate.text('-')
+    removeModelButton.prop('disabled', !trainer.policy.dateSaved)
+  })
 
   trainer.addEventListener('epochComplete', () => {
     epochNumber.text(trainer.epochIndex+1)

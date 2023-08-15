@@ -1,6 +1,6 @@
 export default class Trainer extends EventTarget {
 
-  constructor(policy, tankLogic, jsBattle, canvas) {
+  constructor(policy, tankLogic, jsBattle) {
     super()
     this.jsBattle = jsBattle
     this.canvas = document.getElementById('battlefield');
@@ -49,6 +49,7 @@ export default class Trainer extends EventTarget {
     this.policy.onBatchFinish()
     this.epochIndex++
     this._epochDuration = performance.now() - this._epochStartTime
+    await this.save()
     this.dispatchEvent(new Event('epochComplete'))
     
   }
@@ -106,6 +107,45 @@ export default class Trainer extends EventTarget {
       this._simulation.start()
     })
     this.dispatchEvent(new Event('episodeComplete'))
+  }
+
+  async restore() {
+    const policyResult = await this.policy.restoreModel()
+    if(!policyResult) return false
+
+    const rawTrainerState = localStorage.getItem("trainerState")
+    if(!rawTrainerState) return false
+
+    const trainerState = JSON.parse(rawTrainerState)
+
+    this.epochSize = 10
+    this.epochIndex = trainerState.epochIndex
+    this._simSpeed = 1
+    this._simulation = null
+    this._epochDuration = trainerState.epochDuration
+    this._epochStartTime = 0
+    this.episodeIndex = 0
+    this.scoreHistory = trainerState.scoreHistory
+
+    this.dispatchEvent(new Event('restore'))
+    return true
+  }
+
+  async save() {
+    await this.policy.saveModel()
+
+    localStorage.setItem("trainerState", JSON.stringify({
+      epochIndex: this.epochIndex,
+      scoreHistory: this.scoreHistory,
+      epochDuration: this._epochDuration,
+    }));
+
+    this.dispatchEvent(new Event('save'))
+  }
+
+  async removeStored() {
+    await this.policy.removeModel()
+    this.dispatchEvent(new Event('remove'))
   }
 
 }
