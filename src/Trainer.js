@@ -1,5 +1,5 @@
 const INIT_EPOCH_SIZE = 15
-
+const INIT_EPISODE_TIME_LIMIT = 15000
 export default class Trainer extends EventTarget {
 
   constructor(policy, tankLogic, jsBattle) {
@@ -16,6 +16,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = []
+    this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
   }
 
   get simulation() {
@@ -107,7 +108,7 @@ export default class Trainer extends EventTarget {
       })
       
       this._simulation.setSpeed(this._simSpeed)
-      this._simulation.timeLimit = 15000
+      this._simulation.timeLimit = this.episodeTimeLimit
     
       this.tankLogic.tankModel.moveTo(bx, by, 0)
     
@@ -133,6 +134,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
+    this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
 
     this.dispatchEvent(new Event('restore'))
     return true

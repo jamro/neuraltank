@@ -15,6 +15,11 @@ export default function initUI(trainer, tankLogic, policy) {
   const policySaveDate = $('#policy-save-date')
   const removeModelButton = $('#btn-remove-stored-model')
 
+  const inputEpochLen = $('#inputEpochLen')
+  const inputEpisodeLen = $('#inputEpisodeLen')
+  const inputLearningRate = $('#inputLearningRate')
+  const inputDiscountRate = $('#inputDiscountRate')
+
   const ctx = document.getElementById('score-chart');
 
   const scoreChartData = {
@@ -76,6 +81,15 @@ export default function initUI(trainer, tankLogic, policy) {
   policySaveDate.text((trainer.policy.dateSaved || '-').toString())
   bestScore.text(trainer.scoreHistory.length ? trainer.scoreHistory[trainer.scoreHistory.length-1].mean.toFixed(2) : '-')
   epochDuration.text(ms2txt(trainer.epochDuration))
+  inputEpochLen.val(trainer.epochSize)
+  inputEpisodeLen.val(trainer.episodeTimeLimit)
+  inputLearningRate.val(policy.learningRate)
+  inputDiscountRate.val(policy.discountRate)
+
+  inputEpochLen.prop('readonly', true);
+  inputEpisodeLen.prop('readonly', true);
+  inputLearningRate.prop('readonly', true);
+  inputDiscountRate.prop('readonly', true);
 
   trainer.addEventListener('save', () => {
     policySaveDate.text(trainer.policy.dateSaved.toString())

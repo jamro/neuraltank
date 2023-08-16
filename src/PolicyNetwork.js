@@ -84,6 +84,10 @@ export default class PolicyNetwork extends EventTarget {
     this.dateSaved = null
   }
 
+  get learningRate() {
+    return this.optimizer.learningRate
+  }
+
   onBatchStart() {
     this.allGradients = [];
     this.allRewards = [];
