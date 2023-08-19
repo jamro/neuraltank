@@ -1,5 +1,7 @@
-const INIT_EPOCH_SIZE = 15
-const INIT_EPISODE_TIME_LIMIT = 15000
+const INIT_EPOCH_SIZE = 10
+const INIT_EPISODE_TIME_LIMIT = 7000
+const INIT_REWARD_TYPE = 'radarBeam'
+
 export default class Trainer extends EventTarget {
 
   constructor(policy, tankLogic, jsBattle) {
@@ -17,6 +19,7 @@ export default class Trainer extends EventTarget {
     this.episodeIndex = 0
     this.scoreHistory = []
     this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
+    this.rewardType = INIT_REWARD_TYPE
   }
 
   get simulation() {
@@ -65,7 +68,7 @@ export default class Trainer extends EventTarget {
   async runEpisode() {
     await new Promise(async (onEpisodeEnd) => {
       this.policy.onGameStart()
-      const renderer = this.jsBattle.createRenderer('bw');
+      const renderer = this.jsBattle.createRenderer('debug');
       renderer.init(this.canvas);
       await new Promise(done => renderer.loadAssets(done))
       this._simulation = this.jsBattle.createSimulation(renderer);
@@ -73,34 +76,29 @@ export default class Trainer extends EventTarget {
       const bx = (this._simulation.battlefield.minX + this._simulation.battlefield.maxX)/2
       const by = (this._simulation.battlefield.minY + this._simulation.battlefield.maxY)/2;
       
-      this.tankLogic.createAI(this._simulation)
+      this.tankLogic.createAI(this._simulation, this.rewardType)
 
       const opponentCode = `importScripts('lib/tank.js');
         tank.init(function(settings, info) {
-
+          this.t = 0
         })
         tank.loop(function(state, control) {
-
+          this.t ++
+          control.THROTTLE = Math.cos(this.t/100)
         });`
       
       let opponent = this.jsBattle.createAiDefinition();
       opponent.fromCode('opponent', opponentCode);
       opponent.disableSandbox()
       let opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx+200, by+200, 0)
+      opponentTank.moveTo(bx-150, by, 45)
     
       opponent = this.jsBattle.createAiDefinition();
       opponent.fromCode('opponent', opponentCode);
       opponent.disableSandbox()
       opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx+200, by-200, 0)
+      opponentTank.moveTo(bx+100, by, -90)
     
-      opponent = this.jsBattle.createAiDefinition();
-      opponent.fromCode('opponent', opponentCode);
-      opponent.disableSandbox()
-      opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx-200, by, 0)
-      
       this._simulation.onFinish(() => {
         this.policy.onGameFinish()
         PIXI.utils.clearTextureCache()
@@ -135,6 +133,7 @@ export default class Trainer extends EventTarget {
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
     this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
+    this.rewardType = INIT_REWARD_TYPE
 
     this.dispatchEvent(new Event('restore'))
     return true

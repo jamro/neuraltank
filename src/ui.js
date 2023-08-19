@@ -19,6 +19,7 @@ export default function initUI(trainer, tankLogic, policy) {
   const inputEpisodeLen = $('#inputEpisodeLen')
   const inputLearningRate = $('#inputLearningRate')
   const inputDiscountRate = $('#inputDiscountRate')
+  const inputReward = $('#inputReward')
 
   const ctx = document.getElementById('score-chart');
 
@@ -90,6 +91,8 @@ export default function initUI(trainer, tankLogic, policy) {
   inputEpisodeLen.prop('readonly', true);
   inputLearningRate.prop('readonly', true);
   inputDiscountRate.prop('readonly', true);
+  inputReward.prop('disabled', true);
+  inputReward.val(trainer.rewardType)
 
   trainer.addEventListener('save', () => {
     policySaveDate.text(trainer.policy.dateSaved.toString())

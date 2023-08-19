@@ -9,6 +9,7 @@ export default class TankLogic {
     this.policy = policy
     this.jsBattle = jsBattle
     this.tankModel = null
+    this.rewardType = null
   }
 
   installCallbacks(target) {
@@ -23,42 +24,68 @@ export default class TankLogic {
     const policy = this.policy
     const init = this.init
     const loop = this.loop
-    const score = { getScore: () => this.tankModel.score}
-    const _this = {}
-    target.tankInit = (function (settings, info) { init(settings, info, _this, policy, score) }).bind(target)
-    target.tankLoop = (function (state, control) { loop(state, control, _this, policy, score) }).bind(target)
+    const _this = { 
+      getRewardType: () => this.rewardType,
+      getScore: () => this.tankModel.score
+    }
+    console.log(_this)
+    target.tankInit = (function (settings, info) { init(settings, info, _this, policy) }).bind(target)
+    target.tankLoop = (function (state, control) { loop(state, control, _this, policy) }).bind(target)
   }
 
   getScore() {
     this.tankModel.score
   }
 
-  init(settings, info, _this, policy, score) {
+  init(settings, info, _this, policy) {
     _this.lastEnemyPosBeamAngle = -1
+    _this.totalRadarScore = 0
   }
   
-  loop(state, control, _this, policy, score) {
+  loop(state, control, _this, policy) {
 
     // calculate angular position of the enemy within the radar beam
+    let enemyDistance = 300
+    let radarScore = -0.05
     if(state.radar.enemy) {
       let enemyPosBeamAngle = Math2.deg.atan2(state.radar.enemy.y - state.y, state.radar.enemy.x - state.x);
       let radarAbsAngle = state.radar.angle + state.angle
       enemyPosBeamAngle = Math2.deg.normalize(radarAbsAngle - enemyPosBeamAngle)/8
       _this.lastEnemyPosBeamAngle = enemyPosBeamAngle
+
+      const edx = state.x - state.radar.enemy.x
+      const edy = state.y - state.radar.enemy.y
+      enemyDistance = Math.sqrt(edx*edx + edy*edy)
+
+      radarScore = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))
     }
-    
+
     const input = [
-      state.radar.enemy ? 1 : -1,
+      enemyDistance/150 - 1,
       _this.lastEnemyPosBeamAngle
     ]
 
-    const action = policy.train(input, score.getScore())
+    // choose reward
+    _this.totalRadarScore += radarScore
+    let totalReward = 0
+    switch(_this.getRewardType()) {
+      case 'gameScore':
+        totalReward = _this.getScore()
+        break;
+      case 'radarBeam':
+        totalReward = _this.totalRadarScore
+        break;
+      default:
+        throw new Error(`Unknown reward type '${_this.rewardType}'`)
+    }
+
+    const action = policy.train(input, totalReward)
   
-    control.SHOOT = 0.1
-    control.TURN = action ? 1 : -1
+    control.RADAR_TURN = action ? 1 : -1
   }
 
-  createAI(simulation) {
+  createAI(simulation, rewardType) {
+    this.rewardType = rewardType
     const code = `importScripts('lib/tank.js');
       tank.init(function(settings, info) {
         tankInit(settings, info)
