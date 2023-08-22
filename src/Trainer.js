@@ -1,16 +1,15 @@
-const INIT_EPOCH_SIZE = 3
 const INIT_EPISODE_TIME_LIMIT = 7000
 const INIT_REWARD_TYPE = 'radarBeam'
 
 export default class Trainer extends EventTarget {
 
-  constructor(policy, tankLogic, jsBattle) {
+  constructor(policy, tankLogic, jsBattle, settings) {
     super()
+    this.settings = settings
     this.jsBattle = jsBattle
     this.canvas = document.getElementById('battlefield');
     this.policy = policy
     this.tankLogic = tankLogic
-    this.epochSize = INIT_EPOCH_SIZE
     this.epochIndex = 0
     this._simSpeed = 1
     this._simulation = null
@@ -39,6 +38,14 @@ export default class Trainer extends EventTarget {
     if(this._simulation) {
       this._simulation.setSpeed(this._simSpeed)
     }
+  }
+
+  get epochSize() {
+    return this.settings.prop('epochSize')
+  }
+
+  set epochSize(v) {
+    return this.settings.prop('epochSize', v)
   }
 
   async runEpoch() {
@@ -124,7 +131,6 @@ export default class Trainer extends EventTarget {
 
     const trainerState = JSON.parse(rawTrainerState)
 
-    this.epochSize = INIT_EPOCH_SIZE
     this.epochIndex = trainerState.epochIndex
     this._simSpeed = 1
     this._simulation = null

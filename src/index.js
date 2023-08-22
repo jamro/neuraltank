@@ -8,7 +8,7 @@ import TankLogic from "./TankLogic";
 import Trainer from './Trainer';
 import initUI from './ui';
 import 'remixicon/fonts/remixicon.css'
-
+import Settings from './Settings'
 
 (async () => {
   console.log("Neural Tank")
@@ -17,10 +17,12 @@ import 'remixicon/fonts/remixicon.css'
   await tf.ready()
   console.log("TF Backend:", tf.getBackend())
 
+  const settings = new Settings()
+
   const policy = new PolicyNetwork()
   const tankLogic = new TankLogic(JsBattle, policy)
   tankLogic.installCallbacks(window)
-  const trainer = new Trainer(policy, tankLogic, JsBattle)
+  const trainer = new Trainer(policy, tankLogic, JsBattle, settings)
 
   if(!(await trainer.restore())) {
     console.log('Stored model not found. creating...')

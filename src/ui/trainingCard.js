@@ -33,6 +33,10 @@ export default function initUI(trainer, tankLogic, policy) {
   epochNumber.text(trainer.epochIndex+1)
   epochDuration.text(ms2txt(trainer.epochDuration))
 
+  trainer.settings.addEventListener('change_epochSize', () => {
+    episodeNumber.text(`${trainer.episodeIndex+1} / ${trainer.epochSize}`)
+  })
+
   trainer.addEventListener('epochComplete', () => {
     epochNumber.text(trainer.epochIndex+1)
     epochDuration.text(ms2txt(trainer.epochDuration))
