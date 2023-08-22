@@ -7,6 +7,7 @@ import PolicyNetwork from "./PolicyNetwork";
 import TankLogic from "./TankLogic";
 import Trainer from './Trainer';
 import initUI from './ui';
+import 'remixicon/fonts/remixicon.css'
 
 
 (async () => {

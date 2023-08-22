@@ -7,7 +7,6 @@ export default function initUI(trainer, tankLogic, policy) {
   const inputDiscountRate = $('#inputDiscountRate')
   const inputReward = $('#inputReward')
 
-  
   inputEpochLen.val(trainer.epochSize)
   inputEpisodeLen.val(trainer.episodeTimeLimit)
   inputLearningRate.val(policy.learningRate)
@@ -19,5 +18,8 @@ export default function initUI(trainer, tankLogic, policy) {
   inputDiscountRate.prop('readonly', true);
   inputReward.prop('disabled', true);
   inputReward.val(trainer.rewardType)
+
+  window.addEventListener('fastMode', () =>console.log('fast'))
+  window.addEventListener('previewMode', () =>console.log('preview'))
   
 }

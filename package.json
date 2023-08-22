@@ -26,7 +26,8 @@
     "chart.js": "^4.3.3",
     "jquery": "^3.7.0",
     "jsbattle-engine": "^3.7.0",
-    "mathjs": "^11.9.1"
+    "mathjs": "^11.9.1",
+    "remixicon": "^3.5.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^11.0.0",

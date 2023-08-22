@@ -17,6 +17,7 @@ export default function initUI(trainer, tankLogic, policy) {
     battlefield.hide()
     epochStats.show()
     trainer.simSpeed = 100
+    window.dispatchEvent(new Event('fastMode'))
   })
 
   previewButton.on('click', () => {
@@ -25,6 +26,7 @@ export default function initUI(trainer, tankLogic, policy) {
     battlefield.show()
     epochStats.hide()
     trainer.simSpeed = 1
+    window.dispatchEvent(new Event('previewMode'))
   })
 
   episodeNumber.text(`${trainer.episodeIndex} / ${trainer.epochSize}`)
