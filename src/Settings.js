@@ -4,11 +4,15 @@ export default class Settings extends EventTarget {
     super()
     
     this.data = {
-      epochSize: 3
+      epochSize: 10,
+      episodeTimeLimit: 10000
     }
     const rawData = localStorage.getItem('settings')
     if(rawData) {
-      this.data = JSON.parse(rawData)
+      this.data = {
+        ...this.data,
+        ...JSON.parse(rawData)
+      }
     }
     localStorage.setItem('settings', JSON.stringify(this.data))
   }

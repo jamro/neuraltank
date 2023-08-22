@@ -1,4 +1,3 @@
-const INIT_EPISODE_TIME_LIMIT = 7000
 const INIT_REWARD_TYPE = 'radarBeam'
 
 export default class Trainer extends EventTarget {
@@ -17,7 +16,6 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = []
-    this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
     this.rewardType = INIT_REWARD_TYPE
   }
 
@@ -46,6 +44,14 @@ export default class Trainer extends EventTarget {
 
   set epochSize(v) {
     return this.settings.prop('epochSize', v)
+  }
+
+  get episodeTimeLimit() {
+    return this.settings.prop('episodeTimeLimit')
+  }
+
+  set episodeTimeLimit(v) {
+    return this.settings.prop('episodeTimeLimit', v)
   }
 
   async runEpoch() {
@@ -138,7 +144,6 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
-    this.episodeTimeLimit = INIT_EPISODE_TIME_LIMIT
     this.rewardType = INIT_REWARD_TYPE
 
     this.dispatchEvent(new Event('restore'))

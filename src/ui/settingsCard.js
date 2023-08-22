@@ -40,6 +40,9 @@ export default function initUI(trainer, tankLogic, policy) {
   editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
     trainer.epochSize = v
   })
+  editable(inputEpisodeLen, regexpValidator(/^[0-9]+$/), (v) => {
+    trainer.episodeTimeLimit = v
+  })
   
 }
 
