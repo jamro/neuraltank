@@ -68,7 +68,7 @@
         </div>
         <div class="col-6">
           <div class="card">
-            <h5 class="card-header">Scoring</h5>
+            <h5 class="card-header">Scoring History <button id="btn-reset-scoring-history" type="button" class="btn btn-danger btn-sm float-end">Reset</button></h5>
             <div class="card-body" style="text-align: right;">
               <h1 class="card-title" id="best-score">-</h1>
               <canvas id="score-chart" style="width: 100%; height: 15em"></canvas>
@@ -79,6 +79,12 @@
             <div class="card-body">
               <form>
                 <div class="form-group row">
+                  <label for="inputAlgo" class="col-sm-6 col-form-label">Algorithm:</label>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control text-start" id="inputAlgo" value="REINFORCE" disabled="disabled">
+                  </div>
+                </div>
+                <div class="form-group row row mt-1">
                   <label for="inputEpochLen" class="col-sm-6 col-form-label">Episodes per epoch:</label>
                   <div class="col-sm-6">
                     <input type="text" class="form-control text-end" id="inputEpochLen">
@@ -108,6 +114,7 @@
                     <select class="form-select" id="inputReward" readonly="readonly">
                       <option value="gameScore">Game Score</option>
                       <option value="radarBeam">Radar Beam</option>
+                      <option value="enemyFound">Enemy Find Time</option>
                     </select>
                   </div>
                 </div>

@@ -91,13 +91,13 @@ export default class Trainer extends EventTarget {
       opponent.fromCode('opponent', opponentCode);
       opponent.disableSandbox()
       let opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx-150, by, 45)
+      opponentTank.moveTo(bx+180, by-50, 180)
     
       opponent = this.jsBattle.createAiDefinition();
       opponent.fromCode('opponent', opponentCode);
       opponent.disableSandbox()
       opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx+100, by, -90)
+      opponentTank.moveTo(bx+150, by+50, 0)
     
       this._simulation.onFinish(() => {
         this.policy.onGameFinish()
@@ -154,6 +154,13 @@ export default class Trainer extends EventTarget {
   async removeStored() {
     await this.policy.removeModel()
     this.dispatchEvent(new Event('remove'))
+  }
+
+  async resetScoreHistory() {
+    const data = JSON.parse(localStorage.getItem('trainerState'))
+    this.scoreHistory = []
+    data.scoreHistory = this.scoreHistory
+    localStorage.setItem("trainerState", JSON.stringify(data));
   }
 
 }

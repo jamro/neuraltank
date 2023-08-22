@@ -40,6 +40,9 @@ export default class TankLogic {
   init(settings, info, _this, policy) {
     _this.lastEnemyPosBeamAngle = -1
     _this.totalRadarScore = 0
+    _this.timeToFindTarget = 0
+    _this.firstTargetFound = false
+
   }
   
   loop(state, control, _this, policy) {
@@ -60,6 +63,13 @@ export default class TankLogic {
       radarScore = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))
     }
 
+    // calculate time to find the enemy
+    if(state.radar.enemy) {
+      _this.firstTargetFound = true
+    } else if(!_this.firstTargetFound) {
+      _this.timeToFindTarget++
+    }
+
     const input = [
       enemyDistance/150 - 1,
       _this.lastEnemyPosBeamAngle
@@ -75,13 +85,16 @@ export default class TankLogic {
       case 'radarBeam':
         totalReward = _this.totalRadarScore
         break;
+      case 'enemyFound':
+        totalReward = -_this.timeToFindTarget  + (_this.firstTargetFound ? 100 : 0)
+        break;
       default:
         throw new Error(`Unknown reward type '${_this.rewardType}'`)
     }
 
-    const action = policy.train(input, totalReward)
+    const actions = policy.train(input, totalReward)
   
-    control.RADAR_TURN = action ? 1 : -1
+    control.RADAR_TURN = actions[0]
   }
 
   createAI(simulation, rewardType) {

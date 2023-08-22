@@ -68,9 +68,9 @@ export default class PolicyNetwork extends EventTarget {
     this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
 
     this.policyNet = tf.sequential();
-    this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu', inputShape: [2] }));
-    this.policyNet.add(tf.layers.dense({ units: 4, activation: 'elu' }));
-    this.policyNet.add(tf.layers.dense({units: 1}));
+    this.policyNet.add(tf.layers.dense({ units: 16, activation: 'tanh', inputShape: [2] }));
+    this.policyNet.add(tf.layers.dense({ units: 16, activation: 'tanh' }));
+    this.policyNet.add(tf.layers.dense({ units: 2, activation: 'linear' }));
 
     this.allGradients = [];
     this.allRewards = [];
@@ -117,7 +117,7 @@ export default class PolicyNetwork extends EventTarget {
     this.pushGradients(this.gameGradients, gradients);
     this.gameRewards.push(scoreIncrement);
 
-    return this.currentActions[0]
+    return this.currentActions
   }
 
   onGameFinish() {
@@ -128,24 +128,28 @@ export default class PolicyNetwork extends EventTarget {
 
   getGradientsAndSaveActions(inputTensor) {
     const f = () => tf.tidy(() => {
-      const [logits, actions] = this.getLogitsAndActions(inputTensor);
+      let [mean, stdDev, actions] = this.getDistributionsAndActions(inputTensor);
       this.currentActions = actions.dataSync();
-      const labels = tf.sub(1, tf.tensor2d(this.currentActions, actions.shape));
-      return tf.losses.sigmoidCrossEntropy(labels, logits).asScalar();
+
+      const variance = tf.square(stdDev)
+      const exponent = tf.mul(-0.5, tf.div(tf.sub(actions, mean).square(), variance))
+      const coefficient = tf.div(1, tf.mul(stdDev, Math.sqrt(Math.PI * 2)))
+      const logProb = tf.add(tf.log(coefficient), exponent)
+
+      return tf.neg(logProb).asScalar()
     });
     return tf.variableGrads(f);
   }
 
-  getLogitsAndActions(inputs) {
+  getDistributionsAndActions(inputs) {
     return tf.tidy(() => {
-      const logits = this.policyNet.predict(inputs);
-
-      // Get the probability of the leftward action.
-      const leftProb = tf.sigmoid(logits);
-      // Probabilites of the left and right actions.
-      const leftRightProbs = tf.concat([leftProb, tf.sub(1, leftProb)], 1);
-      const actions = tf.multinomial(leftRightProbs, 1, null, true);
-      return [logits, actions];
+      const output = this.policyNet.predict(inputs);
+      const mean = tf.tanh(output.slice([0, 0], [-1, 1]));
+      const logStdDev = output.slice([0, 1], [-1, 1]);
+      const stdDev = tf.exp(logStdDev);
+      const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
+      const scaledActions = tf.clipByValue(unscaledActions, -1, 1);
+      return [mean, stdDev, scaledActions];
     });
   }
 

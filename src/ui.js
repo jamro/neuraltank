@@ -14,6 +14,7 @@ export default function initUI(trainer, tankLogic, policy) {
   const bestScore = $('#best-score')
   const policySaveDate = $('#policy-save-date')
   const removeModelButton = $('#btn-remove-stored-model')
+  const resetHistoryButton = $('#btn-reset-scoring-history')
 
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
@@ -26,8 +27,8 @@ export default function initUI(trainer, tankLogic, policy) {
   const scoreChartData = {
     labels : trainer.scoreHistory.map(e => 'epoch ' + e.x),
     datasets : [
-      { data : trainer.scoreHistory.map(e => e.min), label: "min", borderColor: '#bbbbbb' },
       { data : trainer.scoreHistory.map(e => e.mean), label: "mean", borderColor: '#0d6efd' },
+      { data : trainer.scoreHistory.map(e => e.min), label: "min", borderColor: '#bbbbbb' },
       { data : trainer.scoreHistory.map(e => e.max), label: "max", borderColor: '#bbbbbb' }
     ]
   }
@@ -71,9 +72,23 @@ export default function initUI(trainer, tankLogic, policy) {
   })
 
   removeModelButton.on('click', async () => {
-    removeModelButton.prop('disabled',false)
+    removeModelButton.prop('disabled',true)
     await trainer.removeStored()
     removeModelButton.prop('disabled', !trainer.policy.dateSaved)
+  })
+
+  resetHistoryButton.on('click', async () => {
+    resetHistoryButton.prop('disabled',true)
+    await trainer.resetScoreHistory()
+    scoreChartData.labels = []
+    scoreChartData.datasets[0].data = []
+    scoreChartData.datasets[1].data = []
+    scoreChartData.datasets[2].data = []
+    scoreChart.update()
+    bestScore.text('-')
+    epochNumber.text(trainer.epochIndex+1)
+    resetHistoryButton.prop('disabled', false)
+    
   })
 
   removeModelButton.prop('disabled', !trainer.policy.dateSaved)
@@ -113,8 +128,8 @@ export default function initUI(trainer, tankLogic, policy) {
     episodeNumber.text(`0 / ${trainer.epochSize}`)
 
     scoreChartData.labels = trainer.scoreHistory.map(e => 'epoch ' + e.x)
-    scoreChartData.datasets[0].data = trainer.scoreHistory.map(e => e.min)
-    scoreChartData.datasets[1].data = trainer.scoreHistory.map(e => e.mean)
+    scoreChartData.datasets[0].data = trainer.scoreHistory.map(e => e.mean)
+    scoreChartData.datasets[1].data = trainer.scoreHistory.map(e => e.min)
     scoreChartData.datasets[2].data = trainer.scoreHistory.map(e => e.max)
     scoreChart.update()
   })
