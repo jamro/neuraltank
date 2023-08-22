@@ -1,4 +1,4 @@
-const INIT_EPOCH_SIZE = 10
+const INIT_EPOCH_SIZE = 3
 const INIT_EPISODE_TIME_LIMIT = 7000
 const INIT_REWARD_TYPE = 'radarBeam'
 
