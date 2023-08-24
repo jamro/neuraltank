@@ -5,8 +5,8 @@ const Math2 = ExtendedMath()
 
 export default class TankLogic {
 
-  constructor(jsBattle, policy) {
-    this.policy = policy
+  constructor(jsBattle, agent) {
+    this.agent = agent
     this.jsBattle = jsBattle
     this.tankModel = null
     this.rewardType = null
@@ -21,7 +21,7 @@ export default class TankLogic {
     }
 
     // escape this context
-    const policy = this.policy
+    const agent = this.agent
     const init = this.init
     const loop = this.loop
     const _this = { 
@@ -29,15 +29,15 @@ export default class TankLogic {
       getScore: () => this.tankModel.score
     }
     console.log(_this)
-    target.tankInit = (function (settings, info) { init(settings, info, _this, policy) }).bind(target)
-    target.tankLoop = (function (state, control) { loop(state, control, _this, policy) }).bind(target)
+    target.tankInit = (function (settings, info) { init(settings, info, _this, agent) }).bind(target)
+    target.tankLoop = (function (state, control) { loop(state, control, _this, agent) }).bind(target)
   }
 
   getScore() {
     this.tankModel.score
   }
 
-  init(settings, info, _this, policy) {
+  init(settings, info, _this, agent) {
     _this.lastEnemyPosBeamAngle = -1
     _this.totalRadarScore = 0
     _this.timeToFindTarget = 0
@@ -45,7 +45,7 @@ export default class TankLogic {
 
   }
   
-  loop(state, control, _this, policy) {
+  loop(state, control, _this, agent) {
 
     // calculate angular position of the enemy within the radar beam
     let enemyDistance = 300
@@ -92,7 +92,7 @@ export default class TankLogic {
         throw new Error(`Unknown reward type '${_this.rewardType}'`)
     }
 
-    const actions = policy.train(input, totalReward)
+    const actions = agent.train(input, totalReward)
   
     control.RADAR_TURN = actions[0]
   }

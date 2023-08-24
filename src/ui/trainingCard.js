@@ -1,6 +1,6 @@
 import * as $ from 'jquery'
 
-export default function initUI(trainer, tankLogic, policy) {
+export default function initUI(trainer, tankLogic, agent) {
   const trainButton = $('#btn-train')
   const previewButton = $('#btn-preview')
   const battlefield = $('#battlefield')

@@ -2,12 +2,12 @@ const INIT_REWARD_TYPE = 'radarBeam'
 
 export default class Trainer extends EventTarget {
 
-  constructor(policy, tankLogic, jsBattle, settings) {
+  constructor(agent, tankLogic, jsBattle, settings) {
     super()
     this.settings = settings
     this.jsBattle = jsBattle
     this.canvas = document.getElementById('battlefield');
-    this.policy = policy
+    this.agent = agent
     this.tankLogic = tankLogic
     this.epochIndex = 0
     this._simSpeed = 1
@@ -56,21 +56,21 @@ export default class Trainer extends EventTarget {
 
   async runEpoch() {
     this._epochStartTime = performance.now()
-    this.policy.onBatchStart()
+    this.agent.onBatchStart()
     for(let i=0; i < this.epochSize; i++) {
       this.episodeIndex = i
       await this.runEpisode()   
     }
     this.scoreHistory.push({
       x: this.epochIndex+1, 
-      mean: mean(this.policy.gameScores), 
-      min: Math.min(...this.policy.gameScores), 
-      max: Math.max(...this.policy.gameScores)
+      mean: mean(this.agent.gameScores), 
+      min: Math.min(...this.agent.gameScores), 
+      max: Math.max(...this.agent.gameScores)
     })
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()
     }
-    this.policy.onBatchFinish()
+    this.agent.onBatchFinish()
     this.epochIndex++
     this._epochDuration = performance.now() - this._epochStartTime
     await this.save()
@@ -80,7 +80,7 @@ export default class Trainer extends EventTarget {
 
   async runEpisode() {
     await new Promise(async (onEpisodeEnd) => {
-      this.policy.onGameStart()
+      this.agent.onGameStart()
       const renderer = this.jsBattle.createRenderer('debug');
       renderer.init(this.canvas);
       await new Promise(done => renderer.loadAssets(done))
@@ -113,7 +113,7 @@ export default class Trainer extends EventTarget {
       opponentTank.moveTo(bx+150, by+50, 0)
     
       this._simulation.onFinish(() => {
-        this.policy.onGameFinish()
+        this.agent.onGameFinish()
         PIXI.utils.clearTextureCache()
         onEpisodeEnd()
       })
@@ -129,8 +129,8 @@ export default class Trainer extends EventTarget {
   }
 
   async restore() {
-    const policyResult = await this.policy.restoreModel()
-    if(!policyResult) return false
+    const agentResult = await this.agent.restoreModel()
+    if(!agentResult) return false
 
     const rawTrainerState = localStorage.getItem("trainerState")
     if(!rawTrainerState) return false
@@ -151,7 +151,7 @@ export default class Trainer extends EventTarget {
   }
 
   async save() {
-    await this.policy.saveModel()
+    await this.agent.saveModel()
 
     localStorage.setItem("trainerState", JSON.stringify({
       epochIndex: this.epochIndex,
@@ -163,7 +163,7 @@ export default class Trainer extends EventTarget {
   }
 
   async removeStored() {
-    await this.policy.removeModel()
+    await this.agent.removeModel()
     this.dispatchEvent(new Event('remove'))
   }
 

@@ -1,9 +1,9 @@
 import * as tf from '@tensorflow/tfjs';
+import ActorNetwork from './net/ActorNetwork';
+import Memory from './Memory';
 
 const INIT_DISCOUNT_RATE = 0.98
-const INIT_LEARNING_RATE = 0.01
-
-const MODEL_SAVE_PATH = 'indexeddb://neural-tank';
+const INIT_LEARNING_RATE = 0.005
 
 function discountRewards(rewards, discountRate) {
   const discountedBuffer = tf.buffer([rewards.length]);
@@ -61,50 +61,39 @@ function scaleAndAverageGradients(allGradients, normalizedRewards) {
   });
 }
 
-export default class PolicyNetwork extends EventTarget {
+export default class Agent extends EventTarget {
   constructor() {
     super()
     this.discountRate = INIT_DISCOUNT_RATE
-    this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
 
-    this.policyNet = tf.sequential();
-    this.policyNet.add(tf.layers.dense({ units: 16, activation: 'tanh', inputShape: [2] }));
-    this.policyNet.add(tf.layers.dense({ units: 16, activation: 'tanh' }));
-    this.policyNet.add(tf.layers.dense({ units: 2, activation: 'linear' }));
+    this.actorNet = new ActorNetwork(2, 1, INIT_LEARNING_RATE)
 
-    this.allGradients = [];
-    this.allRewards = [];
+    this.memory = new Memory()
     this.gameScores = [];
-
-    this.gameRewards = [];
-    this.gameGradients = [];
 
     this.currentActions = null
     this.totalReward = 0
-    this.dateSaved = null
   }
 
   get learningRate() {
-    return this.optimizer.learningRate
+    return this.actorNet.optimizer.learningRate
   }
 
   onBatchStart() {
-    this.allGradients = [];
-    this.allRewards = [];
+    this.memory.resetAll()
     this.gameScores = [];
   }
 
   onBatchFinish() {
     tf.tidy(() => {
-      const normalizedRewards = discountAndNormalizeRewards(this.allRewards, this.discountRate);
-      this.optimizer.applyGradients(scaleAndAverageGradients(this.allGradients, normalizedRewards));
+      const normalizedRewards = discountAndNormalizeRewards(this.memory.allRewards, this.discountRate);
+      this.actorNet.optimizer.applyGradients(scaleAndAverageGradients(this.memory.allGradients, normalizedRewards));
     });
-    tf.dispose(this.allGradients);
+    tf.dispose(this.memory.allGradients);
   }
 
   onGameStart() {
-    this.gameRewards = [];
-    this.gameGradients = [];
+    this.memory.resetGame()
     this.totalReward = 0
   }
 
@@ -114,21 +103,19 @@ export default class PolicyNetwork extends EventTarget {
     this.totalReward = totalScore
     const gradients = tf.tidy(() => this.getGradientsAndSaveActions(inputTensor).grads );
 
-    this.pushGradients(this.gameGradients, gradients);
-    this.gameRewards.push(scoreIncrement);
+    this.memory.rememberGameStep(gradients, scoreIncrement);
 
     return this.currentActions
   }
 
   onGameFinish() {
     this.gameScores.push(this.totalReward);
-    this.pushGradients(this.allGradients, this.gameGradients);
-    this.allRewards.push(this.gameRewards);
+    this.memory.aggregateGameResults()
   }
 
   getGradientsAndSaveActions(inputTensor) {
     const f = () => tf.tidy(() => {
-      let [mean, stdDev, actions] = this.getDistributionsAndActions(inputTensor);
+      let [mean, stdDev, actions] = this.actorNet.exec(inputTensor);
       this.currentActions = actions.dataSync();
 
       const variance = tf.square(stdDev)
@@ -139,18 +126,6 @@ export default class PolicyNetwork extends EventTarget {
       return tf.neg(logProb).asScalar()
     });
     return tf.variableGrads(f);
-  }
-
-  getDistributionsAndActions(inputs) {
-    return tf.tidy(() => {
-      const output = this.policyNet.predict(inputs);
-      const mean = tf.tanh(output.slice([0, 0], [-1, 1]));
-      const logStdDev = output.slice([0, 1], [-1, 1]);
-      const stdDev = tf.exp(logStdDev);
-      const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
-      const scaledActions = tf.clipByValue(unscaledActions, -1, 1);
-      return [mean, stdDev, scaledActions];
-    });
   }
 
   pushGradients(record, gradients) {
@@ -164,39 +139,28 @@ export default class PolicyNetwork extends EventTarget {
   }
 
   async saveModel() {
-    await this.policyNet.save(MODEL_SAVE_PATH);
-    const modelsInfo = await tf.io.listModels();
-    this.dateSaved = modelsInfo[MODEL_SAVE_PATH].dateSaved
+    await this.actorNet.save();
     this.dispatchEvent(new Event('save'))
   }
 
   async removeModel() {
-    this.dispatchEvent(new Event('remove'))
-    await tf.io.removeModel(MODEL_SAVE_PATH);
-    this.dateSaved = null
+    await this.actorNet.remove();
     this.dispatchEvent(new Event('remove'))
   }
 
-  async restoreModel() {
-    const modelsInfo = await tf.io.listModels();
-    if(!modelsInfo) return false
-    if (MODEL_SAVE_PATH in modelsInfo) {
-      this.policyNet = await tf.loadLayersModel(MODEL_SAVE_PATH);
+  get dateSaved() {
+    return this.actorNet.dateSaved
+  }
 
-      this.allGradients = [];
-      this.allRewards = [];
-      this.gameScores = [];
-  
-      this.gameRewards = [];
-      this.gameGradients = [];
+  async restoreModel() {
+    if (await this.actorNet.restore()) {
+      this.memory.resetAll()
+      this.gameScores = []
   
       this.currentActions = null
       this.totalReward = 0
 
-      this.dateSaved = modelsInfo[MODEL_SAVE_PATH].dateSaved
-
       this.discountRate = INIT_DISCOUNT_RATE
-      this.optimizer = tf.train.adam(INIT_LEARNING_RATE);
       return true
     } else {
       return false

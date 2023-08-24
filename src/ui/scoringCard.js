@@ -1,7 +1,7 @@
 import * as $ from 'jquery'
 import Chart from 'chart.js/auto';
 
-export default function initUI(trainer, tankLogic, policy) {
+export default function initUI(trainer, tankLogic, agent) {
   const bestScore = $('#best-score')
   const resetHistoryButton = $('#btn-reset-scoring-history')
 
