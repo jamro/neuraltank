@@ -3,7 +3,8 @@ import * as $ from 'jquery'
 export default function initUI(trainer, tankLogic, agent) {
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
-  const inputLearningRate = $('#inputLearningRate')
+  const inputActorLearningRate = $('#inputActorLearningRate')
+  const inputCriticLearningRate = $('#inputCriticLearningRate')
   const inputDiscountRate = $('#inputDiscountRate')
   const inputReward = $('#inputReward')
   const settingsLock = $('#settingsLock')
@@ -11,7 +12,9 @@ export default function initUI(trainer, tankLogic, agent) {
   const inputs = [
     inputEpochLen,
     inputEpisodeLen,
-    inputLearningRate,
+    inputActorLearningRate,
+    inputActorLearningRate,
+    inputCriticLearningRate,
     inputDiscountRate,
     inputReward
   ]
@@ -28,7 +31,8 @@ export default function initUI(trainer, tankLogic, agent) {
 
   inputEpochLen.val(trainer.epochSize)
   inputEpisodeLen.val(trainer.episodeTimeLimit)
-  inputLearningRate.val(agent.learningRate)
+  inputActorLearningRate.val(agent.actorLearningRate)
+  inputCriticLearningRate.val(agent.criticLearningRate)
   inputDiscountRate.val(agent.discountRate)
 
   enableForm()

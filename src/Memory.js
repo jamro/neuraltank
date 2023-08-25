@@ -1,29 +1,51 @@
 import * as tf from '@tensorflow/tfjs';
 
 export default class Memory {
-  constructor() {
+  constructor(discountRate) {
+    this.discountRate = discountRate
     this.resetAll()
   }
 
-  rememberGameStep(gradients, reward) {
+  rememberGameStep(input, gradients, reward, value) {
+    if(this.gameRewards.length > 0) {
+      const prevReward = this.gameRewards[this.gameRewards.length-1]
+      const prevValue = this.gameValues[this.gameValues.length-1]
+      const advantage = prevReward + this.discountRate * value - prevValue
+      this.gameAdvantages.push(advantage)
+    }
+
     this.pushGradients(this.gameGradients, gradients);
     this.gameRewards.push(reward);
+    this.gameValues.push(value)
+    this.gameInputs.push(input)
   }
 
   aggregateGameResults() {
+    if(this.gameRewards.length > 0) {
+      const prevReward = this.gameRewards[this.gameRewards.length-1]
+      const prevValue = this.gameValues[this.gameValues.length-1]
+      const advantage = prevReward - prevValue
+      this.gameAdvantages.push(advantage)
+    }
+
     this.pushGradients(this.allGradients, this.gameGradients);
     this.allRewards.push(this.gameRewards);
+    this.allAdvantages.push(this.gameAdvantages);
   }
 
   resetAll() {
     this.allGradients = [];
     this.allRewards = [];
+    this.allAdvantages = [];
     this.resetGame()
   }
 
   resetGame() {
+    this.gameValues = [];
+    this.gameInputs = [];
     this.gameRewards = [];
     this.gameGradients = [];
+    this.gameAdvantages = [];
   }
 
   pushGradients(record, gradients) {
@@ -36,36 +58,10 @@ export default class Memory {
     }
   }
 
-  discountRewards(rewards, discountRate) {
-    const discountedBuffer = tf.buffer([rewards.length]);
-    let prev = 0;
-    for (let i = rewards.length - 1; i >= 0; --i) {
-      const current = discountRate * prev + rewards[i];
-      discountedBuffer.set(current, i);
-      prev = current;
-    }
-    return discountedBuffer.toTensor();
-  }
-
-  discountAndNormalizeRewards(discountRate) {
+  scaleAndAverageGradients() {
     return tf.tidy(() => {
-      const discounted = [];
-      for (const sequence of this.allRewards) {
-        discounted.push(this.discountRewards(sequence, discountRate))
-      }
-      // Compute the overall mean and stddev.
-      const concatenated = tf.concat(discounted);
-      const mean = tf.mean(concatenated);
-      const std = tf.sqrt(tf.mean(tf.square(concatenated.sub(mean))));
-      // Normalize the reward sequences using the mean and std.
-      const normalized = discounted.map(rs => rs.sub(mean).div(std));
-      return normalized;
-    });
-  }
+      const normalizedRewards = this.allAdvantages.map(a => tf.tensor1d(a))
 
-  scaleAndAverageGradients(discountRate) {
-    return tf.tidy(() => {
-      const normalizedRewards = this.discountAndNormalizeRewards(discountRate);
       const gradients = {};
       for (const varName in this.allGradients) {
         gradients[varName] = tf.tidy(() => {
@@ -77,8 +73,7 @@ export default class Memory {
           for (let i = 0; i < varGradients[0].rank - 1; ++i) {
             expandedDims.push(1);
           }
-          const reshapedNormalizedRewards = normalizedRewards.map(
-              rs => rs.reshape(rs.shape.concat(expandedDims)));
+          const reshapedNormalizedRewards = normalizedRewards.map(rs => rs.reshape(rs.shape.concat(expandedDims)));
           for (let g = 0; g < varGradients.length; ++g) {
             // This mul() call uses broadcasting.
             varGradients[g] = varGradients[g].mul(reshapedNormalizedRewards[g]);
@@ -90,6 +85,21 @@ export default class Memory {
       }
       return gradients;
     });
+  }
+
+  getCriticTrainData() {
+    let x = []
+    let y = []
+
+    for(let i=0; i < this.gameInputs.length-1; i++) {
+      x.push(this.gameInputs[i])
+      y.push(this.gameRewards[i] + this.discountRate * this.gameValues[i+1])
+    }
+
+    return [
+      tf.tensor2d(x),
+      tf.tensor1d(y)
+    ]
   }
 }
 

@@ -9,8 +9,8 @@ export default class ActorNetwork extends PersistentNetwork {
     this.optimizer = tf.train.adam(this.learningRate);
 
     this.net = tf.sequential();
-    this.net.add(tf.layers.dense({ units: 16, activation: 'tanh', inputShape: [this.inputCount] }));
-    this.net.add(tf.layers.dense({ units: 16, activation: 'tanh' }));
+    this.net.add(tf.layers.dense({ units: 32, activation: 'tanh', inputShape: [this.inputCount] }));
+    this.net.add(tf.layers.dense({ units: 32, activation: 'tanh' }));
     this.net.add(tf.layers.dense({ units: 2*this.outputCount, activation: 'linear' }));
     this.net.compile({optimizer: this.optimizer, loss: tf.losses.meanSquaredError })
   }

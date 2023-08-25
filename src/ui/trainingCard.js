@@ -8,6 +8,7 @@ export default function initUI(trainer, tankLogic, agent) {
   const epochNumber = $('#epoch-number')
   const episodeNumber = $('#episode-number')
   const epochDuration = $('#epoch-duration')
+  const stepDuration = $('#step-duration')
   const epochProgressBar = $('#epoch-progressbar')
   const episodeProgressBar = $('#episode-progressbar')
 
@@ -48,6 +49,14 @@ export default function initUI(trainer, tankLogic, agent) {
   trainer.addEventListener('episodeComplete', () => {
     episodeNumber.text(`${trainer.episodeIndex+1} / ${trainer.epochSize}`)
     episodeProgressBar.css('width', '0%')
+    stepDuration.text(agent.stepAvgDuration.toFixed(2) + 'ms')
+    $('.expected-val').text(agent.expectedValue.toFixed(2))
+  })
+
+  trainer.addEventListener('step', () => {
+    if(trainer.simSpeed == 1) {
+      $('.expected-val').text(agent.expectedValue.toFixed(2))
+    }
   })
 
   setInterval(() => {

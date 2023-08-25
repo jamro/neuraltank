@@ -12,15 +12,11 @@ export default class PersistentNetwork {
 
     this.optimizer = tf.train.adam(this.learningRate);
 
-    this.net = tf.sequential();
-    this.net.add(tf.layers.dense({ units: 8, activation: 'tanh', inputShape: [this.inputCount] }));
-    this.net.add(tf.layers.dense({ units: this.outputCount, activation: 'linear' }));
-    this.net.compile({optimizer: this.optimizer, loss: tf.losses.meanSquaredError })
+    this.net = null
   }
 
   exec(inputs) {
-    const [mean, stdDev, actions] = [null, null, null]
-    return [mean, stdDev, actions]
+    return null
   }
 
   async save() {
@@ -41,6 +37,7 @@ export default class PersistentNetwork {
     if(!modelsInfo) return false
     if (savePath in modelsInfo) {
       this.net = await tf.loadLayersModel(savePath);
+      this.net.compile({optimizer: this.optimizer, loss: tf.losses.meanSquaredError })
       this.dateSaved = modelsInfo[savePath].dateSaved
 
       this.inputCount = this.net.layers[0].batchInputShape[1]

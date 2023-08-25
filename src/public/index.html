@@ -45,6 +45,7 @@
                   <div class="d-flex justify-content-between align-items-start">
                     <div class="ms-2 me-auto">
                       <div class="fw-bold">Episode</div>
+                      avg. step duration: <span id="step-duration">-</span>
                     </div>
                     <span id="episode-number" class="badge bg-primary rounded-pill">-</span>
                   </div>
@@ -64,6 +65,7 @@
           </div>
           <div class="row text-center">
             <canvas id="battlefield" style="width: 100%"></canvas>
+            <div class="text-start"><small>Expected value: <strong class="expected-val">-</strong></small></div>
           </div>
         </div>
         <div class="col-lg-6 col-12">
@@ -81,7 +83,7 @@
                 <div class="form-group row">
                   <label for="inputAlgo" class="col-sm-6 col-form-label">Algorithm:</label>
                   <div class="col-sm-6">
-                    <input type="text" class="form-control text-start" id="inputAlgo" value="REINFORCE" disabled="disabled">
+                    <input type="text" class="form-control text-start" id="inputAlgo" value="Actor-Critic" disabled="disabled">
                   </div>
                 </div>
                 <div class="form-group row row mt-1">
@@ -97,9 +99,15 @@
                   </div>
                 </div>
                 <div class="form-group row mt-1">
-                  <label for="inputLearningRate" class="col-sm-6 col-form-label">Learning rate:</label>
+                  <label for="inputActorLearningRate" class="col-sm-6 col-form-label">Actor learning rate:</label>
                   <div class="col-sm-6">
-                    <input type="text" class="form-control text-end" id="inputLearningRate">
+                    <input type="text" class="form-control text-end" id="inputActorLearningRate">
+                  </div>
+                </div>
+                <div class="form-group row mt-1">
+                  <label for="inputCriticLearningRate" class="col-sm-6 col-form-label">Critic learning rate:</label>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control text-end" id="inputCriticLearningRate">
                   </div>
                 </div>
                 <div class="form-group row mt-1">

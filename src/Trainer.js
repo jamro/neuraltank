@@ -56,11 +56,14 @@ export default class Trainer extends EventTarget {
 
   async runEpoch() {
     this._epochStartTime = performance.now()
+    console.log("starting new epoch")
     this.agent.onBatchStart()
     for(let i=0; i < this.epochSize; i++) {
+      console.log("starting episode", i+1)
       this.episodeIndex = i
       await this.runEpisode()   
     }
+    console.log("store history")
     this.scoreHistory.push({
       x: this.epochIndex+1, 
       mean: mean(this.agent.gameScores), 
@@ -73,22 +76,29 @@ export default class Trainer extends EventTarget {
     this.agent.onBatchFinish()
     this.epochIndex++
     this._epochDuration = performance.now() - this._epochStartTime
+    console.log("saving...")
     await this.save()
+    console.log("%c--== Epoch End ==--", 'background-color:blue;color:white')
     this.dispatchEvent(new Event('epochComplete'))
     
   }
 
   async runEpisode() {
     await new Promise(async (onEpisodeEnd) => {
+      console.log("on game start")
       this.agent.onGameStart()
+      console.log("create game renderer")
       const renderer = this.jsBattle.createRenderer('debug');
       renderer.init(this.canvas);
+      console.log("loading assets")
       await new Promise(done => renderer.loadAssets(done))
+      console.log("create simulation")
       this._simulation = this.jsBattle.createSimulation(renderer);
       this._simulation.init(900, 600);
       const bx = (this._simulation.battlefield.minX + this._simulation.battlefield.maxX)/2
       const by = (this._simulation.battlefield.minY + this._simulation.battlefield.maxY)/2;
       
+      console.log("create Tank Logic AI")
       this.tankLogic.createAI(this._simulation, this.rewardType)
 
       const opponentCode = `importScripts('lib/tank.js');
@@ -112,19 +122,28 @@ export default class Trainer extends EventTarget {
       opponentTank = this._simulation.addTank(opponent).tank
       opponentTank.moveTo(bx+150, by+50, 0)
     
-      this._simulation.onFinish(() => {
-        this.agent.onGameFinish()
+      this._simulation.onFinish(async () => {
+        console.log("Game finish")
+        await this.agent.onGameFinish()
+        console.log("Clean texture cache")
         PIXI.utils.clearTextureCache()
-        onEpisodeEnd()
+        console.log("%c- Episode End -", 'background-color:blue;color:white')
+        setTimeout(() => onEpisodeEnd(), 50)
       })
-      
+
+      this._simulation.onStep(() => {
+        this.dispatchEvent(new Event('step'))
+      })
+
       this._simulation.setSpeed(this._simSpeed)
       this._simulation.timeLimit = this.episodeTimeLimit
     
       this.tankLogic.tankModel.moveTo(bx, by, 0)
-    
+      console.log("start simulation")
       this._simulation.start()
+      console.log("game started")
     })
+    console.log("EVENT: episodeComplete")
     this.dispatchEvent(new Event('episodeComplete'))
   }
 
@@ -146,6 +165,7 @@ export default class Trainer extends EventTarget {
     this.scoreHistory = trainerState.scoreHistory
     this.rewardType = INIT_REWARD_TYPE
 
+    console.log("EVENT: restore")
     this.dispatchEvent(new Event('restore'))
     return true
   }
@@ -159,11 +179,13 @@ export default class Trainer extends EventTarget {
       epochDuration: this._epochDuration,
     }));
 
+    console.log("EVENT: save")
     this.dispatchEvent(new Event('save'))
   }
 
   async removeStored() {
     await this.agent.removeModel()
+    console.log("EVENT: remove")
     this.dispatchEvent(new Event('remove'))
   }
 
