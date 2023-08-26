@@ -1,25 +1,19 @@
 import * as $ from 'jquery'
 
-export default function initUI(trainer, tankLogic, agent) {
+export default function initUI(messageBus) {
   const agentSaveDate = $('#agent-save-date')
   const removeModelButton = $('#btn-remove-stored-model')
 
+
   removeModelButton.on('click', async () => {
     removeModelButton.prop('disabled',true)
-    await trainer.removeStored()
-    removeModelButton.prop('disabled', !trainer.agent.dateSaved)
+    removeModelButton.hide()
+    messageBus.send('clearSave')
   })
 
-  removeModelButton.prop('disabled', !trainer.agent.dateSaved)
-  agentSaveDate.text((trainer.agent.dateSaved || '-').toString())
-
-  trainer.addEventListener('save', () => {
-    agentSaveDate.text(trainer.agent.dateSaved.toString())
-    removeModelButton.prop('disabled', !trainer.agent.dateSaved)
-  })
-
-  trainer.addEventListener('remove', () => {
-    agentSaveDate.text('-')
-    removeModelButton.prop('disabled', !trainer.agent.dateSaved)
+  messageBus.addEventListener('saveDate', (e) => {
+    agentSaveDate.text(e.data.value || '-')
+    removeModelButton.prop('disabled', !e.data.value)
+    removeModelButton.show()
   })
 }

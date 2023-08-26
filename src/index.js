@@ -1,37 +1,20 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import * as tf from '@tensorflow/tfjs';
-import '@tensorflow/tfjs-backend-webgl';
-import '@tensorflow/tfjs-backend-wasm';
-import Agent from "./Agent";
-import TankLogic from "./TankLogic";
-import Trainer from './Trainer';
-import initUI from './ui';
 import 'remixicon/fonts/remixicon.css'
-import Settings from './Settings'
+import { LocalStorageServer } from './worker/LocalStorageProxy';
+import MessageBus from './worker/MessageBus';
+import initUi from './ui'
 
 (async () => {
-  console.log("Neural Tank")
+  console.log("... Neural Tank ...")
+  const trainerWorker = new Worker("worker.js");
+  const messageBus = new MessageBus(trainerWorker)
+  const localStorageServer = new LocalStorageServer(messageBus)
+  console.log("Waiting for worker to say hello")
+  await new Promise(done => messageBus.addEventListener('workerHello', done))
+  console.log("The worker is alive. initializing...")
+  messageBus.send('initWorker')
 
-  tf.setBackend('webgl');
-  await tf.ready()
-  console.log("TF Backend:", tf.getBackend())
+  initUi(messageBus)
 
-  const settings = new Settings()
-
-  const agent = new Agent()
-  const tankLogic = new TankLogic(JsBattle, agent)
-  tankLogic.installCallbacks(window)
-  const trainer = new Trainer(agent, tankLogic, JsBattle, settings)
-
-  if(!(await trainer.restore())) {
-    console.log('Stored model not found. creating...')
-    await trainer.save()
-  }
-
-  initUI(trainer, tankLogic, agent)
-
-  while(true) {
-    await trainer.runEpoch()
-  }
 })()

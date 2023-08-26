@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import ExtendedMath from 'jsbattle-engine/src/tanks/lib/extendedMath'
+import ExtendedMath from 'jsbattle-engine/src/tanks/lib/extendedMath.js'
 
 const Math2 = ExtendedMath()
 

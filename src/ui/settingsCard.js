@@ -1,6 +1,6 @@
 import * as $ from 'jquery'
 
-export default function initUI(trainer, tankLogic, agent) {
+export default function initUI(messageBus) {
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
   const inputActorLearningRate = $('#inputActorLearningRate')
@@ -29,25 +29,25 @@ export default function initUI(trainer, tankLogic, agent) {
     settingsLock.hide()
   }
 
-  inputEpochLen.val(trainer.epochSize)
-  inputEpisodeLen.val(trainer.episodeTimeLimit)
-  inputActorLearningRate.val(agent.actorLearningRate)
-  inputCriticLearningRate.val(agent.criticLearningRate)
-  inputDiscountRate.val(agent.discountRate)
-
   enableForm()
-  inputReward.val(trainer.rewardType)
 
-  window.addEventListener('fastMode', () => disableForm())
-  window.addEventListener('previewMode', () => enableForm())
-
-  editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
-    trainer.epochSize = v
-  })
-  editable(inputEpisodeLen, regexpValidator(/^[0-9]+$/), (v) => {
-    trainer.episodeTimeLimit = v
+  messageBus.addEventListener('settings', ({data}) => {
+    inputEpochLen.val(data.epochSize)
+    inputEpisodeLen.val(data.episodeTimeLimit)
+    inputActorLearningRate.val(data.actorLearningRate)
+    inputCriticLearningRate.val(data.criticLearningRate)
+    inputDiscountRate.val(data.discountRate)
+    inputReward.val(data.rewardType)
   })
   
+
+  editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
+    messageBus.send('config', {key: 'epochSize', value: Number(v)})
+  })
+  editable(inputEpisodeLen, regexpValidator(/^[0-9]+$/), (v) => {
+    messageBus.send('config', {key: 'episodeTimeLimit', value: Number(v)})
+  })
+
 }
 
 
@@ -83,6 +83,6 @@ function editable(input, validator, executor) {
     if(e.which == 13) {
       input.blur()
     }
-});
+  });
 
 }

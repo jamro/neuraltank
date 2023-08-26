@@ -1,6 +1,6 @@
 import * as $ from 'jquery'
 
-export default function initUI(trainer, tankLogic, agent) {
+export default function initUI(messageBus) {
   const trainButton = $('#btn-train')
   const previewButton = $('#btn-preview')
   const battlefield = $('#battlefield')
@@ -11,7 +11,9 @@ export default function initUI(trainer, tankLogic, agent) {
   const stepDuration = $('#step-duration')
   const epochProgressBar = $('#epoch-progressbar')
   const episodeProgressBar = $('#episode-progressbar')
+  const inputReload = $('#input-reload')
 
+  /*
   trainButton.on('click', () => {
     trainButton.hide()
     previewButton.show()
@@ -30,48 +32,51 @@ export default function initUI(trainer, tankLogic, agent) {
     window.dispatchEvent(new Event('previewMode'))
   })
 
-  episodeNumber.text(`${trainer.episodeIndex} / ${trainer.epochSize}`)
-  epochNumber.text(trainer.epochIndex+1)
-  epochDuration.text(ms2txt(trainer.epochDuration))
-
   trainer.settings.addEventListener('change_epochSize', () => {
     episodeNumber.text(`${trainer.episodeIndex+1} / ${trainer.epochSize}`)
   })
+  */
 
-  trainer.addEventListener('epochComplete', () => {
-    epochNumber.text(trainer.epochIndex+1)
-    epochDuration.text(ms2txt(trainer.epochDuration))
+  messageBus.addEventListener('epochStats', ({data}) => {
+    epochNumber.text(data.epochIndex+1)
+    epochDuration.text(ms2txt(data.epochDuration))
     epochProgressBar.css('width', '0%')
     episodeProgressBar.css('width', '0%')
-    episodeNumber.text(`0 / ${trainer.epochSize}`)
+    episodeNumber.text(`0 / ${data.epochSize}`)
   })
 
-  trainer.addEventListener('episodeComplete', () => {
-    episodeNumber.text(`${trainer.episodeIndex+1} / ${trainer.epochSize}`)
-    episodeProgressBar.css('width', '0%')
-    stepDuration.text(agent.stepAvgDuration.toFixed(2) + 'ms')
-    $('.expected-val').text(agent.expectedValue.toFixed(2))
+  messageBus.addEventListener('epochComplete', ({data}) => {
+    console.log('inputReload.checked', inputReload, inputReload.prop('checked'))
+    if(inputReload.prop('checked')) {
+      location.reload()
+    }
   })
+
+  messageBus.addEventListener('episodeStats', ({data}) => {
+    episodeNumber.text(`${data.episodeIndex+1} / ${data.epochSize}`)
+    episodeProgressBar.css('width', '0%')
+    stepDuration.text(data.stepAvgDuration ? data.stepAvgDuration.toFixed(2) + 'ms' : '-')
+    $('.expected-val').text(data.expectedValue.toFixed(2))
+
+    let progress = (data.episodeIndex+1) / data.epochSize
+    progress = Math.round(100*progress)+ "%"
+    epochProgressBar.css('width', progress)
+  })
+
+  messageBus.addEventListener('episodeProgress', ({data}) => {
+    let progress = data.timeElapsed / data.timeLimit
+    progress = Math.round(100*progress)+ "%"
+    episodeProgressBar.css('width', progress)
+  })
+
+  /*
 
   trainer.addEventListener('step', () => {
     if(trainer.simSpeed == 1) {
       $('.expected-val').text(agent.expectedValue.toFixed(2))
     }
   })
-
-  setInterval(() => {
-    let progress = 0
-    if(trainer.simulation) {
-      progress = trainer.simulation.timeElapsed / trainer.simulation.timeLimit
-    }
-    progress = Math.round(100*progress)+ "%"
-    episodeProgressBar.css('width', progress)
-
-    progress = trainer.episodeIndex / trainer.epochSize
-    progress = Math.round(100*progress)+ "%"
-    epochProgressBar.css('width', progress)
-    
-  }, 200)
+  */
 }
 
 function ms2txt(timeMs) {

@@ -2,20 +2,21 @@ const INIT_REWARD_TYPE = 'radarBeam'
 
 export default class Trainer extends EventTarget {
 
-  constructor(agent, tankLogic, jsBattle, settings) {
+  constructor(agent, tankLogic, jsBattle, settings, canvas=null) {
     super()
+    this.canvas = canvas
     this.settings = settings
     this.jsBattle = jsBattle
-    this.canvas = document.getElementById('battlefield');
     this.agent = agent
     this.tankLogic = tankLogic
     this.epochIndex = 0
-    this._simSpeed = 1
     this._simulation = null
     this._epochDuration = null
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = []
+    this.autoSave = true
+    this.simSpeed = 4
     this.rewardType = INIT_REWARD_TYPE
   }
 
@@ -25,17 +26,6 @@ export default class Trainer extends EventTarget {
 
   get epochDuration() {
     return this._epochDuration
-  }
-
-  get simSpeed() {
-    return this._simSpeed
-  }
-
-  set simSpeed(v) {
-    this._simSpeed = v
-    if(this._simulation) {
-      this._simulation.setSpeed(this._simSpeed)
-    }
   }
 
   get epochSize() {
@@ -76,7 +66,10 @@ export default class Trainer extends EventTarget {
     this.agent.onBatchFinish()
     this.epochIndex++
     this._epochDuration = performance.now() - this._epochStartTime
-    console.log("saving...")
+    console.log("Epoch duration", this._epochDuration )
+    if(this.autoSave) {
+      console.log("saving...")
+    }
     await this.save()
     console.log("%c--== Epoch End ==--", 'background-color:blue;color:white')
     this.dispatchEvent(new Event('epochComplete'))
@@ -88,10 +81,15 @@ export default class Trainer extends EventTarget {
       console.log("on game start")
       this.agent.onGameStart()
       console.log("create game renderer")
-      const renderer = this.jsBattle.createRenderer('debug');
-      renderer.init(this.canvas);
-      console.log("loading assets")
-      await new Promise(done => renderer.loadAssets(done))
+      let renderer
+      if(this.canvas) {
+        renderer = this.jsBattle.createRenderer('debug');
+        renderer.init(this.canvas);
+        console.log("loading assets")
+        await new Promise(done => renderer.loadAssets(done))
+      } else {
+        renderer = this.jsBattle.createRenderer('void');
+      }      
       console.log("create simulation")
       this._simulation = this.jsBattle.createSimulation(renderer);
       this._simulation.init(900, 600);
@@ -125,8 +123,10 @@ export default class Trainer extends EventTarget {
       this._simulation.onFinish(async () => {
         console.log("Game finish")
         await this.agent.onGameFinish()
-        console.log("Clean texture cache")
-        PIXI.utils.clearTextureCache()
+        if(this.canvas) {
+          console.log("Clean texture cache")
+          PIXI.utils.clearTextureCache()
+        }
         console.log("%c- Episode End -", 'background-color:blue;color:white')
         setTimeout(() => onEpisodeEnd(), 50)
       })
@@ -135,7 +135,7 @@ export default class Trainer extends EventTarget {
         this.dispatchEvent(new Event('step'))
       })
 
-      this._simulation.setSpeed(this._simSpeed)
+      this._simulation.setSpeed(this.simSpeed)
       this._simulation.timeLimit = this.episodeTimeLimit
     
       this.tankLogic.tankModel.moveTo(bx, by, 0)
@@ -151,13 +151,12 @@ export default class Trainer extends EventTarget {
     const agentResult = await this.agent.restoreModel()
     if(!agentResult) return false
 
-    const rawTrainerState = localStorage.getItem("trainerState")
+    const rawTrainerState = await localStorage.getItem("trainerState")
     if(!rawTrainerState) return false
 
     const trainerState = JSON.parse(rawTrainerState)
 
     this.epochIndex = trainerState.epochIndex
-    this._simSpeed = 1
     this._simulation = null
     this._epochDuration = trainerState.epochDuration
     this._epochStartTime = 0
@@ -173,7 +172,7 @@ export default class Trainer extends EventTarget {
   async save() {
     await this.agent.saveModel()
 
-    localStorage.setItem("trainerState", JSON.stringify({
+    await localStorage.setItem("trainerState", JSON.stringify({
       epochIndex: this.epochIndex,
       scoreHistory: this.scoreHistory,
       epochDuration: this._epochDuration,
@@ -190,10 +189,10 @@ export default class Trainer extends EventTarget {
   }
 
   async resetScoreHistory() {
-    const data = JSON.parse(localStorage.getItem('trainerState'))
+    const data = JSON.parse(await localStorage.getItem('trainerState'))
     this.scoreHistory = []
     data.scoreHistory = this.scoreHistory
-    localStorage.setItem("trainerState", JSON.stringify(data));
+    await localStorage.setItem("trainerState", JSON.stringify(data));
   }
 
 }

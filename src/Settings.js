@@ -7,14 +7,17 @@ export default class Settings extends EventTarget {
       epochSize: 10,
       episodeTimeLimit: 10000
     }
-    const rawData = localStorage.getItem('settings')
+  }
+
+  async init() {
+    const rawData = await localStorage.getItem('settings')
     if(rawData) {
       this.data = {
         ...this.data,
         ...JSON.parse(rawData)
       }
     }
-    localStorage.setItem('settings', JSON.stringify(this.data))
+    await localStorage.setItem('settings', JSON.stringify(this.data))
   }
 
   prop(key, newVal = undefined) {
