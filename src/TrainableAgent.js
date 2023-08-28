@@ -18,6 +18,7 @@ export default class TrainableAgent extends Agent {
 
   onBatchStart() {
     this.memory.resetAll()
+    this.criticLossHistory = []
     this.gameScores = [];
   }
 
@@ -40,7 +41,9 @@ export default class TrainableAgent extends Agent {
     this.totalReward = totalScore
     const gradients = tf.tidy(() => this.getGradientsAndSaveActions(inputTensor).grads );
 
+    this.startBenchmark()
     this.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
+    this.endBenchmark()
     this.memory.rememberGameStep(input, gradients, scoreIncrement, this.expectedValue);
 
     // performance stats
@@ -56,13 +59,16 @@ export default class TrainableAgent extends Agent {
     this.memory.aggregateGameResults()
 
     this.stepAvgDuration = this.stepCount ? this.stepTotalDuration / this.stepCount : 0
+    this.benchmarkAvgDuration = this.benchmarkCount ? this.benchmarkTotalDuration / this.benchmarkCount : 0
     console.log(`Average step duration ${this.stepAvgDuration.toFixed(2)}ms`)
 
     console.log("Getting critic train data")
     const [x, y] = this.memory.getCriticTrainData()
 
     console.log("Training critic")
-    await this.criticNet.net.fit(x, y, {epochs: 1})
+    const criticResults = await this.criticNet.net.fit(x, y, {epochs: 1})
+    const criticLoss = criticResults.history.loss[0]
+    this.criticLossHistory.push(criticLoss)
   }
 
   getGradientsAndSaveActions(inputTensor) {

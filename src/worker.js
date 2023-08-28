@@ -40,6 +40,7 @@ const messageBus = new MessageBus(self);
       epochDuration: trainer.epochDuration,
       epochSize: trainer.epochSize,
       scoreHistory: trainer.scoreHistory || [],
+      criticLossHistory: trainer.criticLossHistory || [],
     })
     messageBus.send("epochComplete")
   })
@@ -57,6 +58,7 @@ const messageBus = new MessageBus(self);
       episodeIndex: trainer.episodeIndex,
       epochSize: trainer.epochSize,
       stepAvgDuration: agent.stepAvgDuration,
+      benchmarkAvgDuration: agent.benchmarkAvgDuration,
       expectedValue: agent.expectedValue
     })
   })
@@ -99,6 +101,7 @@ const messageBus = new MessageBus(self);
     epochDuration: trainer.epochDuration,
     epochSize: trainer.epochSize,
     scoreHistory: trainer.scoreHistory || [],
+    criticLossHistory: trainer.criticLossHistory || [],
   })
   messageBus.send("settings", {
     epochSize: trainer.epochSize,

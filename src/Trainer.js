@@ -15,6 +15,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = []
+    this.criticLossHistory = []
     this.autoSave = true
     this.simSpeed = 4
     this.rewardType = INIT_REWARD_TYPE
@@ -60,8 +61,17 @@ export default class Trainer extends EventTarget {
       min: Math.min(...this.agent.gameScores), 
       max: Math.max(...this.agent.gameScores)
     })
+    this.criticLossHistory.push({
+      x: this.epochIndex+1, 
+      mean: mean(this.agent.criticLossHistory), 
+      min: Math.min(...this.agent.criticLossHistory), 
+      max: Math.max(...this.agent.criticLossHistory)
+    })
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()
+    }
+    while(this.criticLossHistory.length > 100) {
+      this.criticLossHistory.shift()
     }
     this.agent.onBatchFinish()
     this.epochIndex++
@@ -162,6 +172,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
+    this.criticLossHistory = trainerState.criticLossHistory
     this.rewardType = INIT_REWARD_TYPE
 
     console.log("EVENT: restore")
@@ -175,6 +186,7 @@ export default class Trainer extends EventTarget {
     await localStorage.setItem("trainerState", JSON.stringify({
       epochIndex: this.epochIndex,
       scoreHistory: this.scoreHistory,
+      criticLossHistory: this.criticLossHistory,
       epochDuration: this._epochDuration,
     }));
 

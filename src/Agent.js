@@ -19,6 +19,23 @@ export default class Agent extends EventTarget {
     this.currentActions = null
     this.expectedValue = 0
     this.totalReward = 0
+
+    this.benchmarkStartTime = 0
+    this.benchmarkCount = 0
+    this.benchmarkTotalDuration = 0
+    this.benchmarkAvgDuration = 0
+
+    this.criticLossHistory = []
+  }
+
+  startBenchmark() {
+    this.benchmarkStartTime = performance.now()
+  }
+
+  endBenchmark() {
+    const duration = performance.now() - this.benchmarkStartTime 
+    this.benchmarkCount += 1
+    this.benchmarkTotalDuration += duration
   }
 
   get actorLearningRate() {

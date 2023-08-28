@@ -78,11 +78,12 @@ export default class Memory {
             // This mul() call uses broadcasting.
             varGradients[g] = varGradients[g].mul(reshapedNormalizedRewards[g]);
           }
-          // Concatenate the scaled gradients together, then average them across
-          // all the steps of all the games.
-          return tf.mean(tf.concat(varGradients, 0), 0);
+
+          const loss = tf.mean(tf.concat(varGradients, 0), 0);
+          return loss
         });
       }
+      console.debug(gradients)
       return gradients;
     });
   }

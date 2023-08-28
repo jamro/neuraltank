@@ -9,33 +9,10 @@ export default function initUI(messageBus) {
   const episodeNumber = $('#episode-number')
   const epochDuration = $('#epoch-duration')
   const stepDuration = $('#step-duration')
+  const benchmarkDuration = $('#benchmark-duration')
   const epochProgressBar = $('#epoch-progressbar')
   const episodeProgressBar = $('#episode-progressbar')
   const inputReload = $('#input-reload')
-
-  /*
-  trainButton.on('click', () => {
-    trainButton.hide()
-    previewButton.show()
-    battlefield.hide()
-    epochStats.show()
-    trainer.simSpeed = 100
-    window.dispatchEvent(new Event('fastMode'))
-  })
-
-  previewButton.on('click', () => {
-    trainButton.show()
-    previewButton.hide()
-    battlefield.show()
-    epochStats.hide()
-    trainer.simSpeed = 1
-    window.dispatchEvent(new Event('previewMode'))
-  })
-
-  trainer.settings.addEventListener('change_epochSize', () => {
-    episodeNumber.text(`${trainer.episodeIndex+1} / ${trainer.epochSize}`)
-  })
-  */
 
   messageBus.addEventListener('epochStats', ({data}) => {
     epochNumber.text(data.epochIndex+1)
@@ -56,6 +33,7 @@ export default function initUI(messageBus) {
     episodeNumber.text(`${data.episodeIndex+1} / ${data.epochSize}`)
     episodeProgressBar.css('width', '0%')
     stepDuration.text(data.stepAvgDuration ? data.stepAvgDuration.toFixed(2) + 'ms' : '-')
+    benchmarkDuration.text(data.benchmarkAvgDuration ? data.benchmarkAvgDuration.toFixed(2) + 'ms' : '-')
     $('.expected-val').text(data.expectedValue.toFixed(2))
 
     let progress = (data.episodeIndex+1) / data.epochSize
@@ -69,14 +47,6 @@ export default function initUI(messageBus) {
     episodeProgressBar.css('width', progress)
   })
 
-  /*
-
-  trainer.addEventListener('step', () => {
-    if(trainer.simSpeed == 1) {
-      $('.expected-val').text(agent.expectedValue.toFixed(2))
-    }
-  })
-  */
 }
 
 function ms2txt(timeMs) {
