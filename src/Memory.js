@@ -28,11 +28,7 @@ export default class Memory {
       }
     }
   }
-
-  rememberGameStep(trajectory) {
-    this.add(trajectory)
-  }
-
+  
   aggregateGameResults() {
     const keys = Object.keys(this.episodeMemory)
     for(let key of keys) {

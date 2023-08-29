@@ -40,15 +40,13 @@ export default class TrainableAgent extends Agent {
     const inputTensor = tf.tensor2d([input]);
     const scoreIncrement = totalScore - this.totalReward
     this.totalReward = totalScore
-    const [mean, stdDev, action] = this.actorNet.exec(inputTensor);
+    const [_, __, action] = this.actorNet.exec(inputTensor);
     this.currentActions = action.dataSync();
 
     this.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
-    this.memory.rememberGameStep({
+    this.memory.add({
       input: input, 
       action: action,
-      mean: mean,
-      stdDev: stdDev,
       reward: scoreIncrement, 
       value: this.expectedValue
     });
@@ -75,25 +73,41 @@ export default class TrainableAgent extends Agent {
   }
 
   trainActor() {
+    const epsilon = 0.2
     const f = () => tf.tidy(() => {
       const input = this.memory.epochMemory.input.reshape([-1, this.memory.epochMemory.input.shape[2]])
-      const [mean, stdDev, _] = this.actorNet.exec(input)
-
-      const action = this.memory.epochMemory.action.reshape([-1, this.memory.epochMemory.action.shape[2]])
+      const [mean1, stdDev1, action1] = this.oldActorNet.exec(input)
+      const [mean2, stdDev2, _] = this.actorNet.exec(input)
+      
+      const action2 = this.memory.epochMemory.action.reshape([-1, this.memory.epochMemory.action.shape[2]])
       const reward = this.memory.epochMemory.reward.reshape([-1, this.memory.epochMemory.reward.shape[2]])
       const value = this.memory.epochMemory.value.reshape([-1, this.memory.epochMemory.value.shape[2]])
 
       const nextValue = tf.slice2d(value, [1, 0], [-1, 1]).concat(tf.zeros([1,1]))
       const advantage = nextValue.mul(this.discountRate).add(reward).sub(value)
 
-      const variance = tf.square(stdDev)
-      const exponent = tf.mul(-0.5, tf.div(tf.sub(action, mean).square(), variance))
-      const coefficient = tf.div(1, tf.mul(stdDev, Math.sqrt(Math.PI * 2)))
-      const logProb = tf.add(tf.log(coefficient), exponent)
+      const variance1 = tf.square(stdDev1)
+      const exponent1 = tf.mul(-0.5, tf.div(tf.sub(action1, mean1).square(), variance1))
+      const coefficient1 = tf.div(1, tf.mul(stdDev1, Math.sqrt(Math.PI * 2)))
+      const logProb1 = tf.add(tf.log(coefficient1), exponent1)
 
-      const loss = logProb.mul(advantage)
+      const variance2 = tf.square(stdDev2)
+      const exponent2 = tf.mul(-0.5, tf.div(tf.sub(action2, mean2).square(), variance2))
+      const coefficient2 = tf.div(1, tf.mul(stdDev2, Math.sqrt(Math.PI * 2)))
+      const logProb2 = tf.add(tf.log(coefficient2), exponent2)
+
+      const prob1 = logProb1.exp()
+      const prob2 = logProb2.exp()
+
+      const ratio = logProb1.div(logProb2)
+      const surrogate1 = ratio.mul(advantage)
+      const surrogate2 = tf.clipByValue(ratio, 1 - epsilon, 1 + epsilon).mul(advantage)
+
+      const loss = tf.minimum(surrogate1, surrogate2);
       return tf.neg(loss).mean()
     })
+
+    this.refreshOldActor()
     tf.tidy(() => this.actorNet.optimizer.minimize(f))
   }
 
