@@ -14,11 +14,7 @@ export default class PersistentNetwork {
 
     this.net = null
   }
-
-  exec(inputs) {
-    return null
-  }
-
+  
   async save() {
     const savePath = getModelSavePath(this.name)
     await this.net.save(savePath);

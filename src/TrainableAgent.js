@@ -8,7 +8,8 @@ export default class TrainableAgent extends Agent {
   constructor() {
     super()
 
-    this.memory = new Memory(INIT_DISCOUNT_RATE)
+    this.memory = new Memory()
+    this.discountRate = INIT_DISCOUNT_RATE
     this.gameScores = [];
 
     this.stepCount = 0
@@ -23,7 +24,7 @@ export default class TrainableAgent extends Agent {
   }
 
   onBatchFinish() {
-    tf.tidy(() => this.actorNet.optimizer.applyGradients(this.memory.scaleAndAverageGradients()));
+    this.trainActor()
   }
 
   onGameStart() {
@@ -39,16 +40,18 @@ export default class TrainableAgent extends Agent {
     const inputTensor = tf.tensor2d([input]);
     const scoreIncrement = totalScore - this.totalReward
     this.totalReward = totalScore
-    const gradients = tf.tidy(() => this.getGradientsAndSaveActions(inputTensor).grads );
+    const [mean, stdDev, action] = this.actorNet.exec(inputTensor);
+    this.currentActions = action.dataSync();
 
-    this.startBenchmark()
     this.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
-    this.endBenchmark()
     this.memory.rememberGameStep({
       input: input, 
+      action: action,
+      mean: mean,
+      stdDev: stdDev,
       reward: scoreIncrement, 
       value: this.expectedValue
-    }, gradients);
+    });
 
     // performance stats
     const duration = performance.now() - startTime 
@@ -66,40 +69,44 @@ export default class TrainableAgent extends Agent {
     this.benchmarkAvgDuration = this.benchmarkCount ? this.benchmarkTotalDuration / this.benchmarkCount : 0
     console.log(`Average step duration ${this.stepAvgDuration.toFixed(2)}ms`)
 
-    console.log("Getting critic train data")
-    const [x, y] = this.memory.getCriticTrainData()
-
     console.log("Training critic")
-    const criticResults = await this.criticNet.net.fit(x, y, {epochs: 1})
-    const criticLoss = criticResults.history.loss[0]
+    const criticLoss = await this.trainCritic()
     this.criticLossHistory.push(criticLoss)
   }
 
-  getGradientsAndSaveActions(inputTensor) {
+  trainActor() {
     const f = () => tf.tidy(() => {
-      let [mean, stdDev, actions] = this.actorNet.exec(inputTensor);
-      this.currentActions = actions.dataSync();
+      const input = this.memory.epochMemory.input.reshape([-1, this.memory.epochMemory.input.shape[2]])
+      const [mean, stdDev, _] = this.actorNet.exec(input)
+
+      const action = this.memory.epochMemory.action.reshape([-1, this.memory.epochMemory.action.shape[2]])
+      const reward = this.memory.epochMemory.reward.reshape([-1, this.memory.epochMemory.reward.shape[2]])
+      const value = this.memory.epochMemory.value.reshape([-1, this.memory.epochMemory.value.shape[2]])
+
+      const nextValue = tf.slice2d(value, [1, 0], [-1, 1]).concat(tf.zeros([1,1]))
+      const advantage = nextValue.mul(this.discountRate).add(reward).sub(value)
 
       const variance = tf.square(stdDev)
-      const exponent = tf.mul(-0.5, tf.div(tf.sub(actions, mean).square(), variance))
+      const exponent = tf.mul(-0.5, tf.div(tf.sub(action, mean).square(), variance))
       const coefficient = tf.div(1, tf.mul(stdDev, Math.sqrt(Math.PI * 2)))
       const logProb = tf.add(tf.log(coefficient), exponent)
 
-      return tf.neg(logProb).asScalar()
-    });
-    return tf.variableGrads(f);
+      const loss = logProb.mul(advantage)
+      return tf.neg(loss).mean()
+    })
+    tf.tidy(() => this.actorNet.optimizer.minimize(f))
   }
 
-  pushGradients(record, gradients) {
-    for (const key in gradients) {
-      if (key in record) {
-        record[key].push(gradients[key]);
-      } else {
-        record[key] = [gradients[key]];
-      }
-    }
-  }
+  async trainCritic() {
+    const input = tf.slice2d(this.memory.episodeMemory.input, [1, 0], [-1, -1])
+    const nextValue = tf.slice2d(this.memory.episodeMemory.value, [1, 0], [-1, 1])
+    const reward = tf.slice2d(this.memory.episodeMemory.reward, [1, 0], [-1, 1])
+    const expectedValue = nextValue.mul(this.discountRate).add(reward).squeeze() // reward + discountRate * nextValue
 
+    const criticResults = await this.criticNet.net.fit(input, expectedValue, {epochs: 1})
+    const criticLoss = criticResults.history.loss[0]
+    return criticLoss
+  }
 
   async restoreModel() {
     if (await super.restoreModel()) {

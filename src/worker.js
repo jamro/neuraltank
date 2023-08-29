@@ -108,7 +108,7 @@ const messageBus = new MessageBus(self);
     episodeTimeLimit: trainer.episodeTimeLimit,
     actorLearningRate: agent.actorLearningRate,
     criticLearningRate: agent.criticLearningRate,
-    discountRate: agent.memory.discountRate,
+    discountRate: agent.discountRate,
     rewardType: trainer.rewardType,
   })
 

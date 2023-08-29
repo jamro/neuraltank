@@ -17,7 +17,7 @@ export default class Trainer extends EventTarget {
     this.scoreHistory = []
     this.criticLossHistory = []
     this.autoSave = true
-    this.simSpeed = 4
+    this.simSpeed = 10
     this.rewardType = INIT_REWARD_TYPE
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
   }
