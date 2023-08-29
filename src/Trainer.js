@@ -148,7 +148,7 @@ export default class Trainer extends EventTarget {
       this._simulation.setSpeed(this.simSpeed)
       this._simulation.timeLimit = this.episodeTimeLimit
     
-      this.tankLogic.tankModel.moveTo(bx, by, 0)
+      this.tankLogic.tankModel.moveTo(bx, by)
       console.log("start simulation")
       this._simulation.start()
       console.log("game started")

@@ -44,7 +44,11 @@ export default class TrainableAgent extends Agent {
     this.startBenchmark()
     this.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
     this.endBenchmark()
-    this.memory.rememberGameStep(input, gradients, scoreIncrement, this.expectedValue);
+    this.memory.rememberGameStep({
+      input: input, 
+      reward: scoreIncrement, 
+      value: this.expectedValue
+    }, gradients);
 
     // performance stats
     const duration = performance.now() - startTime 

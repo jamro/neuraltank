@@ -3,49 +3,48 @@ import * as tf from '@tensorflow/tfjs';
 export default class Memory {
   constructor(discountRate) {
     this.discountRate = discountRate
+    this.episodeMemory = {}
+    this.epochMemory = {}
     this.resetAll()
   }
 
-  rememberGameStep(input, gradients, reward, value) {
-    if(this.gameRewards.length > 0) {
-      const prevReward = this.gameRewards[this.gameRewards.length-1]
-      const prevValue = this.gameValues[this.gameValues.length-1]
-      const advantage = prevReward + this.discountRate * value - prevValue
-      this.gameAdvantages.push(advantage)
+  add(keyValue) {
+    const keys = Object.keys(keyValue)
+    for(let key of keys) {
+      const value = keyValue[key]
+      if(!this.episodeMemory[key]) {
+        this.episodeMemory[key] = []
+      }
+      this.episodeMemory[key].push(value)
     }
+  }
 
+  rememberGameStep(trajectory, gradients) {
     this.pushGradients(this.gameGradients, gradients);
-    this.gameRewards.push(reward);
-    this.gameValues.push(value)
-    this.gameInputs.push(input)
+    this.add(trajectory)
   }
 
   aggregateGameResults() {
-    if(this.gameRewards.length > 0) {
-      const prevReward = this.gameRewards[this.gameRewards.length-1]
-      const prevValue = this.gameValues[this.gameValues.length-1]
-      const advantage = prevReward - prevValue
-      this.gameAdvantages.push(advantage)
+    const keys = Object.keys(this.episodeMemory)
+    for(let key of keys) {
+      if(!this.epochMemory[key]) {
+        this.epochMemory[key] = []
+      }
+      this.epochMemory[key].push(this.episodeMemory[key])
     }
 
     this.pushGradients(this.allGradients, this.gameGradients);
-    this.allRewards.push(this.gameRewards);
-    this.allAdvantages.push(this.gameAdvantages);
   }
 
   resetAll() {
     this.allGradients = [];
-    this.allRewards = [];
-    this.allAdvantages = [];
+    this.epochMemory = {}
     this.resetGame()
   }
 
   resetGame() {
-    this.gameValues = [];
-    this.gameInputs = [];
-    this.gameRewards = [];
+    this.episodeMemory = {}
     this.gameGradients = [];
-    this.gameAdvantages = [];
   }
 
   pushGradients(record, gradients) {
@@ -58,9 +57,35 @@ export default class Memory {
     }
   }
 
+  calculateAdvantages() {
+    if(this.epochMemory.reward.length !== this.epochMemory.value.length) {
+      throw Error(`rewards[] (${this.epochMemory.reward.length}) and values[] (${this.epochMemory.value.length}) length must match`)
+    }
+
+    const advantages = []
+
+    for(let j=0; j < this.epochMemory.reward.length; j++) {
+      const rewards = this.epochMemory.reward[j]
+      const values = this.epochMemory.value[j]
+      advantages[j] = []
+
+      if(rewards.length !== values.length) {
+        throw Error(`rewards (${rewards.length}) and values (${values.length}) length must match`)
+      }
+      for(let i=0; i < rewards.length-1; i++) {
+        const advantage = rewards[i] + this.discountRate * values[i+1] - values[i]
+        advantages[j].push(advantage)
+      }
+      advantages[j].push(rewards[rewards.length-1] - values[values.length-1])
+      
+    }
+    return advantages
+  }
+
   scaleAndAverageGradients() {
     return tf.tidy(() => {
-      const normalizedRewards = this.allAdvantages.map(a => tf.tensor1d(a))
+      const allAdvantages = this.calculateAdvantages()
+      const normalizedRewards = allAdvantages.map(a => tf.tensor1d(a))
 
       const gradients = {};
       for (const varName in this.allGradients) {
@@ -83,7 +108,6 @@ export default class Memory {
           return loss
         });
       }
-      console.debug(gradients)
       return gradients;
     });
   }
@@ -92,9 +116,9 @@ export default class Memory {
     let x = []
     let y = []
 
-    for(let i=0; i < this.gameInputs.length-1; i++) {
-      x.push(this.gameInputs[i])
-      y.push(this.gameRewards[i] + this.discountRate * this.gameValues[i+1])
+    for(let i=0; i < this.episodeMemory.input.length-1; i++) {
+      x.push(this.episodeMemory.input[i])
+      y.push(this.episodeMemory.reward[i] + this.discountRate * this.episodeMemory.value[i+1])
     }
 
     return [
