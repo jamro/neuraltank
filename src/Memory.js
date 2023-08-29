@@ -11,11 +11,20 @@ export default class Memory {
   add(keyValue) {
     const keys = Object.keys(keyValue)
     for(let key of keys) {
-      const value = keyValue[key]
-      if(!this.episodeMemory[key]) {
-        this.episodeMemory[key] = []
+      let value = keyValue[key]
+
+      // convert input into 2dim tensor
+      if(typeof(value) !== 'object' || value.constructor.name !== 'Tensor') {
+        value = tf.tensor(value)
+        while(value.shape.length < 2) {
+          value = value.expandDims()
+        }
       }
-      this.episodeMemory[key].push(value)
+      if(!this.episodeMemory[key]) {
+        this.episodeMemory[key] = value
+      } else {
+        this.episodeMemory[key] = tf.concat([this.episodeMemory[key], value])
+      }
     }
   }
 
@@ -28,9 +37,10 @@ export default class Memory {
     const keys = Object.keys(this.episodeMemory)
     for(let key of keys) {
       if(!this.epochMemory[key]) {
-        this.epochMemory[key] = []
+        this.epochMemory[key] = this.episodeMemory[key].expandDims()
+      } else {
+        this.epochMemory[key] = tf.concat([this.epochMemory[key], this.episodeMemory[key].expandDims()])
       }
-      this.epochMemory[key].push(this.episodeMemory[key])
     }
 
     this.pushGradients(this.allGradients, this.gameGradients);
@@ -58,15 +68,20 @@ export default class Memory {
   }
 
   calculateAdvantages() {
-    if(this.epochMemory.reward.length !== this.epochMemory.value.length) {
-      throw Error(`rewards[] (${this.epochMemory.reward.length}) and values[] (${this.epochMemory.value.length}) length must match`)
+    const epochMemory = {
+      reward: this.epochMemory.reward.squeeze().arraySync(),
+      value: this.epochMemory.value.squeeze().arraySync(),
+    }
+
+    if(epochMemory.reward.length !== epochMemory.value.length) {
+      throw Error(`rewards[] (${epochMemory.reward.length}) and values[] (${epochMemory.value.length}) length must match`)
     }
 
     const advantages = []
 
-    for(let j=0; j < this.epochMemory.reward.length; j++) {
-      const rewards = this.epochMemory.reward[j]
-      const values = this.epochMemory.value[j]
+    for(let j=0; j < epochMemory.reward.length; j++) {
+      const rewards = epochMemory.reward[j]
+      const values = epochMemory.value[j]
       advantages[j] = []
 
       if(rewards.length !== values.length) {
@@ -113,17 +128,14 @@ export default class Memory {
   }
 
   getCriticTrainData() {
-    let x = []
-    let y = []
-
-    for(let i=0; i < this.episodeMemory.input.length-1; i++) {
-      x.push(this.episodeMemory.input[i])
-      y.push(this.episodeMemory.reward[i] + this.discountRate * this.episodeMemory.value[i+1])
-    }
+    const input =  tf.slice2d(this.episodeMemory.input, [1, 0], [-1, -1])
+    const nextValue = tf.slice2d(this.episodeMemory.value, [1, 0], [-1, 1])
+    const reward = tf.slice2d(this.episodeMemory.reward, [1, 0], [-1, 1])
+    const expectedValue = nextValue.mul(this.discountRate).add(reward).squeeze() // reward + discountRate * nextValue
 
     return [
-      tf.tensor2d(x),
-      tf.tensor1d(y)
+      input,
+      expectedValue
     ]
   }
 }

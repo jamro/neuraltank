@@ -19,6 +19,7 @@ export default class Trainer extends EventTarget {
     this.autoSave = true
     this.simSpeed = 4
     this.rewardType = INIT_REWARD_TYPE
+    this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
   }
 
   get simulation() {
@@ -33,21 +34,14 @@ export default class Trainer extends EventTarget {
     return this.settings.prop('epochSize')
   }
 
-  set epochSize(v) {
-    return this.settings.prop('epochSize', v)
-  }
-
   get episodeTimeLimit() {
-    return this.settings.prop('episodeTimeLimit')
-  }
-
-  set episodeTimeLimit(v) {
-    return this.settings.prop('episodeTimeLimit', v)
+    return this.currentTimeLimit
   }
 
   async runEpoch() {
     this._epochStartTime = performance.now()
     console.log("starting new epoch")
+    this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
     this.agent.onBatchStart()
     for(let i=0; i < this.epochSize; i++) {
       console.log("starting episode", i+1)

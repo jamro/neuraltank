@@ -76,10 +76,10 @@ const messageBus = new MessageBus(self);
   messageBus.addEventListener('config', ({data}) => {
     switch(data.key) {
       case 'epochSize':
-        trainer.epochSize = data.value;
+        settings.prop('epochSize', data.value)
         break
       case 'episodeTimeLimit':
-        trainer.episodeTimeLimit = data.value;
+        settings.prop('episodeTimeLimit', data.value)
         break
     }
   })
