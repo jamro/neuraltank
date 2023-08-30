@@ -49,18 +49,22 @@ export default class Trainer extends EventTarget {
       await this.runEpisode()   
     }
     console.log("store history")
-    this.scoreHistory.push({
-      x: this.epochIndex+1, 
-      mean: mean(this.agent.gameScores), 
-      min: Math.min(...this.agent.gameScores), 
-      max: Math.max(...this.agent.gameScores)
-    })
-    this.criticLossHistory.push({
-      x: this.epochIndex+1, 
-      mean: mean(this.agent.criticLossHistory), 
-      min: Math.min(...this.agent.criticLossHistory), 
-      max: Math.max(...this.agent.criticLossHistory)
-    })
+    if(this.agent.gameScores.length) {
+      this.scoreHistory.push({
+        x: this.epochIndex+1, 
+        mean: mean(this.agent.gameScores), 
+        min: Math.min(...this.agent.gameScores), 
+        max: Math.max(...this.agent.gameScores)
+      })
+    }
+    if(this.agent.criticLossHistory.length) {
+      this.criticLossHistory.push({
+        x: this.epochIndex+1, 
+        mean: mean(this.agent.criticLossHistory), 
+        min: Math.min(...this.agent.criticLossHistory), 
+        max: Math.max(...this.agent.criticLossHistory)
+      })
+    }
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()
     }

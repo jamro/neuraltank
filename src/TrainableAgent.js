@@ -75,6 +75,7 @@ export default class TrainableAgent extends Agent {
   trainActor() {
     const epsilon = 0.2
     const f = () => tf.tidy(() => {
+      // get recorded inputs for last epoch
       const input = this.memory.epochMemory.input.reshape([-1, this.memory.epochMemory.input.shape[2]])
       const [mean1, stdDev1, action1] = this.oldActorNet.exec(input)
       const [mean2, stdDev2, _] = this.actorNet.exec(input)
@@ -86,29 +87,41 @@ export default class TrainableAgent extends Agent {
       const nextValue = tf.slice2d(value, [1, 0], [-1, 1]).concat(tf.zeros([1,1]))
       const advantage = nextValue.mul(this.discountRate).add(reward).sub(value)
 
+      /*
+        Action probability formula
+        ============================================================
+
+        variance = stddev^2
+        exponent = -0.5 * (((action-mean)^2) / variance)
+        coefficient = 1 / (stddev * 4 * PI()^2)
+        prob = coefficient * EXP(exponent) 
+      */
+ 
       const variance1 = tf.square(stdDev1)
-      const exponent1 = tf.mul(-0.5, tf.div(tf.sub(action1, mean1).square(), variance1))
-      const coefficient1 = tf.div(1, tf.mul(stdDev1, Math.sqrt(Math.PI * 2)))
-      const logProb1 = tf.add(tf.log(coefficient1), exponent1)
+      const exponent1 = tf.mul(-0.5, action1.sub(mean1).square().div(variance1))
+      const coefficient1 = tf.div(1, stdDev1.mul(4*Math.PI*Math.PI))
+      const prob1 = tf.tanh(coefficient1.mul(exponent1.exp()), 0, 1)
+      const probProd1 = prob1.prod(1).expandDims(1) // calculate product of all probabilities in case of multidimensional action space
 
       const variance2 = tf.square(stdDev2)
-      const exponent2 = tf.mul(-0.5, tf.div(tf.sub(action2, mean2).square(), variance2))
-      const coefficient2 = tf.div(1, tf.mul(stdDev2, Math.sqrt(Math.PI * 2)))
-      const logProb2 = tf.add(tf.log(coefficient2), exponent2)
+      const exponent2 = tf.mul(-0.5, action2.sub(mean2).square().div(variance2))
+      const coefficient2 = tf.div(1, stdDev2.mul(4*Math.PI*Math.PI))
+      const prob2 = tf.tanh(coefficient2.mul(exponent2.exp()), 0, 1)
+      const probProd2 = prob2.prod(1).expandDims(1) // calculate product of all probabilities in case of multidimensional action space
 
-      const prob1 = logProb1.exp()
-      const prob2 = logProb2.exp()
-
-      const ratio = logProb1.div(logProb2)
+      const ratio = probProd2.div(probProd1)
       const surrogate1 = ratio.mul(advantage)
       const surrogate2 = tf.clipByValue(ratio, 1 - epsilon, 1 + epsilon).mul(advantage)
 
       const loss = tf.minimum(surrogate1, surrogate2);
+
       return tf.neg(loss).mean()
     })
 
     this.refreshOldActor()
-    tf.tidy(() => this.actorNet.optimizer.minimize(f))
+    const cost = tf.tidy(() => this.actorNet.optimizer.minimize(f, true))
+    const actorLoss = cost.dataSync()[0]
+    console.log("Actor loss:", actorLoss)
   }
 
   async trainCritic() {
