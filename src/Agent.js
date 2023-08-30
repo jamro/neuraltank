@@ -2,6 +2,7 @@
 import ActorNetwork from './net/ActorNetwork.js';
 import CriticNetwork from './net/CriticNetwork.js';
 import * as tf from '@tensorflow/tfjs';
+import DualActorNetwork from './net/DualActorNetwork.js';
 
 const INIT_ACTOR_LEARNING_RATE = 0.001
 const INIT_CRITIC_LEARNING_RATE = 0.01
@@ -13,11 +14,8 @@ export default class Agent extends EventTarget {
   constructor() {
     super()
 
-    this.actorNet = new ActorNetwork(STATE_LEN, ACTION_LEN, INIT_ACTOR_LEARNING_RATE, 'actor')
-    this.oldActorNet = new ActorNetwork(STATE_LEN, ACTION_LEN, INIT_ACTOR_LEARNING_RATE, 'oldActor')
+    this.actorNet = new DualActorNetwork(STATE_LEN, ACTION_LEN, INIT_ACTOR_LEARNING_RATE, 'actor')
     this.criticNet = new CriticNetwork(STATE_LEN, 1, INIT_CRITIC_LEARNING_RATE, 'critic')
-
-    this.refreshOldActor()
 
     this.currentActions = null
     this.expectedValue = 0
@@ -29,10 +27,6 @@ export default class Agent extends EventTarget {
     this.benchmarkAvgDuration = 0
 
     this.criticLossHistory = []
-  }
-
-  refreshOldActor() {
-    this.oldActorNet.net.setWeights(this.actorNet.net.getWeights())
   }
 
   startBenchmark() {

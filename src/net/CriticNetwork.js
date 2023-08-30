@@ -20,4 +20,15 @@ export default class CriticNetwork extends PersistentNetwork {
     return tf.tidy(() => this.net.predict(inputs));
   }
 
+  async train(inputTensor, valueTensor, rewardTensor, discountRate) {
+    const input = tf.slice2d(inputTensor, [1, 0], [-1, -1])
+    const nextValue = tf.slice2d(valueTensor, [1, 0], [-1, 1])
+    const reward = tf.slice2d(rewardTensor, [1, 0], [-1, 1])
+    const expectedValue = nextValue.mul(discountRate).add(reward).squeeze() // reward + discountRate * nextValue
+
+    const criticResults = await this.net.fit(input, expectedValue, {epochs: 1})
+    const criticLoss = criticResults.history.loss[0]
+    return criticLoss
+  }
+
 }
