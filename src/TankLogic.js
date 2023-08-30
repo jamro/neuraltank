@@ -9,7 +9,6 @@ export default class TankLogic {
     this.agent = agent
     this.jsBattle = jsBattle
     this.tankModel = null
-    this.rewardType = null
   }
 
   installCallbacks(target) {
@@ -25,7 +24,6 @@ export default class TankLogic {
     const init = this.init
     const loop = this.loop
     const _this = { 
-      getRewardType: () => this.rewardType,
       getScore: () => this.tankModel.score
     }
     console.log(_this)
@@ -39,16 +37,16 @@ export default class TankLogic {
 
   init(settings, info, _this, agent) {
     _this.lastEnemyPosAngle = -1
-    _this.totalRadarScore = 0
-    _this.timeToFindTarget = 0
-    _this.firstTargetFound = false
+    _this.lastScore = 0
+    _this.lastEnergy = 100
   }
   
   loop(state, control, _this, agent) {
 
+
     // calculate angular position of the enemy within the radar beam
     let enemyDistance = 300
-    let radarScore = -0.05
+    let radarReward = -0.05
     let radarAbsAngle = state.radar.angle + state.angle
     let gunAbsAngle = state.gun.angle + state.angle
 
@@ -65,14 +63,7 @@ export default class TankLogic {
     let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - _this.lastEnemyPosAngle)/180
 
     if(state.radar.enemy) {
-      radarScore = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))
-    }
-
-    // calculate time to find the enemy
-    if(state.radar.enemy) {
-      _this.firstTargetFound = true
-    } else if(!_this.firstTargetFound) {
-      _this.timeToFindTarget++
+      radarReward = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))
     }
 
     const input = [
@@ -81,30 +72,20 @@ export default class TankLogic {
       //enemyPosGunAngle
     ]
 
-    // choose reward
-    _this.totalRadarScore += radarScore
-    let totalReward = 0
-    switch(_this.getRewardType()) {
-      case 'gameScore':
-        totalReward = _this.getScore()
-        break;
-      case 'radarBeam':
-        totalReward = _this.totalRadarScore
-        break;
-      case 'enemyFound':
-        totalReward = -_this.timeToFindTarget  + (_this.firstTargetFound ? 100 : 0)
-        break;
-      default:
-        throw new Error(`Unknown reward type '${_this.rewardType}'`)
-    }
+    // reward
+    const totalScore = _this.getScore()
+    const gameScoreReward = totalScore - _this.lastScore
+    _this.lastScore = totalScore
+    const energyReward = state.energy - _this.lastEnergy
+    _this.lastEnergy = state.energy
+    const collisionReward = state.collisions.wall ? -1 : 0
 
-    const actions = agent.train(input, totalReward)
+    const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
   
     control.RADAR_TURN = actions[0]
   }
 
-  createAI(simulation, rewardType) {
-    this.rewardType = rewardType
+  createAI(simulation) { // @TODO remove reward type
     const code = `importScripts('lib/tank.js');
       tank.init(function(settings, info) {
         tankInit(settings, info)

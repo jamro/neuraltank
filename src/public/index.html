@@ -85,10 +85,24 @@
         </div>
         <div class="col-lg-6 col-12">
           <div class="card">
-            <h5 class="card-header"><i class="ri-medal-line"> </i>Scoring History <button id="btn-reset-scoring-history" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-delete-bin-fill"></i> Reset</button></h5>
+            <h5 class="card-header"><i class="ri-medal-line"> </i>Reward History <button id="btn-reset-reward-history" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-delete-bin-fill"></i> Reset</button></h5>
             <div class="card-body" style="text-align: right;">
-              <h1 class="card-title"></i> <span id="best-score">-</span></h1>
-              <canvas id="score-chart" style="width: 100%; height: 15em"></canvas>
+              <h1 class="card-title"></i> <span id="best-reward">-</span></h1>
+              <div class="row mt-3">
+                <div class="col-3">
+                  <span class="badge rounded-pill text-bg-danger">Score: <span id="reward-0">-</span></span>
+                </div>
+                <div class="col-3">
+                  <span class="badge rounded-pill text-bg-primary">Radar: <span id="reward-1">-</span></span>
+                </div>
+                <div class="col-3">
+                  <span class="badge rounded-pill text-bg-warning">Energy: <span id="reward-2">-</span></span>
+                </div>
+                <div class="col-3">
+                  <span class="badge rounded-pill text-bg-secondary">Collision: <span id="reward-3">-</span></span>
+                </div>
+              </div>
+              <canvas id="component-chart" style="width: 100%; height: 15em"></canvas>
             </div>
           </div>
           <div class="card mt-3">
@@ -129,16 +143,6 @@
                   <label for="inputDiscountRate" class="col-sm-6 col-form-label">Reward discount rate:</label>
                   <div class="col-sm-6">
                     <input type="text" class="form-control text-end" id="inputDiscountRate" disabled="disabled">
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <label for="inputReward" class="col-sm-6 col-form-label">Reward</label>
-                  <div class="col-sm-6">
-                    <select class="form-select" id="inputReward" readonly="readonly" disabled="disabled">
-                      <option value="gameScore">Game Score</option>
-                      <option value="radarBeam">Radar Beam</option>
-                      <option value="enemyFound">Enemy Find Time</option>
-                    </select>
                   </div>
                 </div>
                 <div class="form-group row mt-1">

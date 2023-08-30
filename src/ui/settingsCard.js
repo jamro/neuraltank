@@ -6,7 +6,6 @@ export default function initUI(messageBus) {
   const inputActorLearningRate = $('#inputActorLearningRate')
   const inputCriticLearningRate = $('#inputCriticLearningRate')
   const inputDiscountRate = $('#inputDiscountRate')
-  const inputReward = $('#inputReward')
   const settingsLock = $('#settingsLock')
 
   const inputs = [
@@ -16,7 +15,6 @@ export default function initUI(messageBus) {
     inputActorLearningRate,
     inputCriticLearningRate,
     inputDiscountRate,
-    inputReward
   ]
 
   function disableForm() {
@@ -37,7 +35,6 @@ export default function initUI(messageBus) {
     inputActorLearningRate.val(data.actorLearningRate)
     inputCriticLearningRate.val(data.criticLearningRate)
     inputDiscountRate.val(data.discountRate)
-    inputReward.val(data.rewardType)
   })
   
 

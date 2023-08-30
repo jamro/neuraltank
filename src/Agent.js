@@ -20,6 +20,8 @@ export default class Agent extends EventTarget {
     this.currentActions = null
     this.expectedValue = 0
     this.totalReward = 0
+    this.rewardComponents = null
+    this.epochRewardComponents = null
 
     this.benchmarkStartTime = 0
     this.benchmarkCount = 0
@@ -27,6 +29,7 @@ export default class Agent extends EventTarget {
     this.benchmarkAvgDuration = 0
 
     this.criticLossHistory = []
+    this.rewardHistory = [];
   }
 
   startBenchmark() {
@@ -57,15 +60,29 @@ export default class Agent extends EventTarget {
 
   onGameStart() {
     this.totalReward = 0
+    this.rewardComponents = null
   }
 
   async onGameFinish() {
     
   }
 
-  train(input, totalScore) {
-    const scoreIncrement = totalScore - this.totalReward
-    this.totalReward = totalScore
+  storeRewards(rewards) {
+    const scoreIncrement = rewards.reduce((s, a) => s + a, 0);
+    this.totalReward += scoreIncrement
+    if(!this.rewardComponents) {
+      this.rewardComponents = [...rewards]
+    } else {
+      this.rewardComponents = rewards.reduce((r, v, i) => {
+        r[i] += v
+        return r
+      }, this.rewardComponents)
+    }
+    return scoreIncrement
+  }
+
+  act(input, rewards) {
+    this.storeRewards(rewards)
     const inputTensor = tf.tensor2d([input]);
     let [mean, stdDev, actions] = this.actorNet.exec(inputTensor);
     this.currentActions = actions.dataSync();

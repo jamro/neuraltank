@@ -32,15 +32,22 @@ import * as $ from 'jquery'
     await trainer.save()
   }
 
-
-  const scoreField = $('#score')
+  const totalRewardField = $('#reward-total')
+  const rewardField = [
+    $('#reward-0'),
+    $('#reward-1'),
+    $('#reward-2'),
+    $('#reward-3'),
+  ]
   const valueField = $('#value')
 
   trainer.addEventListener('step', () => {
-    scoreField.text(agent.totalReward.toFixed(2))
+    totalRewardField.text(agent.totalReward.toFixed(2))
     valueField.text(agent.expectedValue.toFixed(2))
+    for(let i=0; i < agent.rewardComponents.length; i++) {
+      rewardField[i].text(agent.rewardComponents[i].toFixed(2))
+    }
   })
-
 
   while(true) {
     await trainer.runEpoch()

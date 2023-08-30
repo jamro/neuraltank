@@ -1,5 +1,3 @@
-const INIT_REWARD_TYPE = 'radarBeam'
-
 export default class Trainer extends EventTarget {
 
   constructor(agent, tankLogic, jsBattle, settings, canvas=null) {
@@ -18,7 +16,6 @@ export default class Trainer extends EventTarget {
     this.criticLossHistory = []
     this.autoSave = true
     this.simSpeed = 10
-    this.rewardType = INIT_REWARD_TYPE
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
   }
 
@@ -49,12 +46,14 @@ export default class Trainer extends EventTarget {
       await this.runEpisode()   
     }
     console.log("store history")
-    if(this.agent.gameScores.length) {
+    if(this.agent.rewardHistory.length) {
+      const rewardShare = this.agent.epochRewardComponents.map(a => a/(this.episodeIndex+1))
       this.scoreHistory.push({
         x: this.epochIndex+1, 
-        mean: mean(this.agent.gameScores), 
-        min: Math.min(...this.agent.gameScores), 
-        max: Math.max(...this.agent.gameScores)
+        mean: mean(this.agent.rewardHistory), 
+        min: Math.min(...this.agent.rewardHistory), 
+        max: Math.max(...this.agent.rewardHistory),
+        rewardShare: rewardShare
       })
     }
     if(this.agent.criticLossHistory.length) {
@@ -105,7 +104,7 @@ export default class Trainer extends EventTarget {
       const by = (this._simulation.battlefield.minY + this._simulation.battlefield.maxY)/2;
       
       console.log("create Tank Logic AI")
-      this.tankLogic.createAI(this._simulation, this.rewardType)
+      this.tankLogic.createAI(this._simulation)
 
       const opponentCode = `importScripts('lib/tank.js');
         tank.init(function(settings, info) {
@@ -171,7 +170,6 @@ export default class Trainer extends EventTarget {
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
     this.criticLossHistory = trainerState.criticLossHistory
-    this.rewardType = INIT_REWARD_TYPE
 
     console.log("EVENT: restore")
     this.dispatchEvent(new Event('restore'))

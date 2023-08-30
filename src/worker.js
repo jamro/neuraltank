@@ -109,7 +109,6 @@ const messageBus = new MessageBus(self);
     actorLearningRate: agent.actorLearningRate,
     criticLearningRate: agent.criticLearningRate,
     discountRate: agent.discountRate,
-    rewardType: trainer.rewardType,
   })
 
   while(true) {
