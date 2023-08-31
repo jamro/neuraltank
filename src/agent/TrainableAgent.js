@@ -41,7 +41,6 @@ export default class TrainableAgent extends Agent {
 
     // process reward
     const scoreIncrement = this.stats.storeRewards(rewards)
-
     // select actions
     this.stats.startBenchmark()
     const [, , action] = this.actorNet.exec(inputTensor);
@@ -50,6 +49,7 @@ export default class TrainableAgent extends Agent {
 
     // store trajectory
     this.stats.expectedValue = expectedValue
+
     this.memory.add({
       input: input, 
       action: action,

@@ -15,7 +15,7 @@ export default function initUI(messageBus) {
   const componentChartData = {
     labels : [],
     datasets : [
-      { data : [], label: "mean", borderColor: '#000000', type: 'line', borderWidth: 5},
+      { data : [], label: "mean", borderColor: '#000000', type: 'line', borderWidth: 3},
       { data : [], label: "score", borderColor: '#dc3545', backgroundColor: '#dc3545'},
       { data : [], label: "radar", borderColor: '#0d6efd', backgroundColor: '#0d6efd'},
       { data : [], label: "energy", borderColor: '#ffc107', backgroundColor: '#ffc107' },

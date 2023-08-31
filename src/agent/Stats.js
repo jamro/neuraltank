@@ -25,7 +25,6 @@ export default class Stats {
     this.rewardHistory = [];
     this.criticLossHistory = []
     this.epochRewardComponents = null
-    console.debug("clean")
   }
 
   onEpochEnd() {

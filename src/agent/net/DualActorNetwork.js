@@ -32,6 +32,7 @@ export default class DualActorNetwork extends ActorNetwork {
 
   train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
     const epsilon = 0.2
+    const lambda = 0.95
     const f = () => tf.tidy(() => {
       // get recorded inputs for last epoch
       const input = inputTensor.reshape([-1, inputTensor.shape[2]])
@@ -42,8 +43,24 @@ export default class DualActorNetwork extends ActorNetwork {
       const reward = rewardTensor.reshape([-1, rewardTensor.shape[2]])
       const value = valueTensor.reshape([-1, valueTensor.shape[2]])
 
-      const nextValue = tf.slice2d(value, [1, 0], [-1, 1]).concat(tf.zeros([1,1]))
-      const advantage = nextValue.mul(discountRate).add(reward).sub(value)
+      // calculate Generalized Advantage Estimation
+      const rewardArray = reward.squeeze().arraySync()
+      const valueArray = value.squeeze().arraySync()
+      const numSteps = rewardArray.length;
+      let nextAdvantage = 0;
+      const advantageArray = new Array(numSteps).fill(0);
+      for (let t = numSteps - 1; t >= 0; t--) {
+        let delta
+        if(t === numSteps - 1) {
+          delta = rewardArray[t] - valueArray[t]
+        } else {
+          delta = rewardArray[t] + discountRate * valueArray[t+1] - valueArray[t]
+        }
+        advantageArray[t] = delta + discountRate * lambda * nextAdvantage
+        nextAdvantage = advantageArray[t]
+      }
+      const advantage = tf.tensor2d(advantageArray, [advantageArray.length, 1])
+
 
       /*
         Action probability formula
