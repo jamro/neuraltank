@@ -30,7 +30,7 @@ export default class Agent extends EventTarget {
   }
 
   onBatchStart() {
-    this.stats.onEpisodeStart()
+    this.stats.onEpochStart()
   }
 
   onBatchFinish() {
