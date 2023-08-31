@@ -1,5 +1,4 @@
 
-import ActorNetwork from './net/ActorNetwork.js';
 import CriticNetwork from './net/CriticNetwork.js';
 import * as tf from '@tensorflow/tfjs';
 import DualActorNetwork from './net/DualActorNetwork.js';

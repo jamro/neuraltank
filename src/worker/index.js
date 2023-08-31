@@ -1,14 +1,14 @@
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-wasm';
-import TrainableAgent from "./TrainableAgent.js";
-import TankLogic from "./TankLogic.js";
-import Trainer from './Trainer.js';
-import Settings from './Settings.js'
+import TrainableAgent from "../agent/TrainableAgent.js";
+import TankLogic from "../agent/TankLogic.js";
+import Trainer from '../Trainer.js';
+import Settings from '../Settings.js'
 
 import JsBattle from 'jsbattle-engine';
-import { LocalStorageClient } from './worker/LocalStorageProxy.js';
-import MessageBus from './worker/MessageBus.js';
+import { LocalStorageClient } from './LocalStorageProxy.js';
+import MessageBus from './MessageBus.js';
 
 
 const messageBus = new MessageBus(self);

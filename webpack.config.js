@@ -5,7 +5,7 @@ module.exports = {
   entry: {
     train: './src/index.js',
     preview: './src/preview.js',
-    worker: './src/worker.js',
+    worker: './src/worker/index.js',
   },
   output: {
     filename: '[name].js',

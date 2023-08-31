@@ -4,8 +4,8 @@ import 'remixicon/fonts/remixicon.css'
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-wasm';
-import Agent from "./Agent.js";
-import TankLogic from "./TankLogic.js";
+import Agent from "./agent/Agent.js";
+import TankLogic from "./agent/TankLogic.js";
 import Trainer from './Trainer.js';
 import Settings from './Settings.js'
 import * as $ from 'jquery'
