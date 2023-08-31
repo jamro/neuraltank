@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 
-export default class Memory {
+export default class TrajectoryMemory {
   constructor() {
     this.episodeMemory = {}
     this.epochMemory = {}

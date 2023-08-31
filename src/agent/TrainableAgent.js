@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import Memory from './Memory.js';
+import TrajectoryMemory from './TrajectoryMemory.js';
 import Agent from './Agent.js';
 
 const INIT_DISCOUNT_RATE = 0.98
@@ -8,22 +8,17 @@ export default class TrainableAgent extends Agent {
   constructor() {
     super()
 
-    this.memory = new Memory()
+    this.memory = new TrajectoryMemory()
     this.discountRate = INIT_DISCOUNT_RATE
-
-    this.stepCount = 0
-    this.stepTotalDuration = 0
-    this.stepAvgDuration = 0
   }
 
   onBatchStart() {
+    super.onBatchStart()
     this.memory.resetAll()
-    this.criticLossHistory = []
-    this.rewardHistory = [];
-    this.epochRewardComponents = null
   }
 
   onBatchFinish() {
+    super.onBatchFinish()
     const actorLoss = this.actorNet.train(
       this.memory.epochMemory.input,
       this.memory.epochMemory.action,
@@ -35,59 +30,42 @@ export default class TrainableAgent extends Agent {
   }
 
   onGameStart() {
-    console.log("reset game memory")
     super.onGameStart()
+    console.log("reset game memory")
     this.memory.resetGame()
-    this.stepCount = 0
-    this.stepTotalDuration = 0
-    this.totalReward = 0
-    this.rewardComponents = null
   }
 
   act(input, rewards) {
-    const startTime = performance.now()
+    this.stats.onStepStart()
     const inputTensor = tf.tensor2d([input]);
 
     // process reward
-    const scoreIncrement = this.storeRewards(rewards)
+    const scoreIncrement = this.stats.storeRewards(rewards)
 
     // select actions
-    const [_, __, action] = this.actorNet.exec(inputTensor);
-    this.currentActions = action.dataSync();
+    this.stats.startBenchmark()
+    const [, , action] = this.actorNet.exec(inputTensor);
+    const expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
+    this.stats.endBenchmark()
 
     // store trajectory
-    this.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
+    this.stats.expectedValue = expectedValue
     this.memory.add({
       input: input, 
       action: action,
       reward: scoreIncrement, 
-      value: this.expectedValue
+      value: expectedValue
     });
 
-    // performance stats
-    const duration = performance.now() - startTime 
-    this.stepCount += 1
-    this.stepTotalDuration += duration
+    // update stats
+    this.stats.onStepEnd()
 
-    return this.currentActions
+    return action.dataSync();
   }
 
   async onGameFinish() {
-    this.rewardHistory.push(this.totalReward);
-    if(!this.epochRewardComponents) {
-      this.epochRewardComponents = [...this.rewardComponents]
-    } else {
-      this.epochRewardComponents = this.rewardComponents.reduce((r, v, i) => {
-        r[i] += v
-        return r
-      }, this.epochRewardComponents)
-    }
-
+    super.onGameFinish()
     this.memory.aggregateGameResults()
-
-    this.stepAvgDuration = this.stepCount ? this.stepTotalDuration / this.stepCount : 0
-    this.benchmarkAvgDuration = this.benchmarkCount ? this.benchmarkTotalDuration / this.benchmarkCount : 0
-    console.log(`Average step duration ${this.stepAvgDuration.toFixed(2)}ms`)
 
     console.log("Training critic")
     const criticLoss = await this.criticNet.train(
@@ -96,13 +74,12 @@ export default class TrainableAgent extends Agent {
       this.memory.episodeMemory.reward,
       this.discountRate
     )
-    this.criticLossHistory.push(criticLoss)
+    this.stats.criticLossHistory.push(criticLoss)
   }
 
   async restoreModel() {
     if (await super.restoreModel()) {
       this.memory.resetAll()
-      this.rewardHistory = []
       return true
     } else {
       return false

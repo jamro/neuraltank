@@ -42,10 +42,10 @@ import * as $ from 'jquery'
   const valueField = $('#value')
 
   trainer.addEventListener('step', () => {
-    totalRewardField.text(agent.totalReward.toFixed(2))
-    valueField.text(agent.expectedValue.toFixed(2))
-    for(let i=0; i < agent.rewardComponents.length; i++) {
-      rewardField[i].text(agent.rewardComponents[i].toFixed(2))
+    totalRewardField.text(agent.stats.totalReward.toFixed(2))
+    valueField.text(agent.stats.expectedValue.toFixed(2))
+    for(let i=0; i < agent.stats.rewardComponents.length; i++) {
+      rewardField[i].text(agent.stats.rewardComponents[i].toFixed(2))
     }
   })
 

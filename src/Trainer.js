@@ -46,22 +46,22 @@ export default class Trainer extends EventTarget {
       await this.runEpisode()   
     }
     console.log("store history")
-    if(this.agent.rewardHistory.length) {
-      const rewardShare = this.agent.epochRewardComponents.map(a => a/(this.episodeIndex+1))
+    if(this.agent.stats.rewardHistory.length) {
+      const rewardShare = this.agent.stats.epochRewardComponents.map(a => a/(this.episodeIndex+1))
       this.scoreHistory.push({
         x: this.epochIndex+1, 
-        mean: mean(this.agent.rewardHistory), 
-        min: Math.min(...this.agent.rewardHistory), 
-        max: Math.max(...this.agent.rewardHistory),
+        mean: mean(this.agent.stats.rewardHistory), 
+        min: Math.min(...this.agent.stats.rewardHistory), 
+        max: Math.max(...this.agent.stats.rewardHistory),
         rewardShare: rewardShare
       })
     }
-    if(this.agent.criticLossHistory.length) {
+    if(this.agent.stats.criticLossHistory.length) {
       this.criticLossHistory.push({
         x: this.epochIndex+1, 
-        mean: mean(this.agent.criticLossHistory), 
-        min: Math.min(...this.agent.criticLossHistory), 
-        max: Math.max(...this.agent.criticLossHistory)
+        mean: mean(this.agent.stats.criticLossHistory), 
+        min: Math.min(...this.agent.stats.criticLossHistory), 
+        max: Math.max(...this.agent.stats.criticLossHistory)
       })
     }
     while(this.scoreHistory.length > 100) {

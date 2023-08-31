@@ -14,6 +14,10 @@ export class LocalStorageClient {
     this.messageBus.postMessage({action: 'localStorage.setItem', key, value })
   }
 
+  async removeItem(key) {
+    this.messageBus.postMessage({action: 'localStorage.removeItem', key })
+  }
+
 }
 
 export class LocalStorageServer {
@@ -23,6 +27,7 @@ export class LocalStorageServer {
 
     this.messageBus.addEventListener('localStorage.getItem', (e) => this.handleGetItem(e.data))
     this.messageBus.addEventListener('localStorage.setItem', (e) => this.handleSetItem(e.data))
+    this.messageBus.addEventListener('localStorage.removeItem', (e) => this.handleRemoveItem(e.data))
   }
 
   handleGetItem({key, ref, callbackId}) {
@@ -33,6 +38,10 @@ export class LocalStorageServer {
 
   handleSetItem({key, value}) {
     localStorage.setItem(key, value)
+  }
+
+  handleRemoveItem({key}) {
+    localStorage.removeItem(key)
   }
 
 }

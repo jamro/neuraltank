@@ -57,9 +57,9 @@ const messageBus = new MessageBus(self);
     messageBus.send("episodeStats", {
       episodeIndex: trainer.episodeIndex,
       epochSize: trainer.epochSize,
-      stepAvgDuration: agent.stepAvgDuration,
-      benchmarkAvgDuration: agent.benchmarkAvgDuration,
-      expectedValue: agent.expectedValue
+      stepAvgDuration: agent.stats.stepAvgDuration,
+      benchmarkAvgDuration: agent.stats.benchmarkAvgDuration,
+      expectedValue: agent.stats.expectedValue
     })
   })
   setInterval(() => {
@@ -93,8 +93,9 @@ const messageBus = new MessageBus(self);
   messageBus.send("episodeStats", {
     episodeIndex: trainer.episodeIndex,
     epochSize: trainer.epochSize,
-    stepAvgDuration: agent.stepAvgDuration,
-    expectedValue: agent.expectedValue
+    stepAvgDuration: agent.stats.stepAvgDuration,
+    expectedValue: agent.stats.expectedValue,
+    benchmarkAvgDuration: agent.stats.benchmarkAvgDuration,
   })
   messageBus.send("epochStats", {
     epochIndex: trainer.epochIndex,

@@ -34,7 +34,6 @@ export default function initUI(messageBus) {
     episodeProgressBar.css('width', '0%')
     stepDuration.text(data.stepAvgDuration ? data.stepAvgDuration.toFixed(2) + 'ms' : '-')
     benchmarkDuration.text(data.benchmarkAvgDuration ? data.benchmarkAvgDuration.toFixed(2) + 'ms' : '-')
-    $('.expected-val').text(data.expectedValue.toFixed(2))
 
     let progress = (data.episodeIndex+1) / data.epochSize
     progress = Math.round(100*progress)+ "%"
