@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import PersistentNetwork from "./PersistentNetwork.js";
+import { std } from 'mathjs';
 
 export default class ActorNetwork extends PersistentNetwork {
 
@@ -20,8 +21,8 @@ export default class ActorNetwork extends PersistentNetwork {
     return tf.tidy(() => {
       const output = this.net.predict(inputs);
       const mean = tf.tanh(output.slice([0, 0], [-1, this.outputCount]));
-      const logStdDev = output.slice([0, this.outputCount], [-1, -1]);
-      const stdDev = tf.exp(logStdDev);
+      let stdDev = output.slice([0, this.outputCount], [-1, -1]);
+      stdDev = tf.softmax(stdDev).add(1e-10)
       const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
       const scaledActions = tf.clipByValue(unscaledActions, -1, 1);
 

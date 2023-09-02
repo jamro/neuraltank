@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
-import PersistentNetwork from "./PersistentNetwork.js";
 import ActorNetwork from './ActorNetwork.js';
+
+const ENTROPY_COEFFICIENT = 0.01
 
 export default class DualActorNetwork extends ActorNetwork {
 
@@ -88,9 +89,11 @@ export default class DualActorNetwork extends ActorNetwork {
       const surrogate1 = ratio.mul(advantage)
       const surrogate2 = tf.clipByValue(ratio, 1 - epsilon, 1 + epsilon).mul(advantage)
 
-      const loss = tf.minimum(surrogate1, surrogate2);
+      const entropy = stdDev2.mean().square().mul(2*Math.PI*Math.E).log().mul(0.5)
+      const loss = tf.neg(tf.minimum(surrogate1, surrogate2)).mean();
+      const lossWithEntropy = loss.sub(entropy.mul(ENTROPY_COEFFICIENT))
 
-      return tf.neg(loss).mean()
+      return lossWithEntropy
     })
 
     this.refreshOldActor()

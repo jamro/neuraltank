@@ -46,7 +46,7 @@ export default class TankLogic {
 
     // calculate angular position of the enemy within the radar beam
     let enemyDistance = 300
-    let radarReward = -0.05
+    let radarReward = -0.02
     let radarAbsAngle = state.radar.angle + state.angle
     let gunAbsAngle = state.gun.angle + state.angle
 
@@ -63,7 +63,7 @@ export default class TankLogic {
     let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - _this.lastEnemyPosAngle)/180
 
     if(state.radar.enemy) {
-      radarReward = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))
+      radarReward = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))/5
     }
 
     const input = [
@@ -82,7 +82,9 @@ export default class TankLogic {
 
     const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
   
-    control.RADAR_TURN = actions[0]
+    control.GUN_TURN = actions[0]
+    control.RADAR_TURN = Math2.deg.normalize(state.gun.angle - state.radar.angle)/10
+    control.SHOOT = 0.1
   }
 
   createAI(simulation) { // @TODO remove reward type

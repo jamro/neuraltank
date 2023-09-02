@@ -4,8 +4,8 @@ export default class Settings extends EventTarget {
     super()
     
     this.data = {
-      epochSize: 10,
-      episodeTimeLimit: 10000
+      epochSize: 24,
+      episodeTimeLimit: 15000
     }
   }
 
