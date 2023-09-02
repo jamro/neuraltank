@@ -20,7 +20,11 @@ export default class CriticNetwork extends PersistentNetwork {
     return tf.tidy(() => this.net.predict(inputs));
   }
 
-  async train(inputTensor, valueTensor, rewardTensor, discountRate) {
+  async train(input, value, reward, discountRate) {
+    const inputTensor = input.reshape([-1, input.shape[2]])
+    const valueTensor = value.reshape([-1, value.shape[2]])
+    const rewardTensor = reward.reshape([-1, reward.shape[2]])
+
     const rewardArray = rewardTensor.squeeze().arraySync()
     const numSteps = rewardArray.length
     const returnArray = new Array(numSteps).fill(0);

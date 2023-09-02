@@ -3,15 +3,15 @@ import Chart from 'chart.js/auto';
 
 export default function initUI(messageBus) {
   const criticLoss = $('#critic-loss')
+  const actorObjective = $('#actor-objective')
 
   const ctx = document.getElementById('loss-chart');
 
   const lossChartData = {
     labels : [],
     datasets : [
-      { data : [], label: "critic-mean", borderColor: '#dc3545' },
-      { data : [], label: "critic-min", borderColor: '#eea1a9' },
-      { data : [], label: "critic-max", borderColor: '#eea1a9' }
+      { data : [], label: "critic", borderColor: '#dc3545', yAxisID: 'critic'},
+      { data : [], label: "actor", borderColor: '#0d6efd', yAxisID: 'actor' },
     ]
   }
 
@@ -22,7 +22,15 @@ export default function initUI(messageBus) {
       animation: false, 
       scales:{
         x: {
-          ticks: false
+          ticks: false,
+        },
+        actor: {
+          position: 'left',
+          grid: {display: false}
+        },
+        critic: {
+          position: 'right',
+          grid: {display: false}
         }
       },
       elements: {
@@ -38,12 +46,12 @@ export default function initUI(messageBus) {
 
  
   messageBus.addEventListener('epochStats', ({data}) => {
-    criticLoss.text(data.criticLossHistory.length ? data.criticLossHistory[data.criticLossHistory.length-1].mean.toFixed(2) : '-')
+    criticLoss.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].critic.toFixed(2) : '-')
+    actorObjective.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].actor.toFixed(2) : '-')
 
-    lossChartData.labels = data.criticLossHistory.map(e => 'epoch ' + e.x)
-    lossChartData.datasets[0].data = data.criticLossHistory.map(e => e.mean)
-    lossChartData.datasets[1].data = data.criticLossHistory.map(e => e.min)
-    lossChartData.datasets[2].data = data.criticLossHistory.map(e => e.max)
+    lossChartData.labels = data.lossHistory.map(e => 'epoch ' + e.x)
+    lossChartData.datasets[0].data = data.lossHistory.map(e => e.critic)
+    lossChartData.datasets[1].data = data.lossHistory.map(e => -e.actor)
     lossChart.update()
   })
 

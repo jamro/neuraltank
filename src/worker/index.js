@@ -40,7 +40,7 @@ const messageBus = new MessageBus(self);
       epochDuration: trainer.epochDuration,
       epochSize: trainer.epochSize,
       scoreHistory: trainer.scoreHistory || [],
-      criticLossHistory: trainer.criticLossHistory || [],
+      lossHistory: trainer.lossHistory || [],
     })
     messageBus.send("epochComplete")
   })
@@ -102,7 +102,7 @@ const messageBus = new MessageBus(self);
     epochDuration: trainer.epochDuration,
     epochSize: trainer.epochSize,
     scoreHistory: trainer.scoreHistory || [],
-    criticLossHistory: trainer.criticLossHistory || [],
+    lossHistory: trainer.lossHistory || [],
   })
   messageBus.send("settings", {
     epochSize: trainer.epochSize,

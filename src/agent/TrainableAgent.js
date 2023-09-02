@@ -17,16 +17,28 @@ export default class TrainableAgent extends Agent {
     this.memory.resetAll()
   }
 
-  onBatchFinish() {
-    super.onBatchFinish()
-    const actorLoss = this.actorNet.train(
+  async onBatchFinish() {
+    await super.onBatchFinish()
+
+    console.log("Training critic")
+    this.stats.criticLoss = await this.criticNet.train(
+      this.memory.epochMemory.input,
+      this.memory.epochMemory.value,
+      this.memory.epochMemory.reward,
+      this.discountRate
+    )
+
+    console.log("Training actor")
+    this.stats.actorLoss = this.actorNet.train(
       this.memory.epochMemory.input,
       this.memory.epochMemory.action,
       this.memory.epochMemory.reward,
       this.memory.epochMemory.value,
       this.discountRate
     )
-    console.log("Actor loss:", actorLoss)
+
+    console.log(`Actor loss: ${this.stats.actorLoss.toFixed(2)}, critic loss: ${this.stats.criticLoss.toFixed(2)}`)
+    
   }
 
   onGameStart() {
@@ -66,15 +78,6 @@ export default class TrainableAgent extends Agent {
   async onGameFinish() {
     super.onGameFinish()
     this.memory.aggregateGameResults()
-
-    console.log("Training critic")
-    const criticLoss = await this.criticNet.train(
-      this.memory.episodeMemory.input,
-      this.memory.episodeMemory.value,
-      this.memory.episodeMemory.reward,
-      this.discountRate
-    )
-    this.stats.criticLossHistory.push(criticLoss)
   }
 
   async restoreModel() {

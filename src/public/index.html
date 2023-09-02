@@ -78,7 +78,14 @@
           <div class="card mt-3">
             <h5 class="card-header"><i class="ri-line-chart-line"></i> Loss History</h5>
             <div class="card-body">
-              <h5 class="card-title"></i>Critic loss: <span id="critic-loss">-</span></h5>
+              <div class="row mt-3 text-center">
+                <div class="col-6">
+                  <span class="badge rounded-pill text-bg-primary">Actor objective: <span id="actor-objective">-</span></span>
+                </div>
+                <div class="col-6">
+                  <span class="badge rounded-pill text-bg-danger">Critic loss: <span id="critic-loss">-</span></span>
+                </div>
+              </div>
               <canvas id="loss-chart" style="width: 100%; height: 15em"></canvas>
             </div>
           </div>
@@ -88,7 +95,7 @@
             <h5 class="card-header"><i class="ri-medal-line"> </i>Reward History <button id="btn-reset-reward-history" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-delete-bin-fill"></i> Reset</button></h5>
             <div class="card-body" style="text-align: right;">
               <h1 class="card-title"></i> <span id="best-reward">-</span></h1>
-              <div class="row mt-3">
+              <div class="row mt-3 text-center">
                 <div class="col-3">
                   <span class="badge rounded-pill text-bg-danger">Score: <span id="reward-0">-</span></span>
                 </div>

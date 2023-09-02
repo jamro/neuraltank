@@ -15,7 +15,8 @@ export default class Stats {
     this.totalReward = 0
     this.rewardHistory = [];
 
-    this.criticLossHistory = []
+    this.criticLoss = 0
+    this.actorLoss = 0
 
     this.rewardComponents = null
     this.epochRewardComponents = null
@@ -23,7 +24,6 @@ export default class Stats {
 
   onEpochStart() {
     this.rewardHistory = [];
-    this.criticLossHistory = []
     this.epochRewardComponents = null
   }
 
@@ -56,18 +56,13 @@ export default class Stats {
   }
 
   onStepStart() {
-    const duration = performance.now() - startTime 
-    this.stepCount += 1
-    this.stepTotalDuration += duration
-  }
-
-  onStepStart() {
     this.stepStartTime = performance.now()
   }
 
   onStepEnd() {
     const duration = performance.now() - this.stepStartTime 
     this.stepCount += 1
+    this.stepsPerSecCounter += 1
     this.stepTotalDuration += duration
   }
 

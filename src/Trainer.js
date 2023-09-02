@@ -13,7 +13,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = []
-    this.criticLossHistory = []
+    this.lossHistory = []
     this.autoSave = true
     this.simSpeed = 10
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
@@ -45,6 +45,7 @@ export default class Trainer extends EventTarget {
       this.episodeIndex = i
       await this.runEpisode()   
     }
+    await this.agent.onBatchFinish()
     console.log("store history")
     if(this.agent.stats.rewardHistory.length) {
       const rewardShare = this.agent.stats.epochRewardComponents.map(a => a/(this.episodeIndex+1))
@@ -56,21 +57,18 @@ export default class Trainer extends EventTarget {
         rewardShare: rewardShare
       })
     }
-    if(this.agent.stats.criticLossHistory.length) {
-      this.criticLossHistory.push({
-        x: this.epochIndex+1, 
-        mean: mean(this.agent.stats.criticLossHistory), 
-        min: Math.min(...this.agent.stats.criticLossHistory), 
-        max: Math.max(...this.agent.stats.criticLossHistory)
-      })
-    }
+    this.lossHistory.push({
+      x: this.epochIndex+1, 
+      critic: this.agent.stats.criticLoss, 
+      actor: this.agent.stats.actorLoss, 
+    })
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()
     }
-    while(this.criticLossHistory.length > 100) {
-      this.criticLossHistory.shift()
+    while(this.lossHistory.length > 100) {
+      this.lossHistory.shift()
     }
-    this.agent.onBatchFinish()
+
     this.epochIndex++
     this._epochDuration = performance.now() - this._epochStartTime
     console.log("Epoch duration", this._epochDuration )
@@ -169,7 +167,7 @@ export default class Trainer extends EventTarget {
     this._epochStartTime = 0
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
-    this.criticLossHistory = trainerState.criticLossHistory
+    this.lossHistory = trainerState.lossHistory
 
     console.log("EVENT: restore")
     this.dispatchEvent(new Event('restore'))
@@ -182,7 +180,7 @@ export default class Trainer extends EventTarget {
     await localStorage.setItem("trainerState", JSON.stringify({
       epochIndex: this.epochIndex,
       scoreHistory: this.scoreHistory,
-      criticLossHistory: this.criticLossHistory,
+      lossHistory: this.lossHistory,
       epochDuration: this._epochDuration,
     }));
 
