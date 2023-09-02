@@ -20,23 +20,17 @@ export default class CriticNetwork extends PersistentNetwork {
     return tf.tidy(() => this.net.predict(inputs));
   }
 
-  async train(input, value, reward, discountRate) {
-    const inputTensor = input.reshape([-1, input.shape[2]])
-    const valueTensor = value.reshape([-1, value.shape[2]])
-    const rewardTensor = reward.reshape([-1, reward.shape[2]])
+  async train(i, v, r, discountRate) {
+    const inputTensor = i.reshape([-1, i.shape[2]])
+    const valueTensor = v.reshape([-1, v.shape[2]])
+    const rewardTensor = r.reshape([-1, r.shape[2]])
 
-    const rewardArray = rewardTensor.squeeze().arraySync()
-    const numSteps = rewardArray.length
-    const returnArray = new Array(numSteps).fill(0);
+    const input = tf.slice2d(inputTensor, [1, 0], [-1, -1])
+    const nextValue = tf.slice2d(valueTensor, [1, 0], [-1, 1])
+    const reward = tf.slice2d(rewardTensor, [1, 0], [-1, 1])
+    const expectedValue = nextValue.mul(discountRate).add(reward).squeeze() // reward + discountRate * nextValue
 
-    let lastReward = 0
-    for (let t = numSteps - 1; t >= 0; t--) {
-      returnArray[t] = rewardArray[t] + discountRate * lastReward
-      lastReward = returnArray[t]
-    }
-    const expectedValue = tf.tensor2d(returnArray, [returnArray.length, 1])
-
-    const criticResults = await this.net.fit(inputTensor, expectedValue, {epochs: 1})
+    const criticResults = await this.net.fit(input, expectedValue, {epochs: 1})
     const criticLoss = criticResults.history.loss[0]
     return criticLoss
   }

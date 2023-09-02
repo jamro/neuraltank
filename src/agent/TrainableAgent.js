@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import TrajectoryMemory from './TrajectoryMemory.js';
 import Agent from './Agent.js';
 
-const INIT_DISCOUNT_RATE = 0.98
+const INIT_DISCOUNT_RATE = 0.99
 
 export default class TrainableAgent extends Agent {
   constructor() {

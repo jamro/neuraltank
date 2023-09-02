@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import ActorNetwork from './ActorNetwork.js';
 
-const ENTROPY_COEFFICIENT = 0.01
+const ENTROPY_COEFFICIENT = 0.005
 
 export default class DualActorNetwork extends ActorNetwork {
 
@@ -33,7 +33,7 @@ export default class DualActorNetwork extends ActorNetwork {
 
   train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
     const epsilon = 0.2
-    const lambda = 0.95
+    const lambda = 0.97
     const f = () => tf.tidy(() => {
       // get recorded inputs for last epoch
       const input = inputTensor.reshape([-1, inputTensor.shape[2]])

@@ -89,7 +89,7 @@ export default class TankLogic {
   
     control.GUN_TURN = actions[0]
     control.RADAR_TURN = Math2.deg.normalize(state.gun.angle - state.radar.angle)/10
-    control.SHOOT = 0.1
+    //control.SHOOT = 0.1
   }
 
   createAI(simulation) { // @TODO remove reward type

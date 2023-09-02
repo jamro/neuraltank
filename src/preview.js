@@ -26,7 +26,7 @@ import * as $ from 'jquery'
   const battleFieldCanvas = document.getElementById('battlefield')
   const trainer = new Trainer(agent, tankLogic, JsBattle, settings, battleFieldCanvas)
   trainer.autoSave = false
-  trainer.simSpeed = 1
+  trainer.simSpeed = 0.5
 
   if(!(await trainer.restore())) {
     console.log('Stored model not found. creating...')
