@@ -50,7 +50,6 @@ export default class Agent extends EventTarget {
     const inputTensor = tf.tensor2d([input]);
     let [mean, stdDev, actions] = this.actorNet.exec(inputTensor);
     this.stats.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
-    console.debug(inputTensor.arraySync()[0][1].toFixed(2))
     return actions.dataSync();
   }
 

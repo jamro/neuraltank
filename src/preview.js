@@ -18,6 +18,7 @@ import * as $ from 'jquery'
   console.log("TF Backend:", tf.getBackend())
 
   const settings = new Settings()
+  await settings.init()
 
   const agent = new Agent()
   const tankLogic = new TankLogic(JsBattle, agent)

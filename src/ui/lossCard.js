@@ -47,7 +47,7 @@ export default function initUI(messageBus) {
  
   messageBus.addEventListener('epochStats', ({data}) => {
     criticLoss.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].critic.toFixed(2) : '-')
-    actorObjective.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].actor.toFixed(2) : '-')
+    actorObjective.text(data.lossHistory.length ? (-data.lossHistory[data.lossHistory.length-1].actor).toFixed(2) : '-')
 
     lossChartData.labels = data.lossHistory.map(e => 'epoch ' + e.x)
     lossChartData.datasets[0].data = data.lossHistory.map(e => e.critic)

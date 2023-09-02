@@ -1,6 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
 import PersistentNetwork from "./PersistentNetwork.js";
-import { std } from 'mathjs';
 
 export default class ActorNetwork extends PersistentNetwork {
 
