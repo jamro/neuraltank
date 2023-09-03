@@ -1,7 +1,11 @@
 import * as tf from '@tensorflow/tfjs';
 import ActorNetwork from './ActorNetwork.js';
+import batchTensors from '../../utils/batchTensors.js';
 
 const ENTROPY_COEFFICIENT = 0.005
+const GAE_LAMBDA = 0.97
+const PPO_CLIP_EPSILON = 0.2
+const BATCH_SIZE = 512
 
 export default class DualActorNetwork extends ActorNetwork {
 
@@ -31,38 +35,33 @@ export default class DualActorNetwork extends ActorNetwork {
     this.oldNet.net.setWeights(this.net.getWeights())
   }
 
-  train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
-    const epsilon = 0.2
-    const lambda = 0.97
+  getAdvantages(rewardTensor, valueTensor, discountRate) {
+    const lambda = GAE_LAMBDA
+    const rewardArray = rewardTensor.squeeze().arraySync()
+    const valueArray = valueTensor.squeeze().arraySync()
+    const numSteps = rewardArray.length;
+    let nextAdvantage = 0;
+    const advantageArray = new Array(numSteps).fill(0);
+    for (let t = numSteps - 1; t >= 0; t--) {
+      let delta
+      if(t === numSteps - 1) {
+        delta = rewardArray[t] - valueArray[t]
+      } else {
+        delta = rewardArray[t] + discountRate * valueArray[t+1] - valueArray[t]
+      }
+      advantageArray[t] = delta + discountRate * lambda * nextAdvantage
+      nextAdvantage = advantageArray[t]
+    }
+    const advantage = tf.tensor2d(advantageArray, [advantageArray.length, 1])
+    return advantage
+  }
+
+  trainSingleBatch(input, action2, advantage) {
+    const epsilon = PPO_CLIP_EPSILON
     const f = () => tf.tidy(() => {
-      // get recorded inputs for last epoch
-      const input = inputTensor.reshape([-1, inputTensor.shape[2]])
       const [mean1, stdDev1, action1] = this.oldNet.exec(input)
       const [mean2, stdDev2, _] = this.exec(input)
       
-      const action2 = actionTensor.reshape([-1, actionTensor.shape[2]])
-      const reward = rewardTensor.reshape([-1, rewardTensor.shape[2]])
-      const value = valueTensor.reshape([-1, valueTensor.shape[2]])
-
-      // calculate Generalized Advantage Estimation
-      const rewardArray = reward.squeeze().arraySync()
-      const valueArray = value.squeeze().arraySync()
-      const numSteps = rewardArray.length;
-      let nextAdvantage = 0;
-      const advantageArray = new Array(numSteps).fill(0);
-      for (let t = numSteps - 1; t >= 0; t--) {
-        let delta
-        if(t === numSteps - 1) {
-          delta = rewardArray[t] - valueArray[t]
-        } else {
-          delta = rewardArray[t] + discountRate * valueArray[t+1] - valueArray[t]
-        }
-        advantageArray[t] = delta + discountRate * lambda * nextAdvantage
-        nextAdvantage = advantageArray[t]
-      }
-      const advantage = tf.tensor2d(advantageArray, [advantageArray.length, 1])
-
-
       /*
         Action probability formula
         ============================================================
@@ -90,16 +89,43 @@ export default class DualActorNetwork extends ActorNetwork {
       const surrogate2 = tf.clipByValue(ratio, 1 - epsilon, 1 + epsilon).mul(advantage)
 
       const entropy = stdDev2.mean().square().mul(2*Math.PI*Math.E).log().mul(0.5)
-      const loss = tf.neg(tf.minimum(surrogate1, surrogate2)).mean();
+      const loss = tf.neg(tf.minimum(surrogate1, surrogate2))
       const lossWithEntropy = loss.sub(entropy.mul(ENTROPY_COEFFICIENT))
 
-      return lossWithEntropy
+      return lossWithEntropy.mean();
     })
 
     this.refreshOldActor()
     const cost = tf.tidy(() => this.optimizer.minimize(f, true))
     const actorLoss = cost.dataSync()[0]
     return actorLoss
+  }
+
+  train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
+    const input = inputTensor.reshape([-1, inputTensor.shape[2]])
+    const reward = rewardTensor.reshape([-1, rewardTensor.shape[2]])
+    const value = valueTensor.reshape([-1, valueTensor.shape[2]])
+    const action2 = actionTensor.reshape([-1, actionTensor.shape[2]])
+
+    // calculate Generalized Advantage Estimation
+    const advantage = this.getAdvantages(reward, value, discountRate)
+
+    // shuffle and split into mini-batches
+    const [
+      inputBatch,
+      action2Batch,
+      advantageBatch,
+    ] = batchTensors(BATCH_SIZE,  input, action2, advantage)
+
+    let lossSum = 0
+    let lossCount = 0
+    for(let i=0; i < inputBatch.length;i ++) {
+      const loss = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i])
+      lossSum += loss
+      lossCount ++
+    }
+
+    return lossSum / lossCount
   }
 
 }

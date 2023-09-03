@@ -4,8 +4,8 @@ import * as tf from '@tensorflow/tfjs';
 import DualActorNetwork from './net/DualActorNetwork.js';
 import Stats from './Stats.js';
 
-const INIT_ACTOR_LEARNING_RATE = 0.0003
-const INIT_CRITIC_LEARNING_RATE = 0.001
+const INIT_ACTOR_LEARNING_RATE = 0.001
+const INIT_CRITIC_LEARNING_RATE = 0.01
 const STATE_LEN = 2
 const ACTION_LEN = 1
 

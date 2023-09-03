@@ -1,6 +1,8 @@
 import * as tf from '@tensorflow/tfjs';
 import PersistentNetwork from "./PersistentNetwork.js";
 
+const BATCH_SIZE = 512
+
 export default class CriticNetwork extends PersistentNetwork {
 
   constructor(inputCount=1, outputCount=1, learningRate=0.001, name='critic') {
@@ -30,7 +32,7 @@ export default class CriticNetwork extends PersistentNetwork {
     const reward = tf.slice2d(rewardTensor, [1, 0], [-1, 1])
     const expectedValue = nextValue.mul(discountRate).add(reward).squeeze() // reward + discountRate * nextValue
 
-    const criticResults = await this.net.fit(input, expectedValue, {epochs: 1})
+    const criticResults = await this.net.fit(input, expectedValue, {epochs: 1, batchSize: BATCH_SIZE})
     const criticLoss = criticResults.history.loss[0]
     return criticLoss
   }
