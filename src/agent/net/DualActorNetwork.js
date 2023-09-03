@@ -101,7 +101,7 @@ export default class DualActorNetwork extends ActorNetwork {
     return actorLoss
   }
 
-  train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
+  async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
     const input = inputTensor.reshape([-1, inputTensor.shape[2]])
     const reward = rewardTensor.reshape([-1, rewardTensor.shape[2]])
     const value = valueTensor.reshape([-1, valueTensor.shape[2]])
@@ -120,12 +120,21 @@ export default class DualActorNetwork extends ActorNetwork {
     let lossSum = 0
     let lossCount = 0
     for(let i=0; i < inputBatch.length;i ++) {
+      this.notifyProgress(i/inputBatch.length)
+      //await new Promise((done) => setTimeout(done, 5))
       const loss = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i])
       lossSum += loss
       lossCount ++
     }
+    this.notifyProgress(1)
 
     return lossSum / lossCount
+  }
+
+  notifyProgress(progress) {
+    const event = new Event('progress')
+    event.progress = progress
+    this.dispatchEvent(event)
   }
 
 }

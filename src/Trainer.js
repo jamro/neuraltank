@@ -41,15 +41,18 @@ export default class Trainer extends EventTarget {
   }
 
   async runEpoch() {
+    this.sendStatus(`Starting epoch ${this.epochIndex+1}...`)
     this._epochStartTime = performance.now()
     console.log("starting new epoch")
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
     this.agent.onBatchStart()
     for(let i=0; i < this.epochSize; i++) {
       console.log("starting episode", i+1)
+      this.sendStatus(`Episode in progress...`)
       this.episodeIndex = i
       await this.runEpisode()   
     }
+    this.sendStatus(`Epoch completed`)
     await this.agent.onBatchFinish()
     console.log("store history")
     if(this.agent.stats.rewardHistory.length) {
@@ -185,6 +188,12 @@ export default class Trainer extends EventTarget {
     data.scoreHistory = this.scoreHistory
     await localStorage.setItem("trainerState", JSON.stringify(data));
   }
+
+  sendStatus(msg) {
+    const event = new Event('status')
+    event.msg = msg
+    this.dispatchEvent(event)
+  } 
 
 }
 

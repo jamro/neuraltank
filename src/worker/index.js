@@ -53,6 +53,12 @@ const messageBus = new MessageBus(self);
   trainer.addEventListener('remove', () => {
     messageBus.send("saveDate", {value: null})
   })
+  trainer.addEventListener('status', (data) => {
+    messageBus.send("status", {msg: 'Trainer: ' + data.msg})
+  })
+  agent.addEventListener('status', (data) => {
+    messageBus.send("status", {msg: 'Agent: ' + data.msg})
+  })
   trainer.addEventListener('episodeComplete', () => {
     messageBus.send("episodeStats", {
       episodeIndex: trainer.episodeIndex,
@@ -85,6 +91,7 @@ const messageBus = new MessageBus(self);
   })
   // --------------------------------------------------------------------------------------------------------------
 
+  messageBus.send("status", {msg: 'Restoring model...'})
   if(!(await trainer.restore())) {
     console.log('Stored model not found. creating...')
     await trainer.save()
@@ -113,6 +120,7 @@ const messageBus = new MessageBus(self);
     envId: trainer.envId,
   })
 
+  messageBus.send("status", {msg: 'Ready!'})
   while(true) {
     await trainer.runEpoch()
   }

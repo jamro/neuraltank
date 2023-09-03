@@ -23,6 +23,12 @@ export default class Agent extends EventTarget {
     this.stats = new Stats()
   }
 
+  sendStatus(msg) {
+    const event = new Event('status')
+    event.msg = msg
+    this.dispatchEvent(event)
+  } 
+
 
   get actorLearningRate() {
     return this.actorNet.optimizer.learningRate

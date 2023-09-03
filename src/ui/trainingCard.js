@@ -1,10 +1,6 @@
 import * as $ from 'jquery'
 
 export default function initUI(messageBus) {
-  const trainButton = $('#btn-train')
-  const previewButton = $('#btn-preview')
-  const battlefield = $('#battlefield')
-  const epochStats = $('#epoch-stats')
   const epochNumber = $('#epoch-number')
   const episodeNumber = $('#episode-number')
   const epochDuration = $('#epoch-duration')
@@ -13,6 +9,7 @@ export default function initUI(messageBus) {
   const epochProgressBar = $('#epoch-progressbar')
   const episodeProgressBar = $('#episode-progressbar')
   const inputReload = $('#input-reload')
+  const statusbar = $('#statusbar')
 
   messageBus.addEventListener('epochStats', ({data}) => {
     epochNumber.text(data.epochIndex+1)
@@ -44,6 +41,10 @@ export default function initUI(messageBus) {
     let progress = data.timeElapsed / data.timeLimit
     progress = Math.round(100*progress)+ "%"
     episodeProgressBar.css('width', progress)
+  })
+
+  messageBus.addEventListener('status', ({data})=> {
+    statusbar.text(data.msg)
   })
 
 }

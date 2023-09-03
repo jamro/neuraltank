@@ -9,6 +9,10 @@ export default class TrainableAgent extends Agent {
     super()
 
     this.discountRate = INIT_DISCOUNT_RATE
+
+    this.actorNet.addEventListener('progress', (event) => {
+      this.sendStatus(`Training actor (${Math.round(event.progress*100)}%)...`)
+    })
   }
 
   onBatchStart() {
@@ -19,6 +23,8 @@ export default class TrainableAgent extends Agent {
   async onBatchFinish() {
     await super.onBatchFinish()
 
+    this.sendStatus("Training critic...")
+
     console.log("Training critic")
     this.stats.criticLoss = await this.criticNet.train(
       this.memory.epochMemory.input,
@@ -27,8 +33,10 @@ export default class TrainableAgent extends Agent {
       this.discountRate
     )
 
+    this.sendStatus("Training actor...")
+
     console.log("Training actor")
-    this.stats.actorLoss = this.actorNet.train(
+    this.stats.actorLoss = await this.actorNet.train(
       this.memory.epochMemory.input,
       this.memory.epochMemory.action,
       this.memory.epochMemory.reward,
@@ -36,6 +44,7 @@ export default class TrainableAgent extends Agent {
       this.discountRate
     )
 
+    this.sendStatus("Training completed")
     console.log(`Actor loss: ${this.stats.actorLoss.toFixed(2)}, critic loss: ${this.stats.criticLoss.toFixed(2)}`)
     
   }

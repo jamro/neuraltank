@@ -1,8 +1,9 @@
 import * as tf from '@tensorflow/tfjs';
 
-export default class PersistentNetwork {
+export default class PersistentNetwork extends EventTarget {
 
   constructor(inputCount=1, outputCount=1, learningRate=0.001, name='default') {
+    super()
     this.name = name
     this.inputCount = inputCount
     this.outputCount = outputCount
