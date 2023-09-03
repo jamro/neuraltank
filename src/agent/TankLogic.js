@@ -37,6 +37,7 @@ export default class TankLogic {
 
   init(settings, info, _this, agent) {
     _this.lastEnemyPosAngle = null
+    _this.lastEnemyPosBeamAngle = -1
     _this.lastScore = 0
     _this.lastEnergy = 100
   }
@@ -45,7 +46,7 @@ export default class TankLogic {
 
 
     // calculate angular position of the enemy within the radar beam
-    let enemyDistance = 300
+    let enemyDistance = 320
     let radarReward = -0.02
     let radarAbsAngle = state.radar.angle + state.angle
 
@@ -56,25 +57,26 @@ export default class TankLogic {
       const edx = state.x - state.radar.enemy.x
       const edy = state.y - state.radar.enemy.y
       enemyDistance = Math.sqrt(edx*edx + edy*edy)
-    }
 
-    let enemyPosBeamAngle = _this.lastEnemyPosAngle === null ? -1 : Math2.deg.normalize(radarAbsAngle - _this.lastEnemyPosAngle)/20
-    enemyPosBeamAngle = Math.min(1, Math.max(-1, enemyPosBeamAngle))
-    if(!state.radar.enemy) {
-      if(enemyPosBeamAngle > 0) {
-        enemyPosBeamAngle = 1
+      let enemyPosBeamAngle = _this.lastEnemyPosAngle === null ? -1 : Math2.deg.normalize(radarAbsAngle - _this.lastEnemyPosAngle)/20
+      enemyPosBeamAngle = Math.min(1, Math.max(-1, enemyPosBeamAngle))
+      _this.lastEnemyPosBeamAngle = enemyPosBeamAngle
+
+    } else {
+      if(_this.lastEnemyPosBeamAngle > 0) {
+        _this.lastEnemyPosBeamAngle = 1
       } else {
-        enemyPosBeamAngle = -1
+        _this.lastEnemyPosBeamAngle = -1
       }
     }
 
     if(state.radar.enemy) {
-      radarReward = Math.max(0, 1 - Math.abs(enemyPosBeamAngle))/5
+      radarReward = Math.max(0, 1 - Math.abs(_this.lastEnemyPosBeamAngle))/5
     }
 
     const input = [
       enemyDistance/150 - 1,
-      enemyPosBeamAngle,
+      _this.lastEnemyPosBeamAngle,
     ]
 
     // reward

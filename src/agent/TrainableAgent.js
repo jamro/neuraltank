@@ -8,7 +8,6 @@ export default class TrainableAgent extends Agent {
   constructor() {
     super()
 
-    this.memory = new TrajectoryMemory()
     this.discountRate = INIT_DISCOUNT_RATE
   }
 

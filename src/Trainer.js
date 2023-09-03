@@ -15,6 +15,7 @@ export default class Trainer extends EventTarget {
     this.scoreHistory = []
     this.lossHistory = []
     this.autoSave = true
+    this.autoPlay = true
     this.simSpeed = 10
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
   }
@@ -28,6 +29,7 @@ export default class Trainer extends EventTarget {
   }
 
   get epochSize() {
+    if(!this.autoPlay) return 1
     return this.settings.prop('epochSize')
   }
 
@@ -143,7 +145,7 @@ export default class Trainer extends EventTarget {
       this._simulation.setSpeed(this.simSpeed)
       this._simulation.timeLimit = this.episodeTimeLimit
     
-      this.tankLogic.tankModel.moveTo(bx, by)
+      this.tankLogic.tankModel.moveTo(bx, by, 180)
       console.log("start simulation")
       this._simulation.start()
       console.log("game started")

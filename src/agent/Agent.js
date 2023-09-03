@@ -3,6 +3,7 @@ import CriticNetwork from './net/CriticNetwork.js';
 import * as tf from '@tensorflow/tfjs';
 import DualActorNetwork from './net/DualActorNetwork.js';
 import Stats from './Stats.js';
+import TrajectoryMemory from './TrajectoryMemory.js';
 
 const INIT_ACTOR_LEARNING_RATE = 0.001
 const INIT_CRITIC_LEARNING_RATE = 0.01
@@ -16,6 +17,8 @@ export default class Agent extends EventTarget {
 
     this.actorNet = new DualActorNetwork(STATE_LEN, ACTION_LEN, INIT_ACTOR_LEARNING_RATE, 'actor')
     this.criticNet = new CriticNetwork(STATE_LEN, 1, INIT_CRITIC_LEARNING_RATE, 'critic')
+
+    this.memory = new TrajectoryMemory()
 
     this.stats = new Stats()
   }
@@ -46,11 +49,22 @@ export default class Agent extends EventTarget {
   }
 
   act(input, rewards) {
-    this.stats.storeRewards(rewards)
+    const scoreIncrement = this.stats.storeRewards(rewards)
     const inputTensor = tf.tensor2d([input]);
-    let [mean, stdDev, actions] = this.actorNet.exec(inputTensor);
+    let [mean, stdDev, action] = this.actorNet.exec(inputTensor);
     this.stats.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
-    return actions.dataSync();
+
+    this.memory.add({
+      input: input, 
+      action: action,
+      actionMean: mean,
+      actionMin: mean.sub(stdDev).clipByValue(-1, 1),
+      actionMax: mean.add(stdDev).clipByValue(-1, 1),
+      reward: scoreIncrement, 
+      value: this.stats.expectedValue
+    });
+
+    return action.dataSync();
   }
 
   async saveModel() {

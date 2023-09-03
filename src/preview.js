@@ -9,6 +9,7 @@ import TankLogic from "./agent/TankLogic.js";
 import Trainer from './Trainer.js';
 import Settings from './Settings.js'
 import * as $ from 'jquery'
+import initUI from './ui/previewScreen.js';
 
 (async () => {
   console.log("... Neural Tank ...")
@@ -26,32 +27,16 @@ import * as $ from 'jquery'
   const battleFieldCanvas = document.getElementById('battlefield')
   const trainer = new Trainer(agent, tankLogic, JsBattle, settings, battleFieldCanvas)
   trainer.autoSave = false
-  trainer.simSpeed = 0.5
+  trainer.autoPlay = false
+  trainer.simSpeed = 1
 
   if(!(await trainer.restore())) {
     console.log('Stored model not found. creating...')
     await trainer.save()
   }
 
-  const totalRewardField = $('#reward-total')
-  const rewardField = [
-    $('#reward-0'),
-    $('#reward-1'),
-    $('#reward-2'),
-    $('#reward-3'),
-  ]
-  const valueField = $('#value')
+  initUI(trainer, agent)
 
-  trainer.addEventListener('step', () => {
-    totalRewardField.text(agent.stats.totalReward.toFixed(2))
-    valueField.text(agent.stats.expectedValue.toFixed(2))
-    for(let i=0; i < agent.stats.rewardComponents.length; i++) {
-      rewardField[i].text(agent.stats.rewardComponents[i].toFixed(2))
-    }
-  })
-
-  while(true) {
-    await trainer.runEpoch()
-  }
+  await trainer.runEpoch()
 
 })()

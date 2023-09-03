@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import PersistentNetwork from "./PersistentNetwork.js";
 
-const BATCH_SIZE = 512
+const BATCH_SIZE = 128
 
 export default class CriticNetwork extends PersistentNetwork {
 

@@ -2,10 +2,10 @@ import * as tf from '@tensorflow/tfjs';
 import ActorNetwork from './ActorNetwork.js';
 import batchTensors from '../../utils/batchTensors.js';
 
-const ENTROPY_COEFFICIENT = 0.005
+const ENTROPY_COEFFICIENT = 0.001
 const GAE_LAMBDA = 0.97
 const PPO_CLIP_EPSILON = 0.2
-const BATCH_SIZE = 512
+const BATCH_SIZE = 128
 
 export default class DualActorNetwork extends ActorNetwork {
 
