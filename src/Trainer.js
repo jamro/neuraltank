@@ -1,3 +1,5 @@
+import simEnv from "./simEnv"
+
 export default class Trainer extends EventTarget {
 
   constructor(agent, tankLogic, jsBattle, settings, canvas=null) {
@@ -18,6 +20,7 @@ export default class Trainer extends EventTarget {
     this.autoPlay = true
     this.simSpeed = 10
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
+    this.envId = this.settings.prop('envId')
   }
 
   get simulation() {
@@ -76,8 +79,9 @@ export default class Trainer extends EventTarget {
     console.log("Epoch duration", this._epochDuration )
     if(this.autoSave) {
       console.log("saving...")
+      await this.save()
     }
-    await this.save()
+    
     console.log("%c--== Epoch End ==--", 'background-color:blue;color:white')
     this.dispatchEvent(new Event('epochComplete'))
     
@@ -100,32 +104,12 @@ export default class Trainer extends EventTarget {
       console.log("create simulation")
       this._simulation = this.jsBattle.createSimulation(renderer);
       this._simulation.init(900, 600);
-      const bx = (this._simulation.battlefield.minX + this._simulation.battlefield.maxX)/2
-      const by = (this._simulation.battlefield.minY + this._simulation.battlefield.maxY)/2;
-      
+
       console.log("create Tank Logic AI")
       this.tankLogic.createAI(this._simulation)
 
-      const opponentCode = `importScripts('lib/tank.js');
-        tank.init(function(settings, info) {
-          this.t = 0
-        })
-        tank.loop(function(state, control) {
-          this.t ++
-          control.THROTTLE = Math.cos(this.t/100)
-        });`
-      
-      let opponent = this.jsBattle.createAiDefinition();
-      opponent.fromCode('opponent', opponentCode);
-      opponent.disableSandbox()
-      let opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx+180, by-50, 180)
-    
-      opponent = this.jsBattle.createAiDefinition();
-      opponent.fromCode('opponent', opponentCode);
-      opponent.disableSandbox()
-      opponentTank = this._simulation.addTank(opponent).tank
-      opponentTank.moveTo(bx+150, by+50, 0)
+      // setup env
+      simEnv[this.envId](this.jsBattle, this._simulation, this.tankLogic)
     
       this._simulation.onFinish(async () => {
         console.log("Game finish")
@@ -145,7 +129,6 @@ export default class Trainer extends EventTarget {
       this._simulation.setSpeed(this.simSpeed)
       this._simulation.timeLimit = this.episodeTimeLimit
     
-      this.tankLogic.tankModel.moveTo(bx, by, 180)
       console.log("start simulation")
       this._simulation.start()
       console.log("game started")

@@ -5,8 +5,8 @@ import DualActorNetwork from './net/DualActorNetwork.js';
 import Stats from './Stats.js';
 import TrajectoryMemory from './TrajectoryMemory.js';
 
-const INIT_ACTOR_LEARNING_RATE = 0.001
-const INIT_CRITIC_LEARNING_RATE = 0.01
+const INIT_ACTOR_LEARNING_RATE = 0.0005
+const INIT_CRITIC_LEARNING_RATE = 0.005
 const STATE_LEN = 2
 const ACTION_LEN = 1
 

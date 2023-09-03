@@ -7,6 +7,7 @@ export default function initUI(messageBus) {
   const inputCriticLearningRate = $('#inputCriticLearningRate')
   const inputDiscountRate = $('#inputDiscountRate')
   const settingsLock = $('#settingsLock')
+  const inputEnv = $('#inputEnv')
 
   const inputs = [
     inputEpochLen,
@@ -15,6 +16,7 @@ export default function initUI(messageBus) {
     inputActorLearningRate,
     inputCriticLearningRate,
     inputDiscountRate,
+    inputEnv
   ]
 
   function disableForm() {
@@ -35,6 +37,7 @@ export default function initUI(messageBus) {
     inputActorLearningRate.val(data.actorLearningRate)
     inputCriticLearningRate.val(data.criticLearningRate)
     inputDiscountRate.val(data.discountRate)
+    inputEnv.val(data.envId)
   })
   
 
