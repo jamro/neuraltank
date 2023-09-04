@@ -80,6 +80,7 @@ const messageBus = new MessageBus(self);
   messageBus.addEventListener('clearSave', async () => await trainer.removeStored())
   messageBus.addEventListener('clearHistory', async () => await trainer.resetScoreHistory())
   messageBus.addEventListener('config', ({data}) => {
+    messageBus.send("status", {msg: 'Settings: updating...'})
     switch(data.key) {
       case 'epochSize':
         settings.prop('epochSize', data.value)
@@ -87,7 +88,11 @@ const messageBus = new MessageBus(self);
       case 'episodeTimeLimit':
         settings.prop('episodeTimeLimit', data.value)
         break
+      case 'envId':
+        settings.prop('envId', data.value)
+        break
     }
+    messageBus.send("status", {msg: 'Settings: updated'})
   })
   // --------------------------------------------------------------------------------------------------------------
 

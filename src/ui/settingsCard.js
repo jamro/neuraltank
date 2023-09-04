@@ -48,6 +48,10 @@ export default function initUI(messageBus) {
     messageBus.send('config', {key: 'episodeTimeLimit', value: Number(v)})
   })
 
+  editable(inputEnv, () => true, (v) => {
+    messageBus.send('config', {key: 'envId', value: v})
+  })
+
 }
 
 
@@ -78,7 +82,7 @@ function editable(input, validator, executor) {
     isProcessing = false
   }
   input.prop('disabled', false);
-  input.on('focusout', () => onChange())
+  input.on('change', () => onChange())
   input.on('keypress',function(e) {
     if(e.which == 13) {
       input.blur()
