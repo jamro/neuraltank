@@ -60,7 +60,8 @@ export default class TrainableAgent extends Agent {
     const inputTensor = tf.tensor2d([input]);
 
     // process reward
-    const scoreIncrement = this.stats.storeRewards(rewards)
+    const weightedRewards = this.weightRewards(rewards)
+    const scoreIncrement = this.stats.storeRewards(weightedRewards)
     // select actions
     this.stats.startBenchmark()
     const [, , action] = this.actorNet.exec(inputTensor);

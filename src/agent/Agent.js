@@ -7,8 +7,9 @@ import TrajectoryMemory from './TrajectoryMemory.js';
 
 const INIT_ACTOR_LEARNING_RATE = 0.0005
 const INIT_CRITIC_LEARNING_RATE = 0.005
-const STATE_LEN = 3
+const STATE_LEN = 4
 const ACTION_LEN = 1
+const INIT_REWARD_WEIGHTS = [1, 0, 1, 1]
 
 export default class Agent extends EventTarget {
 
@@ -19,6 +20,9 @@ export default class Agent extends EventTarget {
     this.criticNet = new CriticNetwork(STATE_LEN, 1, INIT_CRITIC_LEARNING_RATE, 'critic')
 
     this.memory = new TrajectoryMemory()
+
+
+    this.rewardWeights = INIT_REWARD_WEIGHTS
 
     this.stats = new Stats()
   }
@@ -54,8 +58,13 @@ export default class Agent extends EventTarget {
     this.stats.onEpisodeEnd()
   }
 
+  weightRewards(rewards) {
+    return rewards.map((r, i) => r * this.rewardWeights[i])
+  }
+
   act(input, rewards) {
-    const scoreIncrement = this.stats.storeRewards(rewards)
+    const weightedRewards = this.weightRewards(rewards)
+    const scoreIncrement = this.stats.storeRewards(weightedRewards)
     const inputTensor = tf.tensor2d([input]);
     let [mean, stdDev, action] = this.actorNet.exec(inputTensor);
     this.stats.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
@@ -97,6 +106,7 @@ export default class Agent extends EventTarget {
 
     if (actorStatus && criticStatus) {
       await this.stats.restore()
+      this.rewardWeights = INIT_REWARD_WEIGHTS
       return true
     } else {
       return false

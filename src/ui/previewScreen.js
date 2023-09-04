@@ -187,7 +187,7 @@ export default function initUI(trainer, agent) {
 
   function drawTrajectory() {
     drawSingleTrajectory(inputChart, agent.memory.episodeMemory.input, (index) => {
-      const labels = ['distance', 'radar', 'enemyDirection']
+      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos']
       if(labels[index]) {
         return labels[index]
       }

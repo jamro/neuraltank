@@ -84,7 +84,8 @@ export default class TankLogic {
     const input = [
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
-      _this.enemyDirection
+      _this.enemyDirection,
+      Math.max(-1, Math.min(1, Math2.deg.normalize(state.radar.angle - state.gun.angle)/90))
     ]
 
     // reward
@@ -95,9 +96,17 @@ export default class TankLogic {
     _this.lastEnergy = state.energy
     const collisionReward = state.collisions.wall ? -1 : 0
 
-    const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
-  
-    control.RADAR_TURN = actions[0]
+    const actions = agent.act(input, [gameScoreReward ? gameScoreReward : -0.02, radarReward, energyReward, collisionReward])
+    control.GUN_TURN = actions[0]
+
+    // find enemy
+    if(state.radar.enemy) {
+      control.RADAR_TURN = -_this.enemyPosBeamAngle
+    } else {
+      control.RADAR_TURN = 1
+    }
+    control.SHOOT = 0.1
+
   }
 
   createAI(simulation) { // @TODO remove reward type
