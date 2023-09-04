@@ -1,4 +1,3 @@
-import * as tf from '@tensorflow/tfjs';
 import ExtendedMath from 'jsbattle-engine/src/tanks/lib/extendedMath.js'
 
 const Math2 = ExtendedMath()
@@ -36,47 +35,56 @@ export default class TankLogic {
   }
 
   init(settings, info, _this, agent) {
-    _this.lastEnemyPosAngle = null
-    _this.lastEnemyPosBeamAngle = -1
+    _this.enemyPosBeamAngle = -1
+    _this.enemyDistance = 1
+    _this.enemyDirection = 0
+
     _this.lastScore = 0
     _this.lastEnergy = 100
   }
   
   loop(state, control, _this, agent) {
 
-
     // calculate angular position of the enemy within the radar beam
-    let enemyDistance = 320
     let radarReward = -0.02
     let radarAbsAngle = state.radar.angle + state.angle
 
     if(state.radar.enemy) {
+      // calculate enemy angular position wrt. the battlefield
       let enemyPosAngle = Math2.deg.atan2(state.radar.enemy.y - state.y, state.radar.enemy.x - state.x);
-      _this.lastEnemyPosAngle = enemyPosAngle
   
+      // calculate distance to the enemy
       const edx = state.x - state.radar.enemy.x
       const edy = state.y - state.radar.enemy.y
-      enemyDistance = Math.sqrt(edx*edx + edy*edy)
+      const enemyDistance = Math.min(1, Math.max(-1, Math.sqrt(edx*edx + edy*edy)/150 - 1)) // keep it in range of -1,1
+      _this.enemyDistance = enemyDistance
 
-      let enemyPosBeamAngle = _this.lastEnemyPosAngle === null ? -1 : Math2.deg.normalize(radarAbsAngle - _this.lastEnemyPosAngle)/20
+      // calculate angular position of the enemy wrt. radar beam
+      let enemyPosBeamAngle = Math2.deg.normalize(radarAbsAngle - enemyPosAngle)/16 // keep it in range of -1,1
       enemyPosBeamAngle = Math.min(1, Math.max(-1, enemyPosBeamAngle))
-      _this.lastEnemyPosBeamAngle = enemyPosBeamAngle
+      _this.enemyPosBeamAngle = enemyPosBeamAngle
+
+      // calculate enemy direction angle wrt radar beam
+      const enemyAngle = Math2.deg2rad(Math2.deg.normalize(radarAbsAngle - state.radar.enemy.angle))
+      const enemyDirection = (Math.sin(enemyAngle) * state.radar.enemy.speed) / 2 // keep it in range of -1,1
+      _this.enemyDirection = enemyDirection
 
     } else {
-      if(_this.lastEnemyPosBeamAngle > 0) {
-        _this.lastEnemyPosBeamAngle = 1
-      } else {
-        _this.lastEnemyPosBeamAngle = -1
-      }
+      // smoothly move the position to the range border when enemy lost
+      const awayEnemyPosBeamAngle = _this.enemyPosBeamAngle > 0 ? 1 : -1
+      _this.enemyPosBeamAngle = awayEnemyPosBeamAngle * Math.min(1, Math.abs(_this.enemyPosBeamAngle) + 0.1)
+      _this.enemyDistance = Math.min(1, _this.enemyDistance + 0.05)
+      _this.enemyDirection += (0-_this.enemyDirection)/50
     }
 
     if(state.radar.enemy) {
-      radarReward = Math.max(0, 1 - Math.abs(_this.lastEnemyPosBeamAngle))/5
+      radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
     }
 
     const input = [
-      enemyDistance/150 - 1,
-      _this.lastEnemyPosBeamAngle,
+      _this.enemyDistance,
+      _this.enemyPosBeamAngle,
+      _this.enemyDirection
     ]
 
     // reward
@@ -89,9 +97,7 @@ export default class TankLogic {
 
     const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
   
-    control.GUN_TURN = actions[0]
-    control.RADAR_TURN = Math2.deg.normalize(state.gun.angle - state.radar.angle)/10
-    //control.SHOOT = 0.1
+    control.RADAR_TURN = actions[0]
   }
 
   createAI(simulation) { // @TODO remove reward type

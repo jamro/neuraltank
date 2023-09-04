@@ -166,20 +166,20 @@ export default function initUI(trainer, agent) {
       const rowMax = inputMaxArray[i]
       const rowMean = inputMeanArray[i]
       for(let j=0; j < rowMin.length; j++) {
-        while(!chart.data.datasets[2*j]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(2*j) : `Series ${j+1} (min)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
+        while(!chart.data.datasets[3*j]) {
+          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j) : `Series ${3*j} (min)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
         }
-        chart.data.datasets[2*j].data.push(rowMin[j])
+        chart.data.datasets[3*j].data.push(rowMin[j])
         
-        while(!chart.data.datasets[2*j+1]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(2*j+1) : `Series ${j+1} (max)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
+        while(!chart.data.datasets[3*j+1]) {
+          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j+1) : `Series ${3*j+1} (max)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
         }
-        chart.data.datasets[2*j+1].data.push(rowMax[j])
+        chart.data.datasets[3*j+1].data.push(rowMax[j])
         
-        while(!chart.data.datasets[2*j+2]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(2*j+2) : `Series ${j+1} (mean)`, borderWidth: 2, borderColor: colors[j % colors.length]})
+        while(!chart.data.datasets[3*j+2]) {
+          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j+2) : `Series ${3*j+2} (mean)`, borderWidth: 2, borderColor: colors[j % colors.length]})
         }
-        chart.data.datasets[2*j+2].data.push(rowMean[j])
+        chart.data.datasets[3*j+2].data.push(rowMean[j])
       }
     }
     chart.update()
@@ -187,7 +187,7 @@ export default function initUI(trainer, agent) {
 
   function drawTrajectory() {
     drawSingleTrajectory(inputChart, agent.memory.episodeMemory.input, (index) => {
-      const labels = ['distance', 'radar']
+      const labels = ['distance', 'radar', 'enemyDirection']
       if(labels[index]) {
         return labels[index]
       }

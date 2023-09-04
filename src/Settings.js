@@ -5,8 +5,8 @@ export default class Settings extends EventTarget {
     
     this.data = {
       epochSize: 5,
-      episodeTimeLimit: 7000,
-      envId: 'carousel'
+      episodeTimeLimit: 20000,
+      envId: 'pendulum'
     }
   }
 

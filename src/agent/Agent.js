@@ -7,7 +7,7 @@ import TrajectoryMemory from './TrajectoryMemory.js';
 
 const INIT_ACTOR_LEARNING_RATE = 0.0005
 const INIT_CRITIC_LEARNING_RATE = 0.005
-const STATE_LEN = 2
+const STATE_LEN = 3
 const ACTION_LEN = 1
 
 export default class Agent extends EventTarget {
