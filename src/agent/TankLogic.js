@@ -45,8 +45,7 @@ export default class TankLogic {
   
   loop(state, control, _this, agent) {
 
-    // calculate angular position of the enemy within the radar beam
-    let radarReward = -0.02
+    let radarReward = 0
     let radarAbsAngle = state.radar.angle + state.angle
 
     if(state.radar.enemy) {
@@ -96,7 +95,7 @@ export default class TankLogic {
     _this.lastEnergy = state.energy
     const collisionReward = state.collisions.wall ? -1 : 0
 
-    const actions = agent.act(input, [gameScoreReward ? gameScoreReward : -0.02, radarReward, energyReward, collisionReward])
+    const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
     control.GUN_TURN = actions[0]
 
     // find enemy

@@ -101,9 +101,18 @@ export default class DualActorNetwork extends ActorNetwork {
     return actorLoss
   }
 
+  normalizeRewards(rewardTensor) {
+    const mean = tf.mean(rewardTensor);
+    const stdDev = tf.sqrt(tf.mean(tf.square(rewardTensor.sub(mean))));
+
+    const normalizedRewards = rewardTensor.sub(mean).div(stdDev);
+
+    return normalizedRewards;
+  }
+
   async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
     const input = inputTensor.reshape([-1, inputTensor.shape[2]])
-    const reward = rewardTensor.reshape([-1, rewardTensor.shape[2]])
+    const reward = this.normalizeRewards(rewardTensor.reshape([-1, rewardTensor.shape[2]]))
     const value = valueTensor.reshape([-1, valueTensor.shape[2]])
     const action2 = actionTensor.reshape([-1, actionTensor.shape[2]])
 
