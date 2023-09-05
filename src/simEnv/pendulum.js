@@ -30,5 +30,5 @@ export default function(jsBattle, sim, tankLogic) {
   opponentTank = sim.addTank(opponent).tank
   opponentTank.moveTo(bx-30*flip, by-120, (flip > 0) ? 180 : 0)
 
-  tankLogic.tankModel.moveTo(bx, by, -90)
+  tankLogic.tankModel.moveTo(bx, by, -100)
 }

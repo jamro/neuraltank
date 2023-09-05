@@ -1,6 +1,8 @@
 import * as $ from 'jquery'
 import Chart from 'chart.js/auto';
+import { train } from '@tensorflow/tfjs';
 
+const INIT_DISCOUNT_RATE = 0.99
 
 export default function initUI(trainer, agent) {
   const totalRewardField = $('#reward-total')
@@ -138,6 +140,36 @@ export default function initUI(trainer, agent) {
     }
 	});
 
+  const advantageChart = new Chart(document.getElementById('advantage-chart'), {
+		type : 'line',
+		data: {
+      labels : [],
+      datasets : []
+    },
+    options: {
+      animation: false, 
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'advantage'
+          }
+        },
+      },
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: legendSettings
+      }
+    }
+	});
+
   let stepCounter = 0
 
   function drawSingleTrajectory(chart, tensor, labelFormatter) {
@@ -222,8 +254,18 @@ export default function initUI(trainer, agent) {
     if(stepCounter % 5 === 0) {
       drawTrajectory()
     }
+  })
 
+  trainer.addEventListener('epochComplete', async () => {
+    agent.memory.aggregateGameResults()
+    const rewardTensor = agent.memory.epochMemory.reward
+    const valueTensor = agent.memory.epochMemory.value
+    const reward = agent.actorNet.normalizeRewards(rewardTensor.reshape([-1, rewardTensor.shape[2]]))
+    const value = valueTensor.reshape([-1, valueTensor.shape[2]])
 
+    const advantage = agent.actorNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE)
+
+    drawSingleTrajectory(advantageChart, advantage, () => 'Generalized Advantage Estimation')
 
   })
 
