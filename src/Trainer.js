@@ -1,4 +1,5 @@
 import simEnv from "./simEnv"
+import SimEnv from "./simEnv/SimEnv"
 
 export default class Trainer extends EventTarget {
 
@@ -105,7 +106,7 @@ export default class Trainer extends EventTarget {
         renderer = this.jsBattle.createRenderer('void');
       }      
       console.log("create simulation")
-      this._simulation = this.jsBattle.createSimulation(renderer);
+      this._simulation = new SimEnv(renderer);
       this._simulation.init(900, 600);
 
       console.log("create Tank Logic AI")

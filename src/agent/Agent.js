@@ -62,7 +62,7 @@ export default class Agent extends EventTarget {
     return rewards.map((r, i) => r * this.rewardWeights[i])
   }
 
-  act(input, rewards) {
+  act(input, rewards, corrections) {
     const weightedRewards = this.weightRewards(rewards)
     const scoreIncrement = this.stats.storeRewards(weightedRewards)
     const inputTensor = tf.tensor2d([input]);
@@ -78,6 +78,10 @@ export default class Agent extends EventTarget {
       reward: scoreIncrement, 
       value: this.stats.expectedValue
     });
+
+    this.memory.correct({
+      reward: corrections
+    })
 
     return action.dataSync();
   }

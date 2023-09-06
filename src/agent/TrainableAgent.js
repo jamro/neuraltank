@@ -55,7 +55,7 @@ export default class TrainableAgent extends Agent {
     this.memory.resetGame()
   }
 
-  act(input, rewards) {
+  act(input, rewards, corrections) {
     this.stats.onStepStart()
     const inputTensor = tf.tensor2d([input]);
 
@@ -77,6 +77,10 @@ export default class TrainableAgent extends Agent {
       reward: scoreIncrement, 
       value: expectedValue
     });
+
+    this.memory.correct({
+      reward: corrections
+    })
 
     // update stats
     this.stats.onStepEnd()

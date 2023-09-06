@@ -28,6 +28,20 @@ export default class TrajectoryMemory {
       }
     }
   }
+
+  correct(keyValue) {
+    const keys = Object.keys(keyValue)
+    for(let key of keys) {
+      const corrections = keyValue[key]
+      if(corrections.length == 0) continue
+      const raw = this.episodeMemory[key].arraySync()
+      for(let correction of corrections) {
+        raw[correction.sourceTime][0] -= correction.value
+        raw[correction.targetTime][0] += correction.value
+      }
+      this.episodeMemory[key] = tf.tensor2d(raw)
+    }
+  }
   
   aggregateGameResults() {
     const keys = Object.keys(this.episodeMemory)
@@ -35,7 +49,9 @@ export default class TrajectoryMemory {
       if(!this.epochMemory[key]) {
         this.epochMemory[key] = this.episodeMemory[key].expandDims()
       } else {
-        this.epochMemory[key] = tf.concat([this.epochMemory[key], this.episodeMemory[key].expandDims()])
+        const expandedEpisodeMemory = this.episodeMemory[key].expandDims()
+        console.log(`Aggregating results episodeMemory${expandedEpisodeMemory.shape} with epochMemory${this.epochMemory[key].shape}`)
+        this.epochMemory[key] = tf.concat([this.epochMemory[key], expandedEpisodeMemory])
       }
     }
   }

@@ -232,6 +232,9 @@ export default function initUI(trainer, agent) {
       }
       return `Action #${index+1}`
     })
+    // clean up the chart to include data corrections
+    rewardChart.data.labels = []
+    rewardChart.data.datasets = [] 
     drawSingleTrajectory(rewardChart, agent.memory.episodeMemory.reward, () => {
       return 'Reward'
     })

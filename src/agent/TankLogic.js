@@ -8,6 +8,7 @@ export default class TankLogic {
     this.agent = agent
     this.jsBattle = jsBattle
     this.tankModel = null
+    this.scoreCorrectionQueue = []
   }
 
   installCallbacks(target) {
@@ -23,7 +24,14 @@ export default class TankLogic {
     const init = this.init
     const loop = this.loop
     const _this = { 
-      getScore: () => this.tankModel.score
+      getScore: () => this.tankModel.score,
+      getScoreCorrections: () => {
+        const corrections = []
+        while(this.scoreCorrectionQueue.length) {
+          corrections.push(this.scoreCorrectionQueue.pop())
+        }
+        return corrections
+      }
     }
     console.log(_this)
     target.tankInit = (function (settings, info) { init(settings, info, _this, agent) }).bind(target)
@@ -80,11 +88,12 @@ export default class TankLogic {
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
     }
 
+    const gunPos = Math.max(-1, Math.min(1, Math2.deg.normalize(state.radar.angle - state.gun.angle)/90))
     const input = [
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
       _this.enemyDirection,
-      Math.max(-1, Math.min(1, Math2.deg.normalize(state.radar.angle - state.gun.angle)/90))
+      gunPos
     ]
 
     // reward
@@ -95,7 +104,8 @@ export default class TankLogic {
     _this.lastEnergy = state.energy
     const collisionReward = state.collisions.wall ? -1 : 0
 
-    const actions = agent.act(input, [gameScoreReward, radarReward, energyReward, collisionReward])
+    const rewards = [gameScoreReward, radarReward, energyReward, collisionReward]
+    const actions = agent.act(input, rewards, _this.getScoreCorrections())
     control.GUN_TURN = actions[0]
 
     // find enemy
@@ -108,7 +118,7 @@ export default class TankLogic {
 
   }
 
-  createAI(simulation) { // @TODO remove reward type
+  createAI(simulation) {
     const code = `importScripts('lib/tank.js');
       tank.init(function(settings, info) {
         tankInit(settings, info)
@@ -120,6 +130,7 @@ export default class TankLogic {
     this._ai.fromCode('neuraltank', code);
     this._ai.disableSandbox()
     this.tankModel = simulation.addTank(this._ai).tank;
+    this.scoreCorrectionQueue = simulation.scoreCorrectionQueue
   }
 
 }
