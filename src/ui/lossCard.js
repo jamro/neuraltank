@@ -5,8 +5,6 @@ export default function initUI(messageBus) {
   const criticLoss = $('#critic-loss')
   const actorObjective = $('#actor-objective')
 
-  const ctx = document.getElementById('loss-chart');
-
   const lossChartData = {
     labels : [],
     datasets : [
@@ -15,7 +13,7 @@ export default function initUI(messageBus) {
     ]
   }
 
-  const lossChart = new Chart(ctx, {
+  const lossChart = new Chart(document.getElementById('loss-chart'), {
 		type : 'line',
 		data: lossChartData,
     options: {
@@ -44,6 +42,38 @@ export default function initUI(messageBus) {
     }
 	});
 
+  const entropyChartData = {
+    labels : [],
+    datasets : [
+      { data : [], label: "entropy", backgroundColor: '#ffc107' },
+    ]
+  }
+
+  const entropyChart = new Chart(document.getElementById('entropy-chart'), {
+		type : 'bar',
+		data: entropyChartData,
+    options: {
+      animation: false, 
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          type: 'logarithmic',
+        },
+      },
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: true
+      }
+    }
+	});
+
+
  
   messageBus.addEventListener('epochStats', ({data}) => {
     criticLoss.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].critic.toFixed(4) : '-')
@@ -53,6 +83,10 @@ export default function initUI(messageBus) {
     lossChartData.datasets[0].data = data.lossHistory.map(e => e.critic)
     lossChartData.datasets[1].data = data.lossHistory.map(e => -e.actor)
     lossChart.update()
+
+    entropyChartData.labels = data.lossHistory.map(e => 'epoch ' + e.x)
+    entropyChartData.datasets[0].data = data.lossHistory.map(e => e.entropy)
+    entropyChart.update()
   })
 
 }

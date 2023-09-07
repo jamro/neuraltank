@@ -17,6 +17,7 @@ export default class Stats {
 
     this.criticLoss = 0
     this.actorLoss = 0
+    this.entropy = 0
 
     this.rewardComponents = null
     this.epochRewardComponents = null

@@ -36,13 +36,16 @@ export default class TrainableAgent extends Agent {
     this.sendStatus("Training actor...")
 
     console.log("Training actor")
-    this.stats.actorLoss = await this.actorNet.train(
+    const [loss, entropy] = await this.actorNet.train(
       this.memory.epochMemory.input,
       this.memory.epochMemory.action,
       this.memory.epochMemory.reward,
       this.memory.epochMemory.value,
       this.discountRate
     )
+
+    this.stats.actorLoss = loss
+    this.stats.entropy = loss
 
     this.sendStatus("Training completed")
     console.log(`Actor loss: ${this.stats.actorLoss.toFixed(2)}, critic loss: ${this.stats.criticLoss.toFixed(2)}`)

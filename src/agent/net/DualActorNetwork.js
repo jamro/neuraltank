@@ -58,6 +58,7 @@ export default class DualActorNetwork extends ActorNetwork {
 
   trainSingleBatch(input, action2, advantage) {
     const epsilon = PPO_CLIP_EPSILON
+    let batchEntropy = 0
     const f = () => tf.tidy(() => {
       const [mean1, stdDev1, action1] = this.oldNet.exec(input)
       const [mean2, stdDev2, _] = this.exec(input)
@@ -92,13 +93,16 @@ export default class DualActorNetwork extends ActorNetwork {
       const loss = tf.neg(tf.minimum(surrogate1, surrogate2))
       const lossWithEntropy = loss.sub(entropy.mul(ENTROPY_COEFFICIENT))
 
+      batchEntropy = entropy.arraySync()
+
       return lossWithEntropy.mean();
     })
 
     this.refreshOldActor()
     const cost = tf.tidy(() => this.optimizer.minimize(f, true))
     const actorLoss = cost.dataSync()[0]
-    return actorLoss
+
+    return [actorLoss, batchEntropy]
   }
 
   normalizeRewards(rewardTensor) {
@@ -127,17 +131,22 @@ export default class DualActorNetwork extends ActorNetwork {
     ] = batchTensors(BATCH_SIZE,  input, action2, advantage)
 
     let lossSum = 0
+    let entropySum = 0
     let lossCount = 0
     for(let i=0; i < inputBatch.length;i ++) {
       this.notifyProgress(i/inputBatch.length)
       //await new Promise((done) => setTimeout(done, 5))
-      const loss = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i])
+      const [loss, entropy] = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i])
       lossSum += loss
+      entropySum += entropy
       lossCount ++
     }
     this.notifyProgress(1)
 
-    return lossSum / lossCount
+    const epochEntropy = entropySum / lossCount
+    const actorLoss = lossSum / lossCount
+
+    return [actorLoss, epochEntropy]
   }
 
   notifyProgress(progress) {
