@@ -21,7 +21,7 @@ export default class ActorNetwork extends PersistentNetwork {
       const output = this.net.predict(inputs);
       const mean = tf.tanh(output.slice([0, 0], [-1, this.outputCount]));
       let stdDev = output.slice([0, this.outputCount], [-1, -1]);
-      stdDev = tf.sigmoid(stdDev).mul(0.5).add(0.01) // cut stddev to 0.5 to keep variance in reasonable range
+      stdDev = tf.sigmoid(stdDev).add(0.01)
       const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
       const scaledActions = tf.clipByValue(unscaledActions, -1, 1);
 

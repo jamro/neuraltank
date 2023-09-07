@@ -128,7 +128,7 @@ export default class DualActorNetwork extends ActorNetwork {
       inputBatch,
       action2Batch,
       advantageBatch,
-    ] = batchTensors(BATCH_SIZE,  input, action2, advantage)
+    ] = batchTensors(BATCH_SIZE, input, action2, advantage)
 
     let lossSum = 0
     let entropySum = 0

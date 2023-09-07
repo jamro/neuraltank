@@ -22,13 +22,7 @@ export default function(jsBattle, sim, tankLogic) {
   opponent.fromCode('opponent', opponentCode);
   opponent.disableSandbox()
   let opponentTank = sim.addTank(opponent).tank
-  opponentTank.moveTo(bx+30*flip, by+120, (flip > 0) ? 0 : 180)
-
-  opponent = jsBattle.createAiDefinition();
-  opponent.fromCode('opponent', opponentCode);
-  opponent.disableSandbox()
-  opponentTank = sim.addTank(opponent).tank
   opponentTank.moveTo(bx-30*flip, by-120, (flip > 0) ? 180 : 0)
 
-  tankLogic.tankModel.moveTo(bx, by)
+  tankLogic.tankModel.moveTo(bx, by, -135+Math.random()*90)
 }
