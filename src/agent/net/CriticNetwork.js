@@ -23,9 +23,9 @@ export default class CriticNetwork extends PersistentNetwork {
   }
 
   async train(i, v, r, discountRate) {
-    const inputTensor = i.reshape([-1, i.shape[2]])
-    const valueTensor = v.reshape([-1, v.shape[2]])
-    const rewardTensor = r.reshape([-1, r.shape[2]])
+    const inputTensor = tf.concat(i)
+    const valueTensor = tf.concat(v)
+    const rewardTensor = tf.concat(r)
 
     const mean = tf.mean(rewardTensor);
     const stdDev = tf.sqrt(tf.mean(tf.square(rewardTensor.sub(mean))));

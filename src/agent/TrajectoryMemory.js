@@ -47,12 +47,9 @@ export default class TrajectoryMemory {
     const keys = Object.keys(this.episodeMemory)
     for(let key of keys) {
       if(!this.epochMemory[key]) {
-        this.epochMemory[key] = this.episodeMemory[key].expandDims()
-      } else {
-        const expandedEpisodeMemory = this.episodeMemory[key].expandDims()
-        console.log(`Aggregating results episodeMemory${expandedEpisodeMemory.shape} with epochMemory${this.epochMemory[key].shape}`)
-        this.epochMemory[key] = tf.concat([this.epochMemory[key], expandedEpisodeMemory])
-      }
+        this.epochMemory[key] = []
+      } 
+      this.epochMemory[key].push(this.episodeMemory[key])
     }
   }
 

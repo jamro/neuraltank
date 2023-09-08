@@ -1,6 +1,6 @@
 import * as $ from 'jquery'
+import * as tf from '@tensorflow/tfjs';
 import Chart from 'chart.js/auto';
-import { train } from '@tensorflow/tfjs';
 
 const INIT_DISCOUNT_RATE = 0.99
 
@@ -262,10 +262,8 @@ export default function initUI(trainer, agent) {
 
   trainer.addEventListener('epochComplete', async () => {
     agent.memory.aggregateGameResults()
-    const rewardTensor = agent.memory.epochMemory.reward
-    const valueTensor = agent.memory.epochMemory.value
-    const reward = agent.actorNet.normalizeRewards(rewardTensor.reshape([-1, rewardTensor.shape[2]]))
-    const value = valueTensor.reshape([-1, valueTensor.shape[2]])
+    const reward = agent.actorNet.normalizeRewards(tf.concat(agent.memory.epochMemory.reward))
+    const value = tf.concat(agent.memory.epochMemory.value)
 
     const advantage = agent.actorNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE)
 
