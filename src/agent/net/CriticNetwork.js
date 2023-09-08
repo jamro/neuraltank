@@ -11,7 +11,7 @@ export default class CriticNetwork extends PersistentNetwork {
     this.optimizer = tf.train.adam(this.learningRate);
 
     this.net = tf.sequential();
-    this.net.add(tf.layers.dense({ units: 32, activation: 'relu', inputShape: [this.inputCount] }));
+    this.net.add(tf.layers.dense({ units: 64, activation: 'relu', inputShape: [this.inputCount] }));
     this.net.add(tf.layers.dense({ units: 32, activation: 'relu' }));
     this.net.add(tf.layers.dense({ units: 32, activation: 'relu' }));
     this.net.add(tf.layers.dense({ units: this.outputCount, activation: 'linear' }));

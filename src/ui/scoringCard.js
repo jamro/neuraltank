@@ -9,6 +9,7 @@ export default function initUI(messageBus) {
     $('#reward-1'),
     $('#reward-2'),
     $('#reward-3'),
+    $('#reward-4'),
   ]
 
   const componentCtx = document.getElementById('component-chart');
@@ -20,6 +21,7 @@ export default function initUI(messageBus) {
       { data : [], label: "radar", borderColor: '#0d6efd', backgroundColor: '#0d6efd'},
       { data : [], label: "energy", borderColor: '#ffc107', backgroundColor: '#ffc107' },
       { data : [], label: "collision", borderColor: '#5c636a', backgroundColor: '#5c636a' },
+      { data : [], label: "bullets", borderColor: '#666666', backgroundColor: '#666666' },
     ]
   }
 
@@ -72,7 +74,7 @@ export default function initUI(messageBus) {
     componentChartData.labels = data.scoreHistory.map(e => 'epoch ' + e.x)
     componentChartData.datasets[0].data = data.scoreHistory.map(e => e.mean)
     const offset = 1
-    for(let i=0; i < 4; i++) {
+    for(let i=0; i < 5; i++) {
       const arr = data.scoreHistory.map(a => a.rewardShare[i])
       componentChartData.datasets[i+offset].data = arr
       rewardFields[i].text(arr.length > 0 ? arr[arr.length-1].toFixed(1) : '-')

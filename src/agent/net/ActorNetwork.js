@@ -9,19 +9,19 @@ export default class ActorNetwork extends PersistentNetwork {
     this.optimizer = tf.train.adam(this.learningRate);
 
     this.net = tf.sequential();
-    this.net.add(tf.layers.dense({ units: 32, activation: 'tanh', inputShape: [this.inputCount] }));
+    this.net.add(tf.layers.dense({ units: 64, activation: 'tanh', inputShape: [this.inputCount] }));
     this.net.add(tf.layers.dense({ units: 32, activation: 'tanh' }));
     this.net.add(tf.layers.dense({ units: 32, activation: 'tanh' }));
-    this.net.add(tf.layers.dense({ units: 2*this.outputCount, activation: 'linear' }));
+    this.net.add(tf.layers.dense({ units: 2*this.outputCount, activation: 'tanh' }));
     this.net.compile({optimizer: this.optimizer, loss: tf.losses.meanSquaredError })
   }
 
   exec(inputs) {
     return tf.tidy(() => {
       const output = this.net.predict(inputs);
-      const mean = tf.tanh(output.slice([0, 0], [-1, this.outputCount]));
+      const mean = output.slice([0, 0], [-1, this.outputCount]);
       let stdDev = output.slice([0, this.outputCount], [-1, -1]);
-      stdDev = tf.sigmoid(stdDev).add(0.01)
+      stdDev = stdDev.div(4).add(0.5)
       const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
       const scaledActions = tf.clipByValue(unscaledActions, -1, 1);
 

@@ -73,7 +73,6 @@ export default function initUI(messageBus) {
     }
 	});
 
-
  
   messageBus.addEventListener('epochStats', ({data}) => {
     criticLoss.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].critic.toFixed(4) : '-')

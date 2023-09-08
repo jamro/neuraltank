@@ -11,6 +11,7 @@ export default function initUI(trainer, agent) {
     $('#reward-1'),
     $('#reward-2'),
     $('#reward-3'),
+    $('#reward-4'),
   ]
   const valueField = $('#value')
 
