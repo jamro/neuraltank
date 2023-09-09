@@ -1,11 +1,13 @@
 import Simulation from "jsbattle-engine/src/engine/Simulation";
 
+const INIT_BULLET_SCORE = -0.01
+
 export default class SimEnv extends Simulation {
   constructor(renderer, debug) {
     super(renderer, debug)
     this.stepCounter = 0
     this.scoreCorrectionQueue = []
-    this.bulletDistanceScore = 0
+    this.bulletDistanceScore = INIT_BULLET_SCORE
   }
 
   _createBullet(owner, power) {
@@ -38,6 +40,9 @@ export default class SimEnv extends Simulation {
       if(!bullet) continue
       if(bullet.exploded) continue
       if(bullet.owner.name !== 'neuraltank') continue
+      if(!bullet.age) bullet.age = 0
+      bullet.age++
+      if(bullet.age > 70) continue
       
       let distance = 1000000
 
@@ -52,7 +57,7 @@ export default class SimEnv extends Simulation {
       }
       bulletDistance = Math.min(bulletDistance, distance)
     }
-    this.bulletDistanceScore = 500/bulletDistance-0.1
+    this.bulletDistanceScore += (20/Math.sqrt(bulletDistance) + INIT_BULLET_SCORE - this.bulletDistanceScore)/5
   }
 
 }
