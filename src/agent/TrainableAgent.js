@@ -45,7 +45,7 @@ export default class TrainableAgent extends Agent {
     )
 
     this.stats.actorLoss = loss
-    this.stats.entropy = loss
+    this.stats.entropy = entropy
 
     this.sendStatus("Training completed")
     console.log(`Actor loss: ${this.stats.actorLoss.toFixed(2)}, critic loss: ${this.stats.criticLoss.toFixed(2)}`)
