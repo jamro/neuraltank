@@ -117,13 +117,8 @@ export default class TankLogic {
     const rewards = [gameScoreReward, radarReward, energyReward, collisionReward, _this.getBulletDistanceScore()]
     const actions = agent.act(input, rewards, _this.getScoreCorrections())
     control.GUN_TURN = actions[0]
-
-    // find enemy
-    if(state.radar.enemy) {
-      control.RADAR_TURN = -_this.enemyPosBeamAngle
-    } else {
-      control.RADAR_TURN = 1
-    }
+    control.RADAR_TURN = actions[1]
+    control.TURN = 0.2
     control.SHOOT = (_this.enemyPosGunAngle > -1 && _this.enemyPosGunAngle < 1) ? 0.1 : 0
   }
 
