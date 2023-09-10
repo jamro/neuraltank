@@ -94,6 +94,9 @@ const messageBus = new MessageBus(self);
       case 'learningRate':
         settings.prop('learningRate', data.value)
         break
+      case 'entropyCoefficient':
+        settings.prop('entropyCoefficient', data.value)
+        break
       case 'rewardWeights':
         const currentWeights = settings.prop('rewardWeights')
         currentWeights[data.index] = data.value
@@ -128,6 +131,7 @@ const messageBus = new MessageBus(self);
     epochSize: trainer.epochSize,
     episodeTimeLimit: trainer.episodeTimeLimit,
     learningRate: agent.learningRate,
+    entropyCoefficient: agent.entropyCoefficient,
     discountRate: agent.discountRate,
     envId: trainer.envId,
     rewardWeights: agent.rewardWeights

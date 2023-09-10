@@ -3,6 +3,7 @@ import TrajectoryMemory from './TrajectoryMemory.js';
 import Agent from './Agent.js';
 
 const INIT_DISCOUNT_RATE = 0.99
+const INIT_ENTROPY_COEFFICIENT = 0.005
 
 export default class TrainableAgent extends Agent {
   constructor(settings) {
@@ -13,6 +14,10 @@ export default class TrainableAgent extends Agent {
     this.actorNet.addEventListener('progress', (event) => {
       this.sendStatus(`Training actor (${Math.round(event.progress*100)}%)...`)
     })
+  }
+
+  get entropyCoefficient() {
+    return this.settings.prop('entropyCoefficient')
   }
 
   onBatchStart() {
@@ -44,7 +49,8 @@ export default class TrainableAgent extends Agent {
       this.memory.epochMemory.action,
       this.memory.epochMemory.reward,
       this.memory.epochMemory.value,
-      this.discountRate
+      this.discountRate,
+      this.entropyCoefficient,
     )
 
     this.stats.actorLoss = loss

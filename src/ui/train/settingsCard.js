@@ -4,6 +4,7 @@ export default function initUI(messageBus) {
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
   const inputLearningRate = $('#inputLearningRate')
+  const inputEntropyCoef = $('#inputEntropyCoef')
   const settingsLock = $('#settingsLock')
   const inputEnv = $('#inputEnv')
   const inputRewardWeights = [
@@ -18,6 +19,7 @@ export default function initUI(messageBus) {
     inputEpochLen,
     inputEpisodeLen,
     inputLearningRate,
+    inputEntropyCoef,
     inputEnv
   ].concat(inputRewardWeights)
 
@@ -37,6 +39,7 @@ export default function initUI(messageBus) {
     inputEpochLen.val(data.epochSize)
     inputEpisodeLen.val(data.episodeTimeLimit)
     inputLearningRate.val(data.learningRate)
+    inputEntropyCoef.val(data.entropyCoefficient)
     inputEnv.val(data.envId)
     data.rewardWeights.forEach((v, i) => inputRewardWeights[i].val(v))
   })
@@ -54,6 +57,10 @@ export default function initUI(messageBus) {
 
   editable(inputLearningRate, regexpValidator(/^[0-9\.]+$/), (v) => {
     messageBus.send('config', {key: 'learningRate', value: Number(v)})
+  })
+
+  editable(inputEntropyCoef, regexpValidator(/^[0-9\.\-]+$/), (v) => {
+    messageBus.send('config', {key: 'entropyCoefficient', value: Number(v)})
   })
 
   inputRewardWeights.forEach((field, index) =>  editable(field, regexpValidator(/^[0-9\.]+$/), (v) => {

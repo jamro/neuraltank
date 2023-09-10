@@ -2,7 +2,6 @@ import * as tf from '@tensorflow/tfjs';
 import ActorNetwork from './ActorNetwork.js';
 import batchTensors from '../../utils/batchTensors.js';
 
-const ENTROPY_COEFFICIENT = 0.005
 const GAE_LAMBDA = 0.97
 const PPO_CLIP_EPSILON = 0.2
 const BATCH_SIZE = 128
@@ -56,7 +55,7 @@ export default class DualActorNetwork extends ActorNetwork {
     return advantage
   }
 
-  trainSingleBatch(input, action2, advantage) {
+  trainSingleBatch(input, action2, advantage, entropyCoefficient) {
     const epsilon = PPO_CLIP_EPSILON
     let batchEntropy = 0
     const f = () => tf.tidy(() => {
@@ -91,7 +90,7 @@ export default class DualActorNetwork extends ActorNetwork {
 
       const entropy = stdDev2.mean().square().mul(2*Math.PI*Math.E).log().mul(0.5)
       const loss = tf.neg(tf.minimum(surrogate1, surrogate2))
-      const lossWithEntropy = loss.sub(entropy.mul(ENTROPY_COEFFICIENT))
+      const lossWithEntropy = loss.sub(entropy.mul(entropyCoefficient))
 
       batchEntropy = entropy.arraySync()
 
@@ -113,7 +112,7 @@ export default class DualActorNetwork extends ActorNetwork {
     return normalized;
   }
 
-  async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
+  async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate, entropyCoefficient=0.005) {
     const input = tf.concat(inputTensor)
     const reward = tf.concat(rewardTensor)
     const value = tf.concat(valueTensor)
@@ -135,7 +134,7 @@ export default class DualActorNetwork extends ActorNetwork {
     for(let i=0; i < inputBatch.length;i ++) {
       this.notifyProgress(i/inputBatch.length)
       //await new Promise((done) => setTimeout(done, 5))
-      const [loss, entropy] = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i])
+      const [loss, entropy] = this.trainSingleBatch(inputBatch[i], action2Batch[i], advantageBatch[i], entropyCoefficient)
       lossSum += loss
       entropySum += entropy
       lossCount ++
