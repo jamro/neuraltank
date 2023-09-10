@@ -64,7 +64,9 @@ export default class TrainableAgent extends Agent {
 
     // process reward
     const weightedRewards = this.weightRewards(rewards)
+    const weightedCorrections = corrections.map((v) => ({...v, value: v.value * this.rewardWeights[0]}))
     const scoreIncrement = this.stats.storeRewards(weightedRewards)
+
     // select actions
     this.stats.startBenchmark()
     const [, , action] = this.actorNet.exec(inputTensor);
@@ -82,7 +84,7 @@ export default class TrainableAgent extends Agent {
     });
 
     this.memory.correct({
-      reward: corrections
+      reward: weightedCorrections
     })
 
     // update stats

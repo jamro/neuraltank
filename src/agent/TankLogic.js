@@ -76,7 +76,7 @@ export default class TankLogic {
       let enemyPosBeamAngle = Math2.deg.normalize(radarAbsAngle - enemyPosAngle)/16 // keep it in range of -1,1
       enemyPosBeamAngle = Math.min(1, Math.max(-1, enemyPosBeamAngle))
       _this.enemyPosBeamAngle = enemyPosBeamAngle
-      let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - enemyPosAngle)/90 // keep it in range of -1,1
+      let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - enemyPosAngle)/45 // keep it in range of -1,1
       enemyPosGunAngle = Math.min(1, Math.max(-1, enemyPosGunAngle))
       _this.enemyPosGunAngle = enemyPosGunAngle
 
@@ -99,7 +99,6 @@ export default class TankLogic {
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
     }
 
-    const gunPos = Math.max(-1, Math.min(1, Math2.deg.normalize(state.radar.angle - state.gun.angle)/90))
     const input = [
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
@@ -125,8 +124,7 @@ export default class TankLogic {
     } else {
       control.RADAR_TURN = 1
     }
-    control.SHOOT = 0.1
-
+    control.SHOOT = (_this.enemyPosGunAngle > -1 && _this.enemyPosGunAngle < 1) ? 0.1 : 0
   }
 
   createAI(simulation) {

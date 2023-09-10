@@ -9,7 +9,7 @@ const INIT_ACTOR_LEARNING_RATE = 0.0005
 const INIT_CRITIC_LEARNING_RATE = 0.005
 const STATE_LEN = 4
 const ACTION_LEN = 1
-const INIT_REWARD_WEIGHTS = [0, 0, 1, 1, 1]
+const INIT_REWARD_WEIGHTS = [1, 0, 1, 1, 1]
 
 export default class Agent extends EventTarget {
 
@@ -62,10 +62,14 @@ export default class Agent extends EventTarget {
   }
 
   act(input, rewards, corrections) {
+    this.stats.onStepStart()
+    const inputTensor = tf.tensor2d([input]);
+
+    // process reward
     const weightedRewards = this.weightRewards(rewards)
     const weightedCorrections = corrections.map((v) => ({...v, value: v.value * this.rewardWeights[0]}))
     const scoreIncrement = this.stats.storeRewards(weightedRewards)
-    const inputTensor = tf.tensor2d([input]);
+    
     let [mean, stdDev, action] = this.actorNet.exec(inputTensor);
     this.stats.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
 
@@ -82,6 +86,8 @@ export default class Agent extends EventTarget {
     this.memory.correct({
       reward: weightedCorrections
     })
+
+    this.stats.onStepEnd()
 
     return action.dataSync();
   }

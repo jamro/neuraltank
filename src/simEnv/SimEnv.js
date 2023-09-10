@@ -1,13 +1,11 @@
 import Simulation from "jsbattle-engine/src/engine/Simulation";
 
-const INIT_BULLET_SCORE = -0.01
-
 export default class SimEnv extends Simulation {
   constructor(renderer, debug) {
     super(renderer, debug)
     this.stepCounter = 0
     this.scoreCorrectionQueue = []
-    this.bulletDistanceScore = INIT_BULLET_SCORE
+    this.bulletDistanceScore = 0
   }
 
   _createBullet(owner, power) {
@@ -31,8 +29,8 @@ export default class SimEnv extends Simulation {
     return bullet;
   }
 
-  _simulationStep() {
-    super._simulationStep()
+  _updateModel() {
+    super._updateModel()
     this.stepCounter++
 
     let bulletDistance = 1000000
@@ -57,7 +55,11 @@ export default class SimEnv extends Simulation {
       }
       bulletDistance = Math.min(bulletDistance, distance)
     }
-    this.bulletDistanceScore += (20/Math.sqrt(bulletDistance) + INIT_BULLET_SCORE - this.bulletDistanceScore)/5
+    if(bulletDistance === 1000000) {
+      this.bulletDistanceScore += (0 - this.bulletDistanceScore)/5
+    } else {
+      this.bulletDistanceScore += (20/Math.sqrt(bulletDistance) - this.bulletDistanceScore)/5
+    }
   }
 
 }
