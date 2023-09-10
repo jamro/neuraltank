@@ -9,7 +9,7 @@ const INIT_ACTOR_LEARNING_RATE = 0.0005
 const INIT_CRITIC_LEARNING_RATE = 0.005
 const STATE_LEN = 4
 const ACTION_LEN = 1
-const INIT_REWARD_WEIGHTS = [1, 0, 1, 1, 1]
+const INIT_REWARD_WEIGHTS = [0, 0, 1, 1, 1]
 
 export default class Agent extends EventTarget {
 
