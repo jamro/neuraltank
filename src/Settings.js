@@ -7,6 +7,7 @@ export default class Settings extends EventTarget {
       epochSize: 5,
       episodeTimeLimit: 20000,
       learningRate: 0.0005,
+      rewardWeights: [1, 0.25, 1, 1, 1],
       envId: 'pendulum'
     }
   }

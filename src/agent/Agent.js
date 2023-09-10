@@ -7,7 +7,6 @@ import TrajectoryMemory from './TrajectoryMemory.js';
 
 const STATE_LEN = 4
 const ACTION_LEN = 2
-const INIT_REWARD_WEIGHTS = [1, 0.25, 1, 1, 1]
 
 export default class Agent extends EventTarget {
 
@@ -19,7 +18,7 @@ export default class Agent extends EventTarget {
     this.criticNet = new CriticNetwork(STATE_LEN, 1, 10 * this.learningRate, 'critic')
 
     this.memory = new TrajectoryMemory()
-    this.rewardWeights = INIT_REWARD_WEIGHTS
+    this.rewardWeights = settings.prop('rewardWeights')
     this.stats = new Stats()
   }
 
@@ -35,6 +34,7 @@ export default class Agent extends EventTarget {
 
   onBatchStart() {
     this.stats.onEpochStart()
+    this.rewardWeights = this.settings.prop('rewardWeights')
   }
 
   async onBatchFinish() {
@@ -111,7 +111,7 @@ export default class Agent extends EventTarget {
 
     if (actorStatus && criticStatus) {
       await this.stats.restore()
-      this.rewardWeights = INIT_REWARD_WEIGHTS
+      this.rewardWeights = this.settings.prop('rewardWeights')
       return true
     } else {
       return false

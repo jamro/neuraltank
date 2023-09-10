@@ -94,6 +94,11 @@ const messageBus = new MessageBus(self);
       case 'learningRate':
         settings.prop('learningRate', data.value)
         break
+      case 'rewardWeights':
+        const currentWeights = settings.prop('rewardWeights')
+        currentWeights[data.index] = data.value
+        settings.prop('rewardWeights', currentWeights)
+        break
     }
     messageBus.send("status", {msg: 'Settings: updated'})
   })
@@ -125,6 +130,7 @@ const messageBus = new MessageBus(self);
     learningRate: agent.learningRate,
     discountRate: agent.discountRate,
     envId: trainer.envId,
+    rewardWeights: agent.rewardWeights
   })
 
   messageBus.send("status", {msg: 'Ready!'})

@@ -118,7 +118,6 @@ export default class TankLogic {
     const actions = agent.act(input, rewards, _this.getScoreCorrections())
     control.GUN_TURN = actions[0]
     control.RADAR_TURN = actions[1]
-    control.TURN = 0.2
     control.SHOOT = (_this.enemyPosGunAngle > -1 && _this.enemyPosGunAngle < 1) ? 0.1 : 0
   }
 

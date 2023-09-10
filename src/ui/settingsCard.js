@@ -6,13 +6,20 @@ export default function initUI(messageBus) {
   const inputLearningRate = $('#inputLearningRate')
   const settingsLock = $('#settingsLock')
   const inputEnv = $('#inputEnv')
+  const inputRewardWeights = [
+    $('#input-reward-weight-1'),
+    $('#input-reward-weight-2'),
+    $('#input-reward-weight-3'),
+    $('#input-reward-weight-4'),
+    $('#input-reward-weight-5'),
+  ]
 
   const inputs = [
     inputEpochLen,
     inputEpisodeLen,
     inputLearningRate,
     inputEnv
-  ]
+  ].concat(inputRewardWeights)
 
   function disableForm() {
     inputs.forEach(i => i.prop('disabled', true))
@@ -31,8 +38,8 @@ export default function initUI(messageBus) {
     inputEpisodeLen.val(data.episodeTimeLimit)
     inputLearningRate.val(data.learningRate)
     inputEnv.val(data.envId)
+    data.rewardWeights.forEach((v, i) => inputRewardWeights[i].val(v))
   })
-  
 
   editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
     messageBus.send('config', {key: 'epochSize', value: Number(v)})
@@ -48,6 +55,10 @@ export default function initUI(messageBus) {
   editable(inputLearningRate, regexpValidator(/^[0-9\.]+$/), (v) => {
     messageBus.send('config', {key: 'learningRate', value: Number(v)})
   })
+
+  inputRewardWeights.forEach((field, index) =>  editable(field, regexpValidator(/^[0-9\.]+$/), (v) => {
+    messageBus.send('config', {key: 'rewardWeights', value: Number(v), index })
+  }))
 
 }
 
