@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'remixicon/fonts/remixicon.css'
 import { LocalStorageServer } from './worker/LocalStorageProxy';
 import MessageBus from './worker/MessageBus';
-import initUi from './ui'
+import initUi from './ui/train'
 
 (async () => {
   console.log("... Neural Tank ...")

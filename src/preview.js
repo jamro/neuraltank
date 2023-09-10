@@ -9,7 +9,7 @@ import TankLogic from "./agent/TankLogic.js";
 import Trainer from './Trainer.js';
 import Settings from './Settings.js'
 import * as $ from 'jquery'
-import initUI from './ui/previewScreen.js';
+import initUI from './ui/preview';
 
 (async () => {
   console.log("... Neural Tank ...")
