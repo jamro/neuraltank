@@ -7,13 +7,22 @@ export default class PersistentNetwork extends EventTarget {
     this.name = name
     this.inputCount = inputCount
     this.outputCount = outputCount
-    this.learningRate = learningRate
+    this._learningRate = learningRate
     this.dateSaved = null
     this.net = tf.sequential();
 
-    this.optimizer = tf.train.adam(this.learningRate);
+    this.optimizer = tf.train.adam(this._learningRate);
 
     this.net = null
+  }
+
+  get learningRate() {
+    return this._learningRate
+  }
+
+  set learningRate(v) {
+    this._learningRate = v
+    this.optimizer.learningRate = v
   }
   
   async save() {

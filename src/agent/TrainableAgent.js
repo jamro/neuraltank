@@ -5,8 +5,8 @@ import Agent from './Agent.js';
 const INIT_DISCOUNT_RATE = 0.99
 
 export default class TrainableAgent extends Agent {
-  constructor() {
-    super()
+  constructor(settings) {
+    super(settings)
 
     this.discountRate = INIT_DISCOUNT_RATE
 
@@ -22,6 +22,9 @@ export default class TrainableAgent extends Agent {
 
   async onBatchFinish() {
     await super.onBatchFinish()
+
+    this.actorNet.learningRate = this.learningRate
+    this.criticNet.learningRate = 10*this.learningRate
 
     this.sendStatus("Training critic...")
 

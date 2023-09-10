@@ -28,7 +28,7 @@ const messageBus = new MessageBus(self);
   const settings = new Settings()
   await settings.init()
 
-  const agent = new TrainableAgent()
+  const agent = new TrainableAgent(settings)
   const tankLogic = new TankLogic(JsBattle, agent)
   tankLogic.installCallbacks(self)
   const trainer = new Trainer(agent, tankLogic, JsBattle, settings)
@@ -91,6 +91,9 @@ const messageBus = new MessageBus(self);
       case 'envId':
         settings.prop('envId', data.value)
         break
+      case 'learningRate':
+        settings.prop('learningRate', data.value)
+        break
     }
     messageBus.send("status", {msg: 'Settings: updated'})
   })
@@ -119,8 +122,7 @@ const messageBus = new MessageBus(self);
   messageBus.send("settings", {
     epochSize: trainer.epochSize,
     episodeTimeLimit: trainer.episodeTimeLimit,
-    actorLearningRate: agent.actorLearningRate,
-    criticLearningRate: agent.criticLearningRate,
+    learningRate: agent.learningRate,
     discountRate: agent.discountRate,
     envId: trainer.envId,
   })

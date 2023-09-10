@@ -3,19 +3,14 @@ import * as $ from 'jquery'
 export default function initUI(messageBus) {
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
-  const inputActorLearningRate = $('#inputActorLearningRate')
-  const inputCriticLearningRate = $('#inputCriticLearningRate')
-  const inputDiscountRate = $('#inputDiscountRate')
+  const inputLearningRate = $('#inputLearningRate')
   const settingsLock = $('#settingsLock')
   const inputEnv = $('#inputEnv')
 
   const inputs = [
     inputEpochLen,
     inputEpisodeLen,
-    inputActorLearningRate,
-    inputActorLearningRate,
-    inputCriticLearningRate,
-    inputDiscountRate,
+    inputLearningRate,
     inputEnv
   ]
 
@@ -34,9 +29,7 @@ export default function initUI(messageBus) {
   messageBus.addEventListener('settings', ({data}) => {
     inputEpochLen.val(data.epochSize)
     inputEpisodeLen.val(data.episodeTimeLimit)
-    inputActorLearningRate.val(data.actorLearningRate)
-    inputCriticLearningRate.val(data.criticLearningRate)
-    inputDiscountRate.val(data.discountRate)
+    inputLearningRate.val(data.learningRate)
     inputEnv.val(data.envId)
   })
   
@@ -50,6 +43,10 @@ export default function initUI(messageBus) {
 
   editable(inputEnv, () => true, (v) => {
     messageBus.send('config', {key: 'envId', value: v})
+  })
+
+  editable(inputLearningRate, regexpValidator(/^[0-9\.]+$/), (v) => {
+    messageBus.send('config', {key: 'learningRate', value: Number(v)})
   })
 
 }

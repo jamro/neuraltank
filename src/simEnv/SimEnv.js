@@ -58,7 +58,7 @@ export default class SimEnv extends Simulation {
     if(bulletDistance === 1000000) {
       this.bulletDistanceScore += (0 - this.bulletDistanceScore)/5
     } else {
-      this.bulletDistanceScore += (1/Math.sqrt(bulletDistance) - this.bulletDistanceScore)/5
+      this.bulletDistanceScore += (2/Math.sqrt(bulletDistance) - this.bulletDistanceScore)/5
     }
   }
 

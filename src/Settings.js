@@ -6,6 +6,7 @@ export default class Settings extends EventTarget {
     this.data = {
       epochSize: 5,
       episodeTimeLimit: 20000,
+      learningRate: 0.0005,
       envId: 'pendulum'
     }
   }
