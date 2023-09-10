@@ -22,6 +22,7 @@ export default class Trainer extends EventTarget {
     this.simSpeed = 10
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
     this.envId = this.settings.prop('envId')
+    this.style = 'debug'
   }
 
   get simulation() {
@@ -94,12 +95,15 @@ export default class Trainer extends EventTarget {
 
   async runEpisode() {
     await new Promise(async (onEpisodeEnd) => {
+      this.addEventListener('stopSim', () => {
+        onEpisodeEnd()
+      })
       console.log("on game start")
       this.agent.onGameStart()
       console.log("create game renderer")
       let renderer
       if(this.canvas) {
-        renderer = this.jsBattle.createRenderer('debug');
+        renderer = this.jsBattle.createRenderer(this.style);
         renderer.init(this.canvas);
         console.log("loading assets")
         await new Promise(done => renderer.loadAssets(done))
@@ -140,6 +144,12 @@ export default class Trainer extends EventTarget {
     })
     console.log("EVENT: episodeComplete")
     this.dispatchEvent(new Event('episodeComplete'))
+  }
+
+  stop() {
+    this._simulation.stop()
+    const event = new Event("stopSim")
+    this.dispatchEvent(event)
   }
 
   async restore() {

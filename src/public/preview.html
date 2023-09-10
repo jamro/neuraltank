@@ -28,49 +28,66 @@
     </nav>
     <div class="container">
       <div class="row">
-        <div class="col-lg-6 col-12 mb-3">
-          <div class="card">
-            <h5 class="card-header"><i class="ri-medal-line"></i> Scoring</h5>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Reward</div>
+        <div class="col-lg-6 col-12">
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <h5 class="card-header"><i class="ri-movie-line"></i> Controls</h5>
+                <div class="card-body row">
+                  <div class="col"><button id="replay-preview" type="button" class="btn btn-danger" style="width: 100%"><i class="ri-corner-up-left-double-line"></i> Replay</button></div>
+                  <div class="col"><button id="sim-speed-0-1" type="button" class="btn btn-secondary" style="width: 100%"><i class="ri-timer-line"></i> 0.1x</button></div>
+                  <div class="col"><button id="sim-speed-0-5" type="button" class="btn btn-secondary" style="width: 100%"><i class="ri-timer-line"></i> 0.5x</button></div>
+                  <div class="col"><button id="sim-speed-1" type="button" class="btn btn-secondary" style="width: 100%"><i class="ri-timer-line"></i> 1x</button></div>
                 </div>
-                <span id="reward-total" class="badge bg-primary rounded-pill font-monospace" style="min-width: 10em;">-</span>
-              </li>
-              <li class="list-group-item">
-                <div class="row text-center">
-                  <div class="col-4">
-                    <small>score</small>
-                    <h5 id="reward-0">-</h5>
-                  </div>
-                  <div class="col-4">
-                    <small>radar</small>
-                    <h5 id="reward-1">-</h5>
-                  </div>
-                  <div class="col-4">
-                    <small>energy</small>
-                    <h5 id="reward-2">-</h5>
-                  </div>
-                  <div class="col-4">
-                    <small>collision</small>
-                    <h5 id="reward-3">-</h5>
-                  </div>
-                  <div class="col-4">
-                    <small>bullets</small>
-                    <h5 id="reward-4">-</h5>
-                  </div>
-                </div>
-              <li class="list-group-item d-flex justify-content-between align-items-start">
-                <div class="ms-2 me-auto">
-                  <div class="fw-bold">Expected value</div>
-                </div>
-                <span id="value" class="badge bg-primary rounded-pill font-monospace" style="min-width: 10em;">-</span>
-              </li>
-            </ul>
+              </div>
+            </div>
           </div>
           <div class="row mt-3">
             <canvas id="battlefield" style="width: 100%"></canvas>
+          </div>
+          <div class="row mt-3">
+            <div class="col">
+              <div class="card">
+                <h5 class="card-header"><i class="ri-medal-line"></i> Scoring</h5>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                      <div class="fw-bold">Reward</div>
+                    </div>
+                    <span id="reward-total" class="badge bg-primary rounded-pill font-monospace" style="min-width: 10em;">-</span>
+                  </li>
+                  <li class="list-group-item">
+                    <div class="row text-center">
+                      <div class="col-4">
+                        <small>score</small>
+                        <h5 id="reward-0">-</h5>
+                      </div>
+                      <div class="col-4">
+                        <small>radar</small>
+                        <h5 id="reward-1">-</h5>
+                      </div>
+                      <div class="col-4">
+                        <small>energy</small>
+                        <h5 id="reward-2">-</h5>
+                      </div>
+                      <div class="col-4">
+                        <small>collision</small>
+                        <h5 id="reward-3">-</h5>
+                      </div>
+                      <div class="col-4">
+                        <small>bullets</small>
+                        <h5 id="reward-4">-</h5>
+                      </div>
+                    </div>
+                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                      <div class="fw-bold">Expected value</div>
+                    </div>
+                    <span id="value" class="badge bg-primary rounded-pill font-monospace" style="min-width: 10em;">-</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col-lg-6 col-12 mb-3">

@@ -1,6 +1,10 @@
 export default class Stats {
 
   constructor() {
+    this.reset()
+  }
+
+  reset() {
     this.stepCount = 0
     this.stepTotalDuration = 0
     this.stepAvgDuration = 0

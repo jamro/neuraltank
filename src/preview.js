@@ -8,7 +8,6 @@ import Agent from "./agent/Agent.js";
 import TankLogic from "./agent/TankLogic.js";
 import Trainer from './Trainer.js';
 import Settings from './Settings.js'
-import * as $ from 'jquery'
 import initUI from './ui/preview';
 
 (async () => {
@@ -29,6 +28,7 @@ import initUI from './ui/preview';
   trainer.autoSave = false
   trainer.autoPlay = false
   trainer.simSpeed = 1
+  trainer.style = 'debug'
 
   if(!(await trainer.restore())) {
     console.log('Stored model not found. creating...')

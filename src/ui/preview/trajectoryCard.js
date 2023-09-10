@@ -212,6 +212,15 @@ export default function initUI(trainer, agent) {
     chart.update()
   }
 
+  function clearSingleTrajectory(chart) {
+    chart.data.labels = []
+
+    for(let i=0; i < chart.data.datasets.length; i++) {
+      chart.data.datasets[i].data = []
+    }
+    chart.update()
+  }
+
   function drawTrajectory() {
     const actionLabels = ['gun', 'radar']
     drawSingleTrajectory(inputChart, agent.memory.episodeMemory.input, (index) => {
@@ -255,6 +264,8 @@ export default function initUI(trainer, agent) {
   })
 
   trainer.addEventListener('epochComplete', async () => {
+    if(!agent.memory.epochMemory.reward) return
+    if(!agent.memory.epochMemory.value) return
     agent.memory.aggregateGameResults()
     const reward = tf.concat(agent.memory.epochMemory.reward)
     const value = tf.concat(agent.memory.epochMemory.value)
@@ -263,6 +274,15 @@ export default function initUI(trainer, agent) {
 
     drawSingleTrajectory(advantageChart, advantage, () => 'Generalized Advantage Estimation', {fill: 'origin'})
 
+  })
+
+  window.addEventListener('restartPreview', async () => {
+    clearSingleTrajectory(inputChart)
+    clearSingleTrajectory(actionChart)
+    clearSingleTrajectory(actionStdDevChart)
+    clearSingleTrajectory(rewardChart)
+    clearSingleTrajectory(valueChart)
+    clearSingleTrajectory(advantageChart)
   })
 
 
