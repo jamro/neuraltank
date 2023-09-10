@@ -40,16 +40,18 @@ export default function initUI(trainer, agent) {
           title: {
             display: true,
             text: 'input'
-          }
+          },
+          min: -1,
+          max: 1
         },
       },
       elements: {
         point: {
           radius: 0
-        }
+        },
       },
       plugins: {
-        legend: legendSettings
+        legend: legendSettings,
       }
     }
 	});
@@ -68,8 +70,40 @@ export default function initUI(trainer, agent) {
         y: {
           title: {
             display: true,
-            text: 'action'
-          }
+            text: 'action (mean)'
+          },
+          min: -1,
+          max: 1
+        },
+      },
+      elements: {
+        point: {
+          radius: 0
+        }
+      },
+      plugins: {
+        legend: legendSettings
+      }
+    }
+	});
+  const actionStdDevChart = new Chart(document.getElementById('action-stddev-chart'), {
+		type : 'line',
+		data: {
+      labels : [],
+      datasets : []
+    },
+    options: {
+      animation: false, 
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'action (std dev)'
+          },
+          min: 0,
         },
       },
       elements: {
@@ -173,14 +207,14 @@ export default function initUI(trainer, agent) {
 
   let stepCounter = 0
 
-  function drawSingleTrajectory(chart, tensor, labelFormatter) {
+  function drawSingleTrajectory(chart, tensor, labelFormatter, datasetOptions={}) {
     const inputArray = tensor.arraySync()
     for(let i=chart.data.labels.length; i < inputArray.length; i++) {
       chart.data.labels.push(i)
       const row = inputArray[i]
       for(let j=0; j < row.length; j++) {
         while(!chart.data.datasets[j]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(j) : `Series ${j+1}`, borderWidth: 2})
+          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(j) : `Series ${j+1}`, borderWidth: 2, ...datasetOptions})
         }
         chart.data.datasets[j].data.push(row[j])
       }
@@ -188,37 +222,8 @@ export default function initUI(trainer, agent) {
     chart.update()
   }
 
-  function drawRangeTrajectory(chart, minTensor, maxTensor, meanTensor, labelFormatter) {
-    const colors = ['#0d6efd', '#dc3545', '#0dcaf0', '#ffc107', '#000000']
-    const inputMinArray = minTensor.arraySync()
-    const inputMaxArray = maxTensor.arraySync()
-    const inputMeanArray = meanTensor.arraySync()
-    for(let i=chart.data.labels.length; i < inputMinArray.length; i++) {
-      chart.data.labels.push(i)
-      const rowMin = inputMinArray[i]
-      const rowMax = inputMaxArray[i]
-      const rowMean = inputMeanArray[i]
-      for(let j=0; j < rowMin.length; j++) {
-        while(!chart.data.datasets[3*j]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j) : `Series ${3*j} (min)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
-        }
-        chart.data.datasets[3*j].data.push(rowMin[j])
-        
-        while(!chart.data.datasets[3*j+1]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j+1) : `Series ${3*j+1} (max)`, borderWidth: 1, borderColor: colors[j % colors.length], borderDash: [5, 5]})
-        }
-        chart.data.datasets[3*j+1].data.push(rowMax[j])
-        
-        while(!chart.data.datasets[3*j+2]) {
-          chart.data.datasets.push({ data : [], label: labelFormatter ? labelFormatter(3*j+2) : `Series ${3*j+2} (mean)`, borderWidth: 2, borderColor: colors[j % colors.length]})
-        }
-        chart.data.datasets[3*j+2].data.push(rowMean[j])
-      }
-    }
-    chart.update()
-  }
-
   function drawTrajectory() {
+    const actionLabels = ['gun', 'radar']
     drawSingleTrajectory(inputChart, agent.memory.episodeMemory.input, (index) => {
       const labels = ['distance', 'radar', 'enemyDirection', 'gunPos']
       if(labels[index]) {
@@ -226,13 +231,19 @@ export default function initUI(trainer, agent) {
       }
       return `Input #${index+1}`
     })
-    drawRangeTrajectory(actionChart, agent.memory.episodeMemory.actionMin, agent.memory.episodeMemory.actionMax, agent.memory.episodeMemory.actionMean, (index) => {
-      const labels = ['radar (min)', 'radar (max)', 'radar']
-      if(labels[index]) {
-        return labels[index]
+    drawSingleTrajectory(actionChart, agent.memory.episodeMemory.actionMean, (index) => {
+      if(actionLabels[index]) {
+        return actionLabels[index]
       }
-      return `Action #${index+1}`
+      return `Input #${index+1}`
     })
+    drawSingleTrajectory(actionStdDevChart, agent.memory.episodeMemory.actionStdDev, (index) => {
+      if(actionLabels[index]) {
+        return actionLabels[index]
+      }
+      return `Input #${index+1}`
+    })
+
     // clean up the chart to include data corrections
     rewardChart.data.labels = []
     rewardChart.data.datasets = [] 
@@ -241,7 +252,7 @@ export default function initUI(trainer, agent) {
     })
     drawSingleTrajectory(valueChart, agent.memory.episodeMemory.value, () => {
       return 'Value'
-    })
+    }, {fill: 'origin'})
 
   }
 
@@ -267,7 +278,7 @@ export default function initUI(trainer, agent) {
 
     const advantage = agent.actorNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE)
 
-    drawSingleTrajectory(advantageChart, advantage, () => 'Generalized Advantage Estimation')
+    drawSingleTrajectory(advantageChart, advantage, () => 'Generalized Advantage Estimation', {fill: 'origin'})
 
   })
 

@@ -69,8 +69,7 @@ export default class Agent extends EventTarget {
       input: input, 
       action: action,
       actionMean: mean,
-      actionMin: mean.sub(stdDev).clipByValue(-1, 1),
-      actionMax: mean.add(stdDev).clipByValue(-1, 1),
+      actionStdDev: stdDev,
       reward: scoreIncrement, 
       value: this.stats.expectedValue
     });

@@ -10,6 +10,7 @@ export default class TankLogic {
     this.tankModel = null
     this.scoreCorrectionQueue = []
     this._simulation = null
+    this._noVisionTime = 0
   }
 
   installCallbacks(target) {
@@ -51,7 +52,7 @@ export default class TankLogic {
     _this.enemyPosGunAngle = -1
     _this.enemyDistance = 1
     _this.enemyDirection = 0
-
+    _this.noVisionTime = 0
     _this.lastScore = 0
     _this.lastEnergy = 100
   }
@@ -96,7 +97,11 @@ export default class TankLogic {
     }
 
     if(state.radar.enemy) {
+      _this.noVisionTime = 0
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
+    } else {
+      _this.noVisionTime ++
+      radarReward = -_this.noVisionTime * 0.0005
     }
 
     const input = [
