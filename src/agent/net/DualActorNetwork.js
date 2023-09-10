@@ -105,23 +105,22 @@ export default class DualActorNetwork extends ActorNetwork {
     return [actorLoss, batchEntropy]
   }
 
-  normalizeRewards(rewardTensor) {
-    const mean = tf.mean(rewardTensor);
-    const stdDev = tf.sqrt(tf.mean(tf.square(rewardTensor.sub(mean))));
+  normalizeTensor(tensor) {
+    const mean = tf.mean(tensor);
+    const stdDev = tf.sqrt(tf.mean(tf.square(tensor.sub(mean))));
 
-    const normalizedRewards = rewardTensor.sub(mean).div(stdDev);
-
-    return normalizedRewards;
+    const normalized = tensor.sub(mean).div(stdDev);
+    return normalized;
   }
 
   async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate) {
     const input = tf.concat(inputTensor)
-    const reward = this.normalizeRewards(tf.concat(rewardTensor))
+    const reward = tf.concat(rewardTensor)
     const value = tf.concat(valueTensor)
     const action2 = tf.concat(actionTensor)
 
     // calculate Generalized Advantage Estimation
-    const advantage = this.getAdvantages(reward, value, discountRate)
+    const advantage = this.normalizeTensor(this.getAdvantages(reward, value, discountRate))
 
     // shuffle and split into mini-batches
     const [

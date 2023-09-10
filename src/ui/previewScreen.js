@@ -273,7 +273,7 @@ export default function initUI(trainer, agent) {
 
   trainer.addEventListener('epochComplete', async () => {
     agent.memory.aggregateGameResults()
-    const reward = agent.actorNet.normalizeRewards(tf.concat(agent.memory.epochMemory.reward))
+    const reward = tf.concat(agent.memory.epochMemory.reward)
     const value = tf.concat(agent.memory.epochMemory.value)
 
     const advantage = agent.actorNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE)

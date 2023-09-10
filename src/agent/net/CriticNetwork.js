@@ -27,13 +27,9 @@ export default class CriticNetwork extends PersistentNetwork {
     const valueTensor = tf.concat(v)
     const rewardTensor = tf.concat(r)
 
-    const mean = tf.mean(rewardTensor);
-    const stdDev = tf.sqrt(tf.mean(tf.square(rewardTensor.sub(mean))));
-    const normalizedRewards = rewardTensor.sub(mean).div(stdDev);
-
     const input = tf.slice2d(inputTensor, [1, 0], [-1, -1])
     const nextValue = tf.slice2d(valueTensor, [1, 0], [-1, 1])
-    const reward = tf.slice2d(normalizedRewards, [1, 0], [-1, 1])
+    const reward = tf.slice2d(rewardTensor, [1, 0], [-1, 1])
     const expectedValue = nextValue.mul(discountRate).add(reward).squeeze() // reward + discountRate * nextValue
 
     const criticResults = await this.net.fit(input, expectedValue, {epochs: 1, batchSize: BATCH_SIZE})
