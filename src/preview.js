@@ -21,7 +21,7 @@ import initUI from './ui/previewScreen.js';
   const settings = new Settings()
   await settings.init()
 
-  const agent = new Agent()
+  const agent = new Agent(settings)
   const tankLogic = new TankLogic(JsBattle, agent)
   tankLogic.installCallbacks(window)
   const battleFieldCanvas = document.getElementById('battlefield')

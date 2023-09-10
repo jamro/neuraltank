@@ -21,7 +21,7 @@ export default function initUI(messageBus) {
       { data : [], label: "radar", borderColor: '#0d6efd', backgroundColor: '#0d6efd'},
       { data : [], label: "energy", borderColor: '#ffc107', backgroundColor: '#ffc107' },
       { data : [], label: "collision", borderColor: '#5c636a', backgroundColor: '#5c636a' },
-      { data : [], label: "bullets", borderColor: '#666666', backgroundColor: '#666666' },
+      { data : [], label: "bullets", borderColor: '#666666', backgroundColor: '#0dcaf0' },
     ]
   }
 
