@@ -4,11 +4,11 @@ export default class Settings extends EventTarget {
     super()
     
     this.data = {
-      epochSize: 5,
-      episodeTimeLimit: 20000,
+      epochSize: 10,
+      episodeTimeLimit: 15000,
       learningRate: 0.0005,
       entropyCoefficient: 0.005,
-      rewardWeights: [1, 0.25, 1, 1, 1],
+      rewardWeights: [0, 1, 0, 0, 0],
       envId: 'pendulum'
     }
   }

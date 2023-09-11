@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import ActorNetwork from './ActorNetwork.js';
 import batchTensors from '../../utils/batchTensors.js';
 
-const GAE_LAMBDA = 0.97
+const GAE_LAMBDA = 0.90
 const PPO_CLIP_EPSILON = 0.2
 const BATCH_SIZE = 128
 
@@ -12,7 +12,9 @@ export default class DualActorNetwork extends ActorNetwork {
     super(inputCount, outputCount, learningRate, name + '-main')
 
     this.oldNet = new ActorNetwork(inputCount, outputCount, learningRate, name + '-old')
-
+    this.entropyMax = 0.8
+    this.entropyMin = 0.1
+    
     this.refreshOldActor()
   }
 
@@ -89,10 +91,18 @@ export default class DualActorNetwork extends ActorNetwork {
       const surrogate2 = tf.clipByValue(ratio, 1 - epsilon, 1 + epsilon).mul(advantage)
 
       const entropy = stdDev2.mean().square().mul(2*Math.PI*Math.E).log().mul(0.5)
-      const loss = tf.neg(tf.minimum(surrogate1, surrogate2))
-      const lossWithEntropy = loss.sub(entropy.mul(entropyCoefficient))
-
       batchEntropy = entropy.arraySync()
+      const loss = tf.neg(tf.minimum(surrogate1, surrogate2))
+
+      // automatic penalty for too much of entropy to keep it in reasonable range
+      let adjustedEntropyCoefficient = entropyCoefficient
+      if(batchEntropy > this.entropyMax) {
+        adjustedEntropyCoefficient = 10*(this.entropyMax - batchEntropy)
+      }
+      if(batchEntropy < this.entropyMin) {
+        adjustedEntropyCoefficient = 10*(this.entropyMin - batchEntropy)
+      }
+      const lossWithEntropy = loss.sub(entropy.mul(adjustedEntropyCoefficient)) 
 
       return lossWithEntropy.mean();
     })

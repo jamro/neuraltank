@@ -1,5 +1,7 @@
 import * as $ from 'jquery'
 import Chart from 'chart.js/auto';
+import annotationPlugin from 'chartjs-plugin-annotation';
+Chart.register(annotationPlugin);
 
 export default function initUI(messageBus) {
   const criticLoss = $('#critic-loss')
@@ -58,9 +60,7 @@ export default function initUI(messageBus) {
         x: {
           ticks: false,
         },
-        y: {
-          type: 'logarithmic',
-        },
+
       },
       elements: {
         point: {
@@ -68,7 +68,23 @@ export default function initUI(messageBus) {
         }
       },
       plugins: {
-        legend: true
+        legend: true,
+        annotation: {
+          annotations: {
+            entropyMin: {
+              type: 'line',
+              yMin: 0,
+              yMax: 0,
+              borderColor: '#ff0000'
+            },
+            entropyMax: {
+              type: 'line',
+              yMin: 1,
+              yMax: 1,
+              borderColor: '#ff0000'
+            }
+          }
+        }
       }
     }
 	});
@@ -87,5 +103,13 @@ export default function initUI(messageBus) {
     entropyChartData.datasets[0].data = data.lossHistory.map(e => e.entropy)
     entropyChart.update()
   })
+
+  messageBus.addEventListener('settings', ({data}) => {
+    entropyChart.options.plugins.annotation.annotations.entropyMin.yMin = entropyChart.options.plugins.annotation.annotations.entropyMin.yMax = data.entropyLimits[0]
+    entropyChart.options.plugins.annotation.annotations.entropyMax.yMin = entropyChart.options.plugins.annotation.annotations.entropyMax.yMax = data.entropyLimits[1]
+    entropyChart.update()
+  })
+
+
 
 }

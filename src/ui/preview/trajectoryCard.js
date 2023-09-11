@@ -1,16 +1,38 @@
 import * as $ from 'jquery'
 import * as tf from '@tensorflow/tfjs';
 import Chart from 'chart.js/auto';
+import annotationPlugin from 'chartjs-plugin-annotation';
+Chart.register(annotationPlugin);
 
 const INIT_DISCOUNT_RATE = 0.99
 
 export default function initUI(trainer, agent) {
-  const legendSettings = {
-    display: true,
-    labels: {
-      boxHeight: 3,
-      boxWidth: 9,
-      padding: 3,
+
+  const commonOptions = {
+    interaction: {
+      mode: 'nearest',
+      axis: 'x',
+      intersect: false
+    },
+    animation: false, 
+    elements: {
+      point: {
+        radius: 0
+      },
+    },
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          boxHeight: 3,
+          boxWidth: 9,
+          padding: 3,
+        }
+      },
+      tooltip: {
+        enabled: true,
+        intersect: false,
+      }
     }
   }
 
@@ -21,7 +43,7 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
+      ...commonOptions,
       scales:{
         x: {
           ticks: false,
@@ -35,14 +57,6 @@ export default function initUI(trainer, agent) {
           max: 1
         },
       },
-      elements: {
-        point: {
-          radius: 0
-        },
-      },
-      plugins: {
-        legend: legendSettings,
-      }
     }
 	});
   const actionChart = new Chart(document.getElementById('action-chart'), {
@@ -52,7 +66,7 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
+      ...commonOptions,
       scales:{
         x: {
           ticks: false,
@@ -65,14 +79,6 @@ export default function initUI(trainer, agent) {
           min: -1,
           max: 1
         },
-      },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: legendSettings
       }
     }
 	});
@@ -83,7 +89,7 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
+      ...commonOptions,
       scales:{
         x: {
           ticks: false,
@@ -95,14 +101,6 @@ export default function initUI(trainer, agent) {
           },
           min: 0,
         },
-      },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: legendSettings
       }
     }
 	});
@@ -113,7 +111,7 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
+      ...commonOptions,
       scales:{
         x: {
           ticks: false,
@@ -125,14 +123,6 @@ export default function initUI(trainer, agent) {
           }
         },
       },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: legendSettings
-      }
     }
 	});
   const valueChart = new Chart(document.getElementById('value-chart'), {
@@ -142,8 +132,8 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
-      scales:{
+      ...commonOptions,
+      scales: {
         x: {
           ticks: false,
         },
@@ -154,14 +144,6 @@ export default function initUI(trainer, agent) {
           }
         },
       },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: legendSettings
-      }
     }
 	});
 
@@ -172,7 +154,7 @@ export default function initUI(trainer, agent) {
       datasets : []
     },
     options: {
-      animation: false, 
+      ...commonOptions,
       scales:{
         x: {
           ticks: false,
@@ -184,14 +166,6 @@ export default function initUI(trainer, agent) {
           }
         },
       },
-      elements: {
-        point: {
-          radius: 0
-        }
-      },
-      plugins: {
-        legend: legendSettings
-      }
     }
 	});
 
@@ -260,12 +234,20 @@ export default function initUI(trainer, agent) {
 
     if(stepCounter % 5 === 0) {
       drawTrajectory()
+
+
+      const index = 1
+      const tooltipPoint = inputChart.getDatasetMeta(0).data[index]
+      inputChart.tooltip.active = [tooltipPoint]
+      inputChart.tooltip.update(true);
+      inputChart.update()
+
+
     }
+    
   })
 
   trainer.addEventListener('epochComplete', async () => {
-    if(!agent.memory.epochMemory.reward) return
-    if(!agent.memory.epochMemory.value) return
     agent.memory.aggregateGameResults()
     const reward = tf.concat(agent.memory.epochMemory.reward)
     const value = tf.concat(agent.memory.epochMemory.value)

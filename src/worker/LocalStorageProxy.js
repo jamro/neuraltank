@@ -6,7 +6,6 @@ export class LocalStorageClient {
 
   async getItem(key) {
     const data = await this.messageBus.request('localStorage.getItem', {key})
-    console.log(`localStorage.getItem(${key})=${data.value}`)
     return data.value
   }
 

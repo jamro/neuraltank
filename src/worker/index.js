@@ -134,7 +134,8 @@ const messageBus = new MessageBus(self);
     entropyCoefficient: agent.entropyCoefficient,
     discountRate: agent.discountRate,
     envId: trainer.envId,
-    rewardWeights: agent.rewardWeights
+    rewardWeights: agent.rewardWeights,
+    entropyLimits: [agent.actorNet.entropyMin, agent.actorNet.entropyMax]
   })
 
   messageBus.send("status", {msg: 'Ready!'})
