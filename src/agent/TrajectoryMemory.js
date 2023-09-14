@@ -1,5 +1,3 @@
-import * as tf from '@tensorflow/tfjs';
-
 export default class TrajectoryMemory {
   constructor() {
     this.episodeMemory = {}
@@ -12,20 +10,17 @@ export default class TrajectoryMemory {
     for(let key of keys) {
       let value = keyValue[key]
 
-      // convert input into 2dim tensor
-      if(typeof(value) !== 'object' || value.constructor.name !== 'Tensor') {
-        value = tf.tensor(value)
-        while(value.shape.length < 2) {
-          value = value.expandDims()
-        }
-      } else {
-        value = value.clone()
+      if(typeof(value) === 'object' && value.constructor.name === 'Tensor') {
+        value = value.arraySync()[0]
       }
+      if(typeof(value) === 'number') {
+        value = [value]
+      }
+      
       if(!this.episodeMemory[key]) {
-        this.episodeMemory[key] = value
-      } else {
-        this.episodeMemory[key] = tf.concat([this.episodeMemory[key], value])
+        this.episodeMemory[key] = []
       }
+      this.episodeMemory[key].push(value)
     }
   }
 
@@ -34,12 +29,12 @@ export default class TrajectoryMemory {
     for(let key of keys) {
       const corrections = keyValue[key]
       if(corrections.length == 0) continue
-      const raw = this.episodeMemory[key].arraySync()
+      const series = this.episodeMemory[key]
       for(let correction of corrections) {
-        raw[correction.sourceTime][0] -= correction.value
-        raw[correction.targetTime][0] += correction.value
+        series[correction.sourceTime][0] -= correction.value
+        series[correction.targetTime][0] += correction.value
       }
-      this.episodeMemory[key] = tf.tensor2d(raw)
+      this.episodeMemory[key] = series
     }
   }
   

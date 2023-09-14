@@ -5,13 +5,15 @@ Chart.register(annotationPlugin);
 
 export default function initUI(messageBus) {
   const criticLoss = $('#critic-loss')
-  const actorObjective = $('#actor-objective')
+  const shooterObjective = $('#shooter-objective')
+  const driverObjective = $('#driver-objective')
 
   const lossChartData = {
     labels : [],
     datasets : [
       { data : [], label: "critic", borderColor: '#dc3545', yAxisID: 'critic'},
-      { data : [], label: "actor", borderColor: '#0d6efd', yAxisID: 'actor' },
+      { data : [], label: "shooter", borderColor: '#0d6efd', yAxisID: 'actor' },
+      { data : [], label: "driver", borderColor: '#0dcaf0', yAxisID: 'actor' },
     ]
   }
 
@@ -47,7 +49,8 @@ export default function initUI(messageBus) {
   const entropyChartData = {
     labels : [],
     datasets : [
-      { data : [], label: "entropy", backgroundColor: '#ffc107' },
+      { data : [], label: "Shooter", backgroundColor: '#dc3545' },
+      { data : [], label: "Driver", backgroundColor: '#ffc107' },
     ]
   }
 
@@ -60,7 +63,10 @@ export default function initUI(messageBus) {
         x: {
           ticks: false,
         },
-
+        y: {
+          min: 0,
+          max: 1.4
+        }
       },
       elements: {
         point: {
@@ -92,15 +98,18 @@ export default function initUI(messageBus) {
  
   messageBus.addEventListener('epochStats', ({data}) => {
     criticLoss.text(data.lossHistory.length ? data.lossHistory[data.lossHistory.length-1].critic.toFixed(4) : '-')
-    actorObjective.text(data.lossHistory.length ? (-data.lossHistory[data.lossHistory.length-1].actor).toFixed(2) : '-')
+    shooterObjective.text(data.lossHistory.length ? (-data.lossHistory[data.lossHistory.length-1].shooter).toFixed(2) : '-')
+    driverObjective.text(data.lossHistory.length ? (-data.lossHistory[data.lossHistory.length-1].driver).toFixed(2) : '-')
 
     lossChartData.labels = data.lossHistory.map(e => 'epoch ' + e.x)
     lossChartData.datasets[0].data = data.lossHistory.map(e => e.critic)
-    lossChartData.datasets[1].data = data.lossHistory.map(e => -e.actor)
+    lossChartData.datasets[1].data = data.lossHistory.map(e => -e.shooter)
+    lossChartData.datasets[2].data = data.lossHistory.map(e => -e.driver)
     lossChart.update()
 
     entropyChartData.labels = data.lossHistory.map(e => 'epoch ' + e.x)
-    entropyChartData.datasets[0].data = data.lossHistory.map(e => e.entropy)
+    entropyChartData.datasets[0].data = data.lossHistory.map(e => e.shooterEntropy)
+    entropyChartData.datasets[1].data = data.lossHistory.map(e => e.driverEntropy)
     entropyChart.update()
   })
 

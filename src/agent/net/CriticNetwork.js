@@ -26,9 +26,9 @@ export default class CriticNetwork extends PersistentNetwork {
   }
 
   async train(i, v, r, discountRate) {
-    const inputTensor = tf.concat(i)
-    const valueTensor = tf.concat(v)
-    const rewardTensor = tf.concat(r)
+    const inputTensor = tf.tensor2d(i.flat())
+    const valueTensor = tf.tensor2d(v.flat())
+    const rewardTensor = tf.tensor2d(r.flat())
 
     const input = tf.slice2d(inputTensor, [1, 0], [-1, -1])
     const nextValue = tf.slice2d(valueTensor, [1, 0], [-1, 1])

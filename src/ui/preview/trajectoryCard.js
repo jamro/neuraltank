@@ -36,7 +36,7 @@ export default function initUI(trainer, agent) {
     }
   }
 
-  const inputChart = new Chart(document.getElementById('input-chart'), {
+  const shooterInputChart = new Chart(document.getElementById('shooter-input-chart'), {
 		type : 'line',
 		data: {
       labels : [],
@@ -59,7 +59,7 @@ export default function initUI(trainer, agent) {
       },
     }
 	});
-  const actionChart = new Chart(document.getElementById('action-chart'), {
+  const shooterActionChart = new Chart(document.getElementById('shooter-action-chart'), {
 		type : 'line',
 		data: {
       labels : [],
@@ -82,7 +82,75 @@ export default function initUI(trainer, agent) {
       }
     }
 	});
-  const actionStdDevChart = new Chart(document.getElementById('action-stddev-chart'), {
+  const shooterStdDevChart = new Chart(document.getElementById('shooter-action-stddev-chart'), {
+		type : 'line',
+		data: {
+      labels : [],
+      datasets : []
+    },
+    options: {
+      ...commonOptions,
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'action (std dev)'
+          },
+          min: 0,
+        },
+      }
+    }
+	});
+  const driverInputChart = new Chart(document.getElementById('driver-input-chart'), {
+		type : 'line',
+		data: {
+      labels : [],
+      datasets : []
+    },
+    options: {
+      ...commonOptions,
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'input'
+          },
+          min: -1,
+          max: 1
+        },
+      },
+    }
+	});
+  const driverActionChart = new Chart(document.getElementById('driver-action-chart'), {
+		type : 'line',
+		data: {
+      labels : [],
+      datasets : []
+    },
+    options: {
+      ...commonOptions,
+      scales:{
+        x: {
+          ticks: false,
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'action (mean)'
+          },
+          min: -1,
+          max: 1
+        },
+      }
+    }
+	});
+  const driverStdDevChart = new Chart(document.getElementById('driver-action-stddev-chart'), {
 		type : 'line',
 		data: {
       labels : [],
@@ -171,8 +239,7 @@ export default function initUI(trainer, agent) {
 
   let stepCounter = 0
 
-  function drawSingleTrajectory(chart, tensor, labelFormatter, datasetOptions={}) {
-    const inputArray = tensor.arraySync()
+  function drawSingleTrajectory(chart, inputArray, labelFormatter, datasetOptions={}) {
     for(let i=chart.data.labels.length; i < inputArray.length; i++) {
       chart.data.labels.push(i)
       const row = inputArray[i]
@@ -196,23 +263,43 @@ export default function initUI(trainer, agent) {
   }
 
   function drawTrajectory() {
-    const actionLabels = ['gun', 'radar']
-    drawSingleTrajectory(inputChart, agent.memory.episodeMemory.input, (index) => {
-      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos']
+    const shooterActionLabels = ['gun', 'radar']
+    const driverActionLabels = ['turn', 'throttle']
+    drawSingleTrajectory(shooterInputChart, agent.memory.episodeMemory.shooterInput, (index) => {
+      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos', 'wall', 'tankAngle', 'turnControl']
       if(labels[index]) {
         return labels[index]
       }
       return `Input #${index+1}`
     })
-    drawSingleTrajectory(actionChart, agent.memory.episodeMemory.actionMean, (index) => {
-      if(actionLabels[index]) {
-        return actionLabels[index]
+    drawSingleTrajectory(shooterActionChart, agent.memory.episodeMemory.shooterActionMean, (index) => {
+      if(shooterActionLabels[index]) {
+        return shooterActionLabels[index]
       }
       return `Input #${index+1}`
     })
-    drawSingleTrajectory(actionStdDevChart, agent.memory.episodeMemory.actionStdDev, (index) => {
-      if(actionLabels[index]) {
-        return actionLabels[index]
+    drawSingleTrajectory(shooterStdDevChart, agent.memory.episodeMemory.shooterActionStdDev, (index) => {
+      if(shooterActionLabels[index]) {
+        return shooterActionLabels[index]
+      }
+      return `Input #${index+1}`
+    })
+    drawSingleTrajectory(driverInputChart, agent.memory.episodeMemory.driverInput, (index) => {
+      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos', 'wall', 'tankAngle']
+      if(labels[index]) {
+        return labels[index]
+      }
+      return `Input #${index+1}`
+    })
+    drawSingleTrajectory(driverActionChart, agent.memory.episodeMemory.driverActionMean, (index) => {
+      if(driverActionLabels[index]) {
+        return driverActionLabels[index]
+      }
+      return `Input #${index+1}`
+    })
+    drawSingleTrajectory(driverStdDevChart, agent.memory.episodeMemory.driverActionStdDev, (index) => {
+      if(driverActionLabels[index]) {
+        return driverActionLabels[index]
       }
       return `Input #${index+1}`
     })
@@ -237,11 +324,10 @@ export default function initUI(trainer, agent) {
 
 
       const index = 1
-      const tooltipPoint = inputChart.getDatasetMeta(0).data[index]
-      inputChart.tooltip.active = [tooltipPoint]
-      inputChart.tooltip.update(true);
-      inputChart.update()
-
+      const tooltipPoint = shooterInputChart.getDatasetMeta(0).data[index]
+      shooterInputChart.tooltip.active = [tooltipPoint]
+      shooterInputChart.tooltip.update(true);
+      shooterInputChart.update()
 
     }
     
@@ -249,19 +335,19 @@ export default function initUI(trainer, agent) {
 
   trainer.addEventListener('epochComplete', async () => {
     agent.memory.aggregateGameResults()
-    const reward = tf.concat(agent.memory.epochMemory.reward)
-    const value = tf.concat(agent.memory.epochMemory.value)
+    const reward = tf.tensor2d(agent.memory.epochMemory.reward.flat())
+    const value = tf.tensor2d(agent.memory.epochMemory.value.flat())
 
-    const advantage = agent.actorNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE)
+    const advantage = agent.shooterNet.getAdvantages(reward, value, INIT_DISCOUNT_RATE).arraySync()
 
     drawSingleTrajectory(advantageChart, advantage, () => 'Generalized Advantage Estimation', {fill: 'origin'})
 
   })
 
   window.addEventListener('restartPreview', async () => {
-    clearSingleTrajectory(inputChart)
-    clearSingleTrajectory(actionChart)
-    clearSingleTrajectory(actionStdDevChart)
+    clearSingleTrajectory(shooterInputChart)
+    clearSingleTrajectory(shooterActionChart)
+    clearSingleTrajectory(shooterStdDevChart)
     clearSingleTrajectory(rewardChart)
     clearSingleTrajectory(valueChart)
     clearSingleTrajectory(advantageChart)

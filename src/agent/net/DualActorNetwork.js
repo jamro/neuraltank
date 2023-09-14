@@ -123,10 +123,10 @@ export default class DualActorNetwork extends ActorNetwork {
   }
 
   async train(inputTensor, actionTensor, rewardTensor, valueTensor, discountRate, entropyCoefficient=0.005) {
-    const input = tf.concat(inputTensor)
-    const reward = tf.concat(rewardTensor)
-    const value = tf.concat(valueTensor)
-    const action2 = tf.concat(actionTensor)
+    const input = tf.tensor2d(inputTensor.flat())
+    const reward = tf.tensor2d(rewardTensor.flat())
+    const value = tf.tensor2d(valueTensor.flat())
+    const action2 = tf.tensor2d(actionTensor.flat())
 
     // calculate Generalized Advantage Estimation
     const advantage = this.normalizeTensor(this.getAdvantages(reward, value, discountRate))

@@ -91,11 +91,20 @@
           </div>
         </div>
         <div class="col-xxl-8 col-lg-6 col-12 mb-3">
+          <div class="card mt-1">
+            <h5 class="card-header"><i class="ri-car-line"></i> Driver Trajectory</h5>
+            <canvas id="driver-input-chart" style="width: 100%; height: 10em"></canvas>
+            <canvas id="driver-action-chart" style="width: 100%; height: 10em"></canvas>
+            <canvas id="driver-action-stddev-chart" style="width: 100%; height: 10em"></canvas>
+          </div>
           <div class="card">
-            <h5 class="card-header"><i class="ri-route-fill"></i> Trajectory</h5>
-            <canvas id="input-chart" style="width: 100%; height: 10em"></canvas>
-            <canvas id="action-chart" style="width: 100%; height: 10em"></canvas>
-            <canvas id="action-stddev-chart" style="width: 100%; height: 10em"></canvas>
+            <h5 class="card-header"><i class="ri-focus-3-line"></i> Shooter Trajectory</h5>
+            <canvas id="shooter-input-chart" style="width: 100%; height: 10em"></canvas>
+            <canvas id="shooter-action-chart" style="width: 100%; height: 10em"></canvas>
+            <canvas id="shooter-action-stddev-chart" style="width: 100%; height: 10em"></canvas>
+          </div>
+          <div class="card mt-1">
+            <h5 class="card-header"><i class="ri-medal-line"></i> Rewards Trajectory</h5>
             <canvas id="reward-chart" style="width: 100%; height: 10em"></canvas>
             <canvas id="value-chart" style="width: 100%; height: 10em"></canvas>
             <canvas id="advantage-chart" style="width: 100%; height: 10em"></canvas>

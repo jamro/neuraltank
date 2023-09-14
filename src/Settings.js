@@ -9,7 +9,9 @@ export default class Settings extends EventTarget {
       learningRate: 0.0005,
       entropyCoefficient: 0.005,
       rewardWeights: [0, 1, 0, 0, 0],
-      envId: 'pendulum'
+      envId: 'pendulum',
+      shooterEnabled: true,
+      driverEnabled: true,
     }
   }
 

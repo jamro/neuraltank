@@ -1,6 +1,10 @@
 import * as $ from 'jquery'
 
 export default function initUI(messageBus) {
+  const inputShooterNetwork = $('#input-shooter-enabled')
+  const inputDriverNetwork = $('#input-driver-enabled')
+  const inputReload = $('#input-reload')
+  const inputReloadLabel = $('#input-reload-label')
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
   const inputLearningRate = $('#inputLearningRate')
@@ -14,6 +18,10 @@ export default function initUI(messageBus) {
     $('#input-reward-weight-4'),
     $('#input-reward-weight-5'),
   ]
+
+  inputReload.on('change', () => {
+    inputReloadLabel.text(inputReload.is(':checked') ? 'On' : 'Off')
+  })
 
   const inputs = [
     inputEpochLen,
@@ -32,6 +40,8 @@ export default function initUI(messageBus) {
     inputs.forEach(i => i.prop('disabled', !i.isEditable))
     settingsLock.hide()
   }
+  inputShooterNetwork.prop("disabled", false );
+  inputDriverNetwork.prop("disabled", false );
 
   enableForm()
 
@@ -42,6 +52,8 @@ export default function initUI(messageBus) {
     inputEntropyCoef.val(data.entropyCoefficient)
     inputEnv.val(data.envId)
     data.rewardWeights.forEach((v, i) => inputRewardWeights[i].val(v))
+    inputShooterNetwork.prop( "checked", data.activeNetworks.shooter );
+    inputDriverNetwork.prop( "checked", data.activeNetworks.driver );
   })
 
   editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
@@ -66,6 +78,14 @@ export default function initUI(messageBus) {
   inputRewardWeights.forEach((field, index) =>  editable(field, regexpValidator(/^[0-9\.]+$/), (v) => {
     messageBus.send('config', {key: 'rewardWeights', value: Number(v), index })
   }))
+
+  inputShooterNetwork.on('change', () => {
+    messageBus.send('config', {key: 'shooterEnabled', value: inputShooterNetwork.prop('checked') })
+  })
+
+  inputDriverNetwork.on('change', () => {
+    messageBus.send('config', {key: 'driverEnabled', value: inputDriverNetwork.prop('checked') })
+  })
 
 }
 

@@ -88,15 +88,23 @@
             <h5 class="card-header"><i class="ri-line-chart-line"></i> Loss History</h5>
             <div class="card-body">
               <div class="row mt-3 text-center">
-                <div class="col-6">
-                  <span class="badge rounded-pill text-bg-primary">Actor objective: <span id="actor-objective">-</span></span>
+                <div class="col-4">
+                  <span class="badge rounded-pill text-bg-primary">Shooter objective: <span id="shooter-objective">-</span></span>
                 </div>
-                <div class="col-6">
+                <div class="col-4">
+                  <span class="badge rounded-pill text-bg-info">Driver objective: <span id="driver-objective">-</span></span>
+                </div>
+                <div class="col-4">
                   <span class="badge rounded-pill text-bg-danger">Critic loss: <span id="critic-loss">-</span></span>
                 </div>
               </div>
-              <canvas id="loss-chart" style="width: 100%; height: 10em"></canvas>
-              <canvas id="entropy-chart" style="width: 100%; height: 10em"></canvas>
+              <canvas id="loss-chart" style="width: 100%; height: 12em"></canvas>
+            </div>
+          </div>
+          <div class="card mt-3">
+            <h5 class="card-header"><i class="ri-bubble-chart-fill"></i> Entropy</h5>
+            <div class="card-body">
+              <canvas id="entropy-chart" style="width: 100%; height: 12em"></canvas>
             </div>
           </div>
         </div>
@@ -141,6 +149,18 @@
                     </select>
                   </div>
                 </div>
+                <div class="form-group row mt-1">
+                  <span class="col-sm-6 col-form-label">Active networks:</span>
+                  <div class="col-sm-6">
+                    <div class="btn-group" role="group" style="width: 100%">
+                      <input type="checkbox" class="btn-check" id="input-shooter-enabled" disabled="disabled">
+                      <label class="btn btn-outline-primary" for="input-shooter-enabled">Shooter</label>
+                    
+                      <input type="checkbox" class="btn-check" id="input-driver-enabled" disabled="disabled">
+                      <label class="btn btn-outline-info" for="input-driver-enabled">Driver</label>
+                    </div>
+                  </div>
+                </div>
                 <div class="form-group row row mt-1">
                   <label for="inputEpochLen" class="col-sm-6 col-form-label">Episodes per epoch:</label>
                   <div class="col-sm-6">
@@ -168,8 +188,9 @@
                 <div class="form-group row mt-1">
                   <label for="input-reload" class="col-sm-6 col-form-label">Reload after epoch</label>
                   <div class="col-sm-6">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="yes" id="input-reload" checked="checked">
+                    <div class="btn-group" role="group" style="width: 100%">
+                      <input type="checkbox" class="btn-check" id="input-reload" checked="checked">
+                      <label class="btn btn-outline-warning" for="input-reload" id="input-reload-label">On</label>
                     </div>
                   </div>
                 </div>

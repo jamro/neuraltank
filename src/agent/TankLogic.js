@@ -50,6 +50,7 @@ export default class TankLogic {
   init(settings, info, _this, agent) {
     _this.enemyPosBeamAngle = -1
     _this.enemyPosGunAngle = -1
+    _this.enemyPosTankAngle = -1
     _this.enemyDistance = 1
     _this.enemyDirection = 0
     _this.noVisionTime = 0
@@ -80,6 +81,9 @@ export default class TankLogic {
       let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - enemyPosAngle)/45 // keep it in range of -1,1
       enemyPosGunAngle = Math.min(1, Math.max(-1, enemyPosGunAngle))
       _this.enemyPosGunAngle = enemyPosGunAngle
+      let enemyPosTankAngle = Math2.deg.normalize(state.angle - enemyPosAngle)/90 // keep it in range of -1,1
+      enemyPosTankAngle = Math.min(1, Math.max(-1, enemyPosTankAngle))
+      _this.enemyPosTankAngle = enemyPosTankAngle
 
       // calculate enemy direction angle wrt radar beam
       const enemyAngle = Math2.deg2rad(Math2.deg.normalize(radarAbsAngle - state.radar.enemy.angle))
@@ -92,6 +96,8 @@ export default class TankLogic {
       _this.enemyPosBeamAngle = awayEnemyPosBeamAngle * Math.min(1, Math.abs(_this.enemyPosBeamAngle) + 0.1)
       const awayEnemyPosGunAngle = _this.enemyPosGunAngle > 0 ? 1 : -1
       _this.enemyPosGunAngle = awayEnemyPosGunAngle * Math.min(1, Math.abs(_this.enemyPosGunAngle) + 0.1)
+      const awayEnemyPosTankAngle = _this.enemyPosTankAngle > 0 ? 1 : -1
+      _this.enemyPosTankAngle = awayEnemyPosTankAngle * Math.min(1, Math.abs(_this.enemyPosTankAngle) + 0.1)
       _this.enemyDistance = Math.min(1, _this.enemyDistance + 0.05)
       _this.enemyDirection += (0-_this.enemyDirection)/50
     }
@@ -108,7 +114,9 @@ export default class TankLogic {
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
       _this.enemyDirection,
-      _this.enemyPosGunAngle
+      _this.enemyPosGunAngle,
+      (state.radar.wallDistance === null) ? 1 : (state.radar.wallDistance/150 - 1),
+      _this.enemyPosTankAngle
     ]
 
     // reward
@@ -121,8 +129,10 @@ export default class TankLogic {
 
     const rewards = [gameScoreReward, radarReward, energyReward, collisionReward, _this.getBulletDistanceScore()]
     const actions = agent.act(input, rewards, _this.getScoreCorrections())
-    control.GUN_TURN = actions[0]
-    control.RADAR_TURN = actions[1]
+    control.TURN = actions[0]
+    control.THROTTLE = actions[1]
+    control.GUN_TURN = actions[2]
+    control.RADAR_TURN = actions[3]
     control.SHOOT = (_this.enemyPosGunAngle > -1 && _this.enemyPosGunAngle < 1) ? 0.1 : 0
   }
 

@@ -5,8 +5,11 @@ import DualActorNetwork from './net/DualActorNetwork.js';
 import Stats from './Stats.js';
 import TrajectoryMemory from './TrajectoryMemory.js';
 
-const STATE_LEN = 4
-const ACTION_LEN = 2
+export const DRIVER_STATE_LEN = 6
+export const SHOOTER_STATE_LEN = DRIVER_STATE_LEN + 1
+export const CRITIC_STATE_LEN = DRIVER_STATE_LEN
+export const SHOOTER_ACTION_LEN = 2
+export const DRIVER_ACTION_LEN = 2
 
 export default class Agent extends EventTarget {
 
@@ -14,8 +17,9 @@ export default class Agent extends EventTarget {
     super()
     this.settings = settings
 
-    this.actorNet = new DualActorNetwork(STATE_LEN, ACTION_LEN, this.learningRate, 'actor')
-    this.criticNet = new CriticNetwork(STATE_LEN, 1, 10 * this.learningRate, 'critic')
+    this.shooterNet = new DualActorNetwork(SHOOTER_STATE_LEN, SHOOTER_ACTION_LEN, this.learningRate, 'shooter')
+    this.driverNet = new DualActorNetwork(DRIVER_STATE_LEN, DRIVER_ACTION_LEN, this.learningRate, 'driver')
+    this.criticNet = new CriticNetwork(CRITIC_STATE_LEN, 1, 10 * this.learningRate, 'critic')
 
     this.memory = new TrajectoryMemory()
     this.rewardWeights = settings.prop('rewardWeights')
@@ -27,6 +31,14 @@ export default class Agent extends EventTarget {
     event.msg = msg
     this.dispatchEvent(event)
   } 
+
+  get shooterEnabled() {
+    return this.settings.prop('shooterEnabled')
+  }
+
+  get driverEnabled() {
+    return this.settings.prop('driverEnabled')
+  }
 
   get learningRate() {
     return this.settings.prop('learningRate')
@@ -55,21 +67,56 @@ export default class Agent extends EventTarget {
 
   act(input, rewards, corrections) {
     this.stats.onStepStart()
-    const inputTensor = tf.tensor2d([input]);
+    const criticInput = [...input]
+    const shooterInput = [...input]
+    const driverInput = [...input]
+    const criticInputTensor = tf.tensor2d([criticInput]);
+    const driverInputTensor = tf.tensor2d([driverInput]);
 
     // process reward
     const weightedRewards = this.weightRewards(rewards)
     const weightedCorrections = corrections.map((v) => ({...v, value: v.value * this.rewardWeights[0]}))
     const scoreIncrement = this.stats.storeRewards(weightedRewards)
     
-    let [mean, stdDev, action] = this.actorNet.exec(inputTensor);
-    this.stats.expectedValue = this.criticNet.exec(inputTensor).dataSync()[0]
+    // driver
+    let driverMean, driverStdDev, driverAction, driverActionArray
+    if(this.driverEnabled) {
+      [driverMean, driverStdDev, driverAction] = this.driverNet.exec(driverInputTensor);
+    } else {
+      driverMean = tf.tensor2d([Array(DRIVER_ACTION_LEN).fill(0)])
+      driverStdDev = tf.tensor2d([Array(DRIVER_ACTION_LEN).fill(0.5)])
+      driverAction = tf.tensor2d([Array(DRIVER_ACTION_LEN).fill(0)])
+    }
+    driverActionArray = driverAction.arraySync()[0]
+
+    // shooter
+    let shooterMean, shooterStdDev, shooterAction
+    shooterInput.push(driverActionArray[0])
+    const shooterInputTensor = tf.tensor2d([shooterInput]);
+    if(this.shooterEnabled) {
+      [shooterMean, shooterStdDev, shooterAction] = this.shooterNet.exec(shooterInputTensor);
+    } else {
+      shooterMean = tf.tensor2d([Array(SHOOTER_ACTION_LEN).fill(0)])
+      shooterStdDev = tf.tensor2d([Array(SHOOTER_ACTION_LEN).fill(0.5)])
+      shooterAction = tf.tensor2d([Array(SHOOTER_ACTION_LEN).fill(0)])
+    }
+    const shooterActionArray = shooterAction.arraySync()[0]
+
+    this.stats.expectedValue = this.criticNet.exec(criticInputTensor).dataSync()[0]
 
     this.memory.add({
-      input: input, 
-      action: action,
-      actionMean: mean,
-      actionStdDev: stdDev,
+      criticInput: criticInput, 
+
+      shooterInput: shooterInput, 
+      shooterAction: shooterAction,
+      shooterActionMean: shooterMean,
+      shooterActionStdDev: shooterStdDev,
+
+      driverInput: driverInput, 
+      driverAction: driverAction,
+      driverActionMean: driverMean,
+      driverActionStdDev: driverStdDev,
+
       reward: scoreIncrement, 
       value: this.stats.expectedValue
     });
@@ -80,35 +127,39 @@ export default class Agent extends EventTarget {
 
     this.stats.onStepEnd()
 
-    return action.dataSync();
+    return [...driverActionArray, ...shooterActionArray];
   }
 
   async saveModel() {
-    await this.actorNet.save();
+    await this.shooterNet.save();
+    await this.driverNet.save();
     await this.criticNet.save();
     await this.stats.save();
     this.dispatchEvent(new Event('save'))
   }
 
   async removeModel() {
-    await this.actorNet.remove();
+    await this.shooterNet.remove();
+    await this.driverNet.remove();
     await this.criticNet.remove();
     await this.stats.remove()
     this.dispatchEvent(new Event('remove'))
   }
 
   get dateSaved() {
-    return this.actorNet.dateSaved
+    return this.shooterNet.dateSaved
   }
 
   async restoreModel() {
-    const actorStatus = await this.actorNet.restore()
+    const shooterStatus = await this.shooterNet.restore()
+    const drivertatus = await this.driverNet.restore()
     const criticStatus = await this.criticNet.restore()
 
-    this.actorNet.learningRate = this.learningRate
+    this.shooterNet.learningRate = this.learningRate
+    this.driverNet.learningRate = this.learningRate
     this.criticNet.learningRate = 10*this.learningRate
 
-    if (actorStatus && criticStatus) {
+    if (shooterStatus && drivertatus && criticStatus) {
       await this.stats.restore()
       this.rewardWeights = this.settings.prop('rewardWeights')
       return true

@@ -20,8 +20,10 @@ export default class Stats {
     this.rewardHistory = [];
 
     this.criticLoss = 0
-    this.actorLoss = 0
-    this.entropy = 0
+    this.shooterLoss = 0
+    this.driverLoss = 0
+    this.shooterEntropy = 0
+    this.driverEntropy = 0
 
     this.rewardComponents = null
     this.epochRewardComponents = null

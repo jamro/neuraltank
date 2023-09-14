@@ -70,8 +70,10 @@ export default class Trainer extends EventTarget {
     this.lossHistory.push({
       x: this.epochIndex+1, 
       critic: this.agent.stats.criticLoss, 
-      actor: this.agent.stats.actorLoss, 
-      entropy: this.agent.stats.entropy, 
+      shooter: this.agent.stats.shooterLoss, 
+      driver: this.agent.stats.driverLoss, 
+      shooterEntropy: this.agent.stats.shooterEntropy, 
+      driverEntropy: this.agent.stats.driverEntropy, 
     })
     while(this.scoreHistory.length > 100) {
       this.scoreHistory.shift()

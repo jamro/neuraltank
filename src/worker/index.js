@@ -102,6 +102,12 @@ const messageBus = new MessageBus(self);
         currentWeights[data.index] = data.value
         settings.prop('rewardWeights', currentWeights)
         break
+      case 'shooterEnabled': 
+        settings.prop('shooterEnabled', data.value)
+        break
+      case 'driverEnabled': 
+        settings.prop('driverEnabled', data.value)
+        break
     }
     messageBus.send("status", {msg: 'Settings: updated'})
   })
@@ -135,7 +141,14 @@ const messageBus = new MessageBus(self);
     discountRate: agent.discountRate,
     envId: trainer.envId,
     rewardWeights: agent.rewardWeights,
-    entropyLimits: [agent.actorNet.entropyMin, agent.actorNet.entropyMax]
+    entropyLimits: [
+      Math.max(agent.shooterNet.entropyMin, agent.driverNet.entropyMin), 
+      Math.min(agent.shooterNet.entropyMax, agent.driverNet.entropyMax)
+    ],
+    activeNetworks: {
+      shooter: agent.shooterEnabled,
+      driver: agent.driverEnabled,
+    }
   })
 
   messageBus.send("status", {msg: 'Ready!'})
