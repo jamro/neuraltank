@@ -5,9 +5,28 @@ import DualActorNetwork from './net/DualActorNetwork.js';
 import Stats from './Stats.js';
 import TrajectoryMemory from './TrajectoryMemory.js';
 
-export const DRIVER_STATE_LEN = 6
-export const SHOOTER_STATE_LEN = DRIVER_STATE_LEN + 1
-export const CRITIC_STATE_LEN = DRIVER_STATE_LEN
+
+/*
+Input:
+  0: distance
+  1: radar
+  2: enemyDirection
+  3: gunPos
+  4: wall
+  5: tankAngle
+*/
+const DRIVER_INPUT_MASK =  [1, 1, 1, 0, 1, 1, 1]
+const SHOOTER_INPUT_MASK = [1, 1, 1, 1, 0, 1, 0]
+const CRITIC_INPUT_MASK =  [1, 1, 1, 1, 1, 1, 1]
+
+export const DRIVER_INPUT_INDICES =  DRIVER_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
+export const SHOOTER_INPUT_INDICES = SHOOTER_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
+export const CRITIC_INPUT_INDICES =  CRITIC_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
+
+export const DRIVER_STATE_LEN = DRIVER_INPUT_INDICES.length
+export const SHOOTER_STATE_LEN = SHOOTER_INPUT_INDICES.length + 1
+export const CRITIC_STATE_LEN = CRITIC_INPUT_INDICES.length
+
 export const SHOOTER_ACTION_LEN = 2
 export const DRIVER_ACTION_LEN = 2
 
@@ -24,6 +43,10 @@ export default class Agent extends EventTarget {
     this.memory = new TrajectoryMemory()
     this.rewardWeights = settings.prop('rewardWeights')
     this.stats = new Stats()
+  }
+
+  filterInput(input, indices) {
+    return indices.map(v => input[v])
   }
 
   sendStatus(msg) {
@@ -65,11 +88,23 @@ export default class Agent extends EventTarget {
     return rewards.map((r, i) => r * this.rewardWeights[i])
   }
 
+  filterCriticInput(input) {
+    return this.filterInput(input, CRITIC_INPUT_INDICES)
+  }
+
+  filterShooterInput(input) {
+    return this.filterInput(input, SHOOTER_INPUT_INDICES)
+  }
+
+  filterDriverInput(input) {
+    return this.filterInput(input, DRIVER_INPUT_INDICES)
+  }
+
   act(input, rewards, corrections) {
     this.stats.onStepStart()
-    const criticInput = [...input]
-    const shooterInput = [...input]
-    const driverInput = [...input]
+    const criticInput = this.filterCriticInput(input)
+    const shooterInput = this.filterShooterInput(input)
+    const driverInput = this.filterDriverInput(input)
     const criticInputTensor = tf.tensor2d([criticInput]);
     const driverInputTensor = tf.tensor2d([driverInput]);
 

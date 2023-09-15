@@ -97,9 +97,9 @@ export default class TrainableAgent extends Agent {
 
   act(input, rewards, corrections) {
     this.stats.onStepStart()
-    const criticInput = [...input]
-    const shooterInput = [...input]
-    const driverInput = [...input]
+    const criticInput = this.filterCriticInput(input)
+    const shooterInput = this.filterShooterInput(input)
+    const driverInput = this.filterDriverInput(input)
     const criticInputTensor = tf.tensor2d([criticInput]);
     const driverInputTensor = tf.tensor2d([driverInput]);
 

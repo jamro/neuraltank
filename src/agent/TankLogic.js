@@ -56,6 +56,7 @@ export default class TankLogic {
     _this.noVisionTime = 0
     _this.lastScore = 0
     _this.lastEnergy = 100
+    _this.collisionTimer = -1
   }
   
   loop(state, control, _this, agent) {
@@ -110,13 +111,20 @@ export default class TankLogic {
       radarReward = -_this.noVisionTime * 0.0005
     }
 
+    if(state.collisions.wall || state.collisions.enemy || state.collisions.ally) {
+      _this.collisionTimer = 1
+    } else {
+      _this.collisionTimer += (-1 - _this.collisionTimer)/10
+    }
+
     const input = [
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
       _this.enemyDirection,
       _this.enemyPosGunAngle,
       (state.radar.wallDistance === null) ? 1 : (state.radar.wallDistance/150 - 1),
-      _this.enemyPosTankAngle
+      _this.enemyPosTankAngle,
+      _this.collisionTimer
     ]
 
     // reward
@@ -125,7 +133,7 @@ export default class TankLogic {
     _this.lastScore = totalScore
     const energyReward = state.energy - _this.lastEnergy
     _this.lastEnergy = state.energy
-    const collisionReward = state.collisions.wall ? -1 : 0
+    const collisionReward = (state.collisions.wall || state.collisions.enemy || state.collisions.ally) ? -1 : 0
 
     const rewards = [gameScoreReward, radarReward, energyReward, collisionReward, _this.getBulletDistanceScore()]
     const actions = agent.act(input, rewards, _this.getScoreCorrections())
