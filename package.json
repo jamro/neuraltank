@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jamro/neuraltank#readme",
   "dependencies": {
+    "@svgdotjs/svg.js": "^3.2.0",
     "@tensorflow/tfjs": "^4.10.0",
     "@tensorflow/tfjs-backend-wasm": "^4.10.0",
     "@tensorflow/tfjs-backend-webgl": "^4.10.0",
