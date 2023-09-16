@@ -49,7 +49,7 @@ export default class TrainableAgent extends Agent {
 
     let shooterLoss = 0
     let shooterEntropy = 0
-    if(this.shooterEnabled) {
+    if(this.shooterTrainable) {
       console.log("Training shooter actor");
       [shooterLoss, shooterEntropy] = await this.shooterNet.train(
         this.memory.epochMemory.shooterInput,
@@ -65,7 +65,7 @@ export default class TrainableAgent extends Agent {
 
     let driverLoss = 0
     let driverEntropy = 0
-    if(this.driverEnabled) {
+    if(this.driverTrainable) {
       console.log("Training driver actor");
       [driverLoss, driverEntropy] = await this.driverNet.train(
         this.memory.epochMemory.driverInput,

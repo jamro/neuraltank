@@ -12,6 +12,8 @@ export default class Settings extends EventTarget {
       envId: 'pendulum',
       shooterEnabled: true,
       driverEnabled: true,
+      shooterTrainable: true,
+      driverTrainable: true,
     }
   }
 

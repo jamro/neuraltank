@@ -108,6 +108,12 @@ const messageBus = new MessageBus(self);
       case 'driverEnabled': 
         settings.prop('driverEnabled', data.value)
         break
+      case 'shooterTrainable': 
+        settings.prop('shooterTrainable', data.value)
+        break
+      case 'driverTrainable': 
+        settings.prop('driverTrainable', data.value)
+        break
     }
     messageBus.send("status", {msg: 'Settings: updated'})
   })
@@ -148,6 +154,10 @@ const messageBus = new MessageBus(self);
     activeNetworks: {
       shooter: agent.shooterEnabled,
       driver: agent.driverEnabled,
+    },
+    trainableNetworks: {
+      shooter: agent.shooterTrainable,
+      driver: agent.driverTrainable,
     }
   })
 

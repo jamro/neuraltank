@@ -1,8 +1,10 @@
 import * as $ from 'jquery'
 
 export default function initUI(messageBus) {
-  const inputShooterNetwork = $('#input-shooter-enabled')
-  const inputDriverNetwork = $('#input-driver-enabled')
+  const inputShooterNetworkEnabled = $('#input-shooter-enabled')
+  const inputDriverNetworkEnabled = $('#input-driver-enabled')
+  const inputShooterNetworkTrainable = $('#input-shooter-trainable')
+  const inputDriverNetworkTrainable= $('#input-driver-trainable')
   const inputReload = $('#input-reload')
   const inputReloadLabel = $('#input-reload-label')
   const inputEpochLen = $('#inputEpochLen')
@@ -40,8 +42,10 @@ export default function initUI(messageBus) {
     inputs.forEach(i => i.prop('disabled', !i.isEditable))
     settingsLock.hide()
   }
-  inputShooterNetwork.prop("disabled", false );
-  inputDriverNetwork.prop("disabled", false );
+  inputShooterNetworkEnabled.prop("disabled", false );
+  inputDriverNetworkEnabled.prop("disabled", false );
+  inputShooterNetworkTrainable.prop("disabled", false );
+  inputDriverNetworkTrainable.prop("disabled", false );
 
   enableForm()
 
@@ -52,8 +56,10 @@ export default function initUI(messageBus) {
     inputEntropyCoef.val(data.entropyCoefficient)
     inputEnv.val(data.envId)
     data.rewardWeights.forEach((v, i) => inputRewardWeights[i].val(v))
-    inputShooterNetwork.prop( "checked", data.activeNetworks.shooter );
-    inputDriverNetwork.prop( "checked", data.activeNetworks.driver );
+    inputShooterNetworkEnabled.prop( "checked", data.activeNetworks.shooter );
+    inputDriverNetworkEnabled.prop( "checked", data.activeNetworks.driver );
+    inputShooterNetworkTrainable.prop( "checked", data.trainableNetworks.shooter );
+    inputDriverNetworkTrainable.prop( "checked", data.trainableNetworks.driver );
   })
 
   editable(inputEpochLen, regexpValidator(/^[0-9]+$/), (v) => {
@@ -79,12 +85,20 @@ export default function initUI(messageBus) {
     messageBus.send('config', {key: 'rewardWeights', value: Number(v), index })
   }))
 
-  inputShooterNetwork.on('change', () => {
-    messageBus.send('config', {key: 'shooterEnabled', value: inputShooterNetwork.prop('checked') })
+  inputShooterNetworkEnabled.on('change', () => {
+    messageBus.send('config', {key: 'shooterEnabled', value: inputShooterNetworkEnabled.prop('checked') })
   })
 
-  inputDriverNetwork.on('change', () => {
-    messageBus.send('config', {key: 'driverEnabled', value: inputDriverNetwork.prop('checked') })
+  inputDriverNetworkEnabled.on('change', () => {
+    messageBus.send('config', {key: 'driverEnabled', value: inputDriverNetworkEnabled.prop('checked') })
+  })
+
+  inputShooterNetworkTrainable.on('change', () => {
+    messageBus.send('config', {key: 'shooterTrainable', value: inputShooterNetworkTrainable.prop('checked') })
+  })
+
+  inputDriverNetworkTrainable.on('change', () => {
+    messageBus.send('config', {key: 'driverTrainable', value: inputDriverNetworkTrainable.prop('checked') })
   })
 
 }

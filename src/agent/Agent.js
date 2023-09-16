@@ -63,6 +63,14 @@ export default class Agent extends EventTarget {
     return this.settings.prop('driverEnabled')
   }
 
+  get shooterTrainable() {
+    return this.settings.prop('shooterTrainable')
+  }
+
+  get driverTrainable() {
+    return this.settings.prop('driverTrainable')
+  }
+
   get learningRate() {
     return this.settings.prop('learningRate')
   }
