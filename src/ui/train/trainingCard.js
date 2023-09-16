@@ -1,6 +1,7 @@
 import * as $ from 'jquery'
 
-export default function initUI(messageBus) {
+export default function initUI(messageBus, bootCamp) {
+  const buttonExit = $('#btn-exit')
   const epochNumber = $('#epoch-number')
   const episodeNumber = $('#episode-number')
   const epochDuration = $('#epoch-duration')
@@ -10,6 +11,11 @@ export default function initUI(messageBus) {
   const episodeProgressBar = $('#episode-progressbar')
   const inputReload = $('#input-reload')
   const statusbar = $('#statusbar')
+
+  buttonExit.on('click', () => {
+    bootCamp.inProgress = false
+    window.location.href = '/index.html'
+  })
 
   messageBus.addEventListener('epochStats', ({data}) => {
     epochNumber.text(data.epochIndex+1)

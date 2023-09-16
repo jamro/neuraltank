@@ -76,47 +76,6 @@ const messageBus = new MessageBus(self);
       })
     }
   }, 1000)
-
-  messageBus.addEventListener('clearSave', async () => await trainer.removeStored())
-  messageBus.addEventListener('clearHistory', async () => await trainer.resetScoreHistory())
-  messageBus.addEventListener('config', ({data}) => {
-    messageBus.send("status", {msg: 'Settings: updating...'})
-    switch(data.key) {
-      case 'epochSize':
-        settings.prop('epochSize', data.value)
-        break
-      case 'episodeTimeLimit':
-        settings.prop('episodeTimeLimit', data.value)
-        break
-      case 'envId':
-        settings.prop('envId', data.value)
-        break
-      case 'learningRate':
-        settings.prop('learningRate', data.value)
-        break
-      case 'entropyCoefficient':
-        settings.prop('entropyCoefficient', data.value)
-        break
-      case 'rewardWeights':
-        const currentWeights = settings.prop('rewardWeights')
-        currentWeights[data.index] = data.value
-        settings.prop('rewardWeights', currentWeights)
-        break
-      case 'shooterEnabled': 
-        settings.prop('shooterEnabled', data.value)
-        break
-      case 'driverEnabled': 
-        settings.prop('driverEnabled', data.value)
-        break
-      case 'shooterTrainable': 
-        settings.prop('shooterTrainable', data.value)
-        break
-      case 'driverTrainable': 
-        settings.prop('driverTrainable', data.value)
-        break
-    }
-    messageBus.send("status", {msg: 'Settings: updated'})
-  })
   // --------------------------------------------------------------------------------------------------------------
 
   messageBus.send("status", {msg: 'Restoring model...'})

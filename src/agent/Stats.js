@@ -84,39 +84,6 @@ export default class Stats {
     this.benchmarkTotalDuration += duration
   }
   
-  async save() {
-    await localStorage.setItem('agentStats', JSON.stringify({
-      benchmarkAvgDuration:  this.benchmarkAvgDuration,
-      stepAvgDuration:  this.stepAvgDuration,
-    }))
-  }
-
-  async remove() {
-    await localStorage.removeItem('agentStats')
-  }
-
-  async restore() {
-    const rawData = await localStorage.getItem('agentStats')
-    this.stepCount = 0
-    this.stepTotalDuration = 0
-    this.stepAvgDuration = 0
-    this.stepStartTime = 0
-
-    this.benchmarkStartTime = 0
-    this.benchmarkCount = 0
-    this.benchmarkTotalDuration = 0
-    this.benchmarkAvgDuration = 0
-
-    this.expectedValue = 0
-    this.totalReward = 0
-    this.rewardHistory = [];
-    if(rawData) {
-      const json = JSON.parse(rawData)
-      this.benchmarkAvgDuration = json.benchmarkAvgDuration
-      this.stepAvgDuration = json.stepAvgDuration
-    }
-  }
-
   storeRewards(rewards) {
     const scoreIncrement = rewards.reduce((s, a) => s + a, 0);
     this.totalReward += scoreIncrement

@@ -26,19 +26,107 @@
         </div>
       </div>
     </nav>
+    <nav class="navbar bg-secondary small pt-1 pb-1" data-bs-theme="secondary" style="margin-bottom: 2em">
+      <div class="container-fluid text-light">
+        <div class="row">
+          <div class="col-12">
+            <i class="ri-information-fill"></i> <span id="statusbar">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </nav>
     <div class="container-fluid">
       <div class="row">
-        <div class="col-lg-6 col-12 mb-3">
+        <div class="col-lg-6 col-12">
+          <div class="card" >
+            <div class="card-header">
+              <strong><i class="ri-bar-chart-fill"></i> Statistics <button id="btn-exit" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-stop-circle-line"></i> Stop training</button></strong>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div class="ms-2 me-auto">
+                  <div class="fw-bold">Epoch</div>
+                  duration: <span id="epoch-duration">-</span>
+                </div>
+                <span id="epoch-number" class="badge bg-primary rounded-pill">-</span>
+              </li>
+              <li class="list-group-item">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="ms-2 me-auto">
+                    <div class="fw-bold">Episode</div>
+                    <div>
+                      avg. step duration: <span id="step-duration">-</span>
+                    </div>
+                    <div>
+                      avg. benchmark duration: <span id="benchmark-duration">-</span>
+                    </div>
+                  </div>
+                  <span id="episode-number" class="badge bg-primary rounded-pill">-</span>
+                </div>
+                <div style="padding: 0.5em 1em">
+                  <div class="progress" role="progressbar">
+                    <div id="epoch-progressbar" class="progress-bar" style="width: 0%; transition: none;"></div>
+                  </div>
+                </div>
+                <div style="padding: 0.5em 1em">
+                  <div class="progress" role="progressbar">
+                    <div id="episode-progressbar" class="progress-bar" style="width: 0%; transition: none;"></div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
           <div class="card mt-3">
-            <h5 class="card-header"><i class="ri-database-2-fill"></i> Persistency <button id="btn-remove-stored-model" type="button" class="btn btn-danger btn-sm float-end" disabled="disabled"><i class="ri-delete-bin-fill"></i> Delete</button></h5>
+            <h5 class="card-header"><i class="ri-line-chart-line"></i> Loss History</h5>
             <div class="card-body">
-              Last saved: <em id="agent-save-date" class="small">-</em>
+              <div class="row mt-3 text-center">
+                <div class="col-4">
+                  <span class="badge rounded-pill text-bg-primary">Shooter objective: <span id="shooter-objective">-</span></span>
+                </div>
+                <div class="col-4">
+                  <span class="badge rounded-pill text-bg-info">Driver objective: <span id="driver-objective">-</span></span>
+                </div>
+                <div class="col-4">
+                  <span class="badge rounded-pill text-bg-danger">Critic loss: <span id="critic-loss">-</span></span>
+                </div>
+              </div>
+              <canvas id="loss-chart" style="width: 100%; height: 12em"></canvas>
+            </div>
+          </div>
+          <div class="card mt-3">
+            <h5 class="card-header"><i class="ri-bubble-chart-fill"></i> Entropy</h5>
+            <div class="card-body">
+              <canvas id="entropy-chart" style="width: 100%; height: 12em"></canvas>
             </div>
           </div>
         </div>
         <div class="col-lg-6 col-12">
+          <div class="card">
+            <h5 class="card-header"><i class="ri-medal-line"> </i>Reward History</h5>
+            <div class="card-body" style="text-align: right;">
+              <h1 class="card-title"></i> <span id="best-reward">-</span></h1>
+              <div class="row mt-3 text-center">
+                <div class="col">
+                  <span class="badge rounded-pill text-bg-danger">Score: <span id="reward-0">-</span></span>
+                </div>
+                <div class="col">
+                  <span class="badge rounded-pill text-bg-primary">Radar: <span id="reward-1">-</span></span>
+                </div>
+                <div class="col">
+                  <span class="badge rounded-pill text-bg-warning">Energy: <span id="reward-2">-</span></span>
+                </div>
+                <div class="col">
+                  <span class="badge rounded-pill text-bg-secondary">Collision: <span id="reward-3">-</span></span>
+                </div>
+                <div class="col">
+                  <span class="badge rounded-pill text-bg-info">Bullets: <span id="reward-4">-</span></span>
+                </div>
+              </div>
+              <canvas id="component-chart" style="width: 100%; height: 15em"></canvas>
+            </div>
+          </div>
           <div class="card mt-3">
-            <h5 class="card-header"><i class="ri-tools-fill"></i> Settings</h5>
+            <h5 class="card-header"><i class="ri-tools-fill"></i> Settings <small id="settingsLock" class="float-end text-muted" style="display: none"><i class="ri-lock-fill"></i></small></h5>
             <div class="card-body">
               <form>
                 <div class="form-group row mt-1">
@@ -102,6 +190,15 @@
                   </div>
                 </div>
                 <div class="form-group row mt-1">
+                  <label for="input-reload" class="col-sm-6 col-form-label">Reload after epoch</label>
+                  <div class="col-sm-6">
+                    <div class="btn-group" role="group" style="width: 100%">
+                      <input type="checkbox" class="btn-check" id="input-reload" checked="checked">
+                      <label class="btn btn-outline-warning" for="input-reload" id="input-reload-label">On</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group row mt-1">
                   <h5 class="col-form-label">Reward rates</h5>
                   <div class="col text-center">
                     <label for="input-reward-weight-1" class="col-12 col-form-label">Score</label>
@@ -134,11 +231,6 @@
                     </div>
                   </div>
                 </div>
-                <div class="row mt-3">
-                  <div class="col">
-                    <button id="btn-train" href="/train.html" type="button" class="btn btn-danger btn-lg" style="width: 100%"><i class="ri-rocket-line"></i> Train</button>
-                  </div>
-                </div>
               </form>
             </div>
           </div>
@@ -146,5 +238,5 @@
       </div>
     </div>
   </body>
-  <script type="text/javascript" src="home.js"></script>
+  <script type="text/javascript" src="train.js"></script>
 </html>

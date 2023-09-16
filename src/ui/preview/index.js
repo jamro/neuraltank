@@ -3,6 +3,8 @@ import controlsCard from './controlsCard'
 import scoringCard from './scoringCard'
 import networkCard from './networkCard'
 
+document.body.style.display = 'block'
+
 export default (...args) => {
   trajectoryCard(...args)
   scoringCard(...args)

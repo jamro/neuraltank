@@ -3,7 +3,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-    train: './src/index.js',
+    home: './src/index.js',
+    train: './src/train.js',
     preview: './src/preview.js',
     worker: './src/worker/index.js',
   },

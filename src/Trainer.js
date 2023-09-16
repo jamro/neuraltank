@@ -192,6 +192,7 @@ export default class Trainer extends EventTarget {
 
   async removeStored() {
     await this.agent.removeModel()
+    await this.resetScoreHistory()
     console.log("EVENT: remove")
     this.dispatchEvent(new Event('remove'))
   }
@@ -199,7 +200,13 @@ export default class Trainer extends EventTarget {
   async resetScoreHistory() {
     const data = JSON.parse(await localStorage.getItem('trainerState'))
     this.scoreHistory = []
+    this.lossHistory = []
+    this.epochIndex = 0
+    this._epochDuration = null
     data.scoreHistory = this.scoreHistory
+    data.epochIndex = this.epochIndex
+    data.lossHistory = this.lossHistory
+    data.epochDuration = this.epochDuration
     await localStorage.setItem("trainerState", JSON.stringify(data));
   }
 

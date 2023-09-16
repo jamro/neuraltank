@@ -3,7 +3,6 @@ import Chart from 'chart.js/auto';
 
 export default function initUI(messageBus) {
   const bestReward = $('#best-reward')
-  const resetHistoryButton = $('#btn-reset-reward-history')
   const rewardFields = [
     $('#reward-0'),
     $('#reward-1'),
@@ -51,22 +50,6 @@ export default function initUI(messageBus) {
       }
     }
 	});
-
-
-  resetHistoryButton.on('click', async () => {
-    resetHistoryButton.prop('disabled',true)
-    messageBus.send('clearHistory')
-    componentChartData.labels = []
-
-    for(let i=0; i < componentChartData.datasets.length; i++) {
-      componentChartData.datasets[0].data = []
-    }
-    for(let i=0; i < 4; i++) {
-      rewardFields[i].text('-')
-    }
-    componentChart.update()
-    bestReward.text('-')
-  })
  
   messageBus.addEventListener('epochStats', ({data}) => {
     bestReward.text(data.scoreHistory.length ? data.scoreHistory[data.scoreHistory.length-1].mean.toFixed(2) : '-')

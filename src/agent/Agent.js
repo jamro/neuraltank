@@ -177,7 +177,6 @@ export default class Agent extends EventTarget {
     await this.shooterNet.save();
     await this.driverNet.save();
     await this.criticNet.save();
-    await this.stats.save();
     this.dispatchEvent(new Event('save'))
   }
 
@@ -185,7 +184,6 @@ export default class Agent extends EventTarget {
     await this.shooterNet.remove();
     await this.driverNet.remove();
     await this.criticNet.remove();
-    await this.stats.remove()
     this.dispatchEvent(new Event('remove'))
   }
 
@@ -203,7 +201,7 @@ export default class Agent extends EventTarget {
     this.criticNet.learningRate = 10*this.learningRate
 
     if (shooterStatus && drivertatus && criticStatus) {
-      await this.stats.restore()
+      this.stats = new Stats()
       this.rewardWeights = this.settings.prop('rewardWeights')
       return true
     } else {
