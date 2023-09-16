@@ -108,7 +108,7 @@ export default class TankLogic {
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
     } else {
       _this.noVisionTime ++
-      radarReward = -_this.noVisionTime * 0.0005
+      radarReward = -Math.min(200, _this.noVisionTime) * 0.00025
     }
 
     if(state.collisions.wall || state.collisions.enemy || state.collisions.ally) {
