@@ -22,7 +22,7 @@ export default class ActorNetwork extends PersistentNetwork {
   exec(inputs) {
     return tf.tidy(() => {
       const output = this.net.predict(inputs);
-      const mean = tf.tanh(output.slice([0, 0], [-1, this.outputCount]));
+      const mean = tf.sin(output.slice([0, 0], [-1, this.outputCount]));
       let stdDev = tf.tanh(output.slice([0, this.outputCount], [-1, -1]));
       stdDev = stdDev.div(4).add(0.5)
       const unscaledActions = tf.add(mean, tf.mul(stdDev, tf.randomNormal(mean.shape)));
