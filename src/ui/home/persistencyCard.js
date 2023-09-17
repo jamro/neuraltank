@@ -12,6 +12,7 @@ async function reloadSnapshotList(onRestore, onLabelChange) {
   for(let agent of agents) {
     container.append(getSnapshotElement(agent))
     $(`#btn-delete-snapshot-${agent.name}`).on('click', async () => {
+      if(!confirm("Really? This operation cannot be undone.")) return
       await Agent.delAgent(agent.name)
       reloadSnapshotList(onRestore, onLabelChange)
     })    
