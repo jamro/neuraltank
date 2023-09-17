@@ -4,6 +4,8 @@ import carousel from "./carousel";
 import execution from "./execution";
 import crawler from "./crawler";
 import chase from "./chase";
+import fighter from "./fighter";
+import jamro from "./jamro";
 
 export default {
   execution,
@@ -12,4 +14,6 @@ export default {
   zombieland,
   chase,
   crawler,
+  fighter,
+  jamro,
 }
