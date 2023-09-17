@@ -353,5 +353,27 @@ export default function initUI(trainer, agent) {
     clearSingleTrajectory(advantageChart)
   })
 
+  $('#driver-collapse').on('click', () => {
+    $('#driver-collapse').hide()
+    $('#driver-expand').show()
+    $('#driver-content').hide()
+  })
 
+  $('#driver-expand').on('click', () => {
+    $('#driver-collapse').show()
+    $('#driver-expand').hide()
+    $('#driver-content').show()
+  })
+
+  $('#shooter-collapse').on('click', () => {
+    $('#shooter-collapse').hide()
+    $('#shooter-expand').show()
+    $('#shooter-content').hide()
+  })
+
+  $('#shooter-expand').on('click', () => {
+    $('#shooter-collapse').show()
+    $('#shooter-expand').hide()
+    $('#shooter-content').show()
+  })
 }
