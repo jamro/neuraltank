@@ -30,15 +30,38 @@ export const CRITIC_STATE_LEN = CRITIC_INPUT_INDICES.length
 export const SHOOTER_ACTION_LEN = 2
 export const DRIVER_ACTION_LEN = 2
 
-export default class Agent extends EventTarget {
 
-  constructor(settings) {
+async function getAgents() {
+  const raw = await localStorage.getItem('agents') || '{}'
+  const json = JSON.parse(raw)
+  return json
+}
+
+async function delAgent(name) {
+  const agents = await getAgents()
+  delete agents[name]
+  await localStorage.setItem('agents', JSON.stringify(agents))
+
+  const modelsInfo = Object.keys(await tf.io.listModels())
+  for(let info of modelsInfo) {
+    if(!info.includes('neural-tank-' + name)) continue;
+    await tf.io.removeModel(info);
+  }
+}
+
+class Agent extends EventTarget {
+
+  constructor(settings, name='latest') {
     super()
+    this.name = name
     this.settings = settings
+    this.saveDate = null
+    this.trainDate = null
+    this.label = ''
 
-    this.shooterNet = new DualActorNetwork(SHOOTER_STATE_LEN, SHOOTER_ACTION_LEN, this.learningRate, 'shooter')
-    this.driverNet = new DualActorNetwork(DRIVER_STATE_LEN, DRIVER_ACTION_LEN, this.learningRate, 'driver')
-    this.criticNet = new CriticNetwork(CRITIC_STATE_LEN, 1, 10 * this.learningRate, 'critic')
+    this.shooterNet = new DualActorNetwork(SHOOTER_STATE_LEN, SHOOTER_ACTION_LEN, this.learningRate, this.name + '-shooter')
+    this.driverNet = new DualActorNetwork(DRIVER_STATE_LEN, DRIVER_ACTION_LEN, this.learningRate, this.name + '-driver')
+    this.criticNet = new CriticNetwork(CRITIC_STATE_LEN, 1, 10 * this.learningRate, this.name + '-critic')
 
     this.memory = new TrajectoryMemory()
     this.rewardWeights = settings.prop('rewardWeights')
@@ -174,39 +197,75 @@ export default class Agent extends EventTarget {
   }
 
   async saveModel() {
-    await this.shooterNet.save();
-    await this.driverNet.save();
-    await this.criticNet.save();
+    await this.saveModelAs(this.name)
     this.dispatchEvent(new Event('save'))
   }
 
+  async saveModelAs(name) {
+    await this.shooterNet.saveAs(name + '-shooter');
+    await this.driverNet.saveAs(name + '-driver');
+    await this.criticNet.saveAs(name + '-critic');
+
+    const agents = await getAgents()
+
+    agents[name] = {
+      name,
+      trainedAt: this.trainDate,
+      label: this.label,
+      savedAt: new Date()
+    }
+    this.saveDate = agents[name].savedAt
+    await localStorage.setItem('agents', JSON.stringify(agents))
+
+    this.dispatchEvent(new Event('saveAs'))
+  }
+
   async removeModel() {
+    this.saveDate = null
+    this.trainDate = null
+    this.label = ''
+    const agents = await getAgents()
+    delete agents[this.name]
+    await localStorage.setItem('agents', JSON.stringify(agents))
+
     await this.shooterNet.remove();
     await this.driverNet.remove();
     await this.criticNet.remove();
+    
     this.dispatchEvent(new Event('remove'))
   }
 
-  get dateSaved() {
-    return this.shooterNet.dateSaved
+  async restoreModel() {
+    return await this.restoreModelFrom(this.name)
   }
 
-  async restoreModel() {
-    const shooterStatus = await this.shooterNet.restore()
-    const drivertatus = await this.driverNet.restore()
-    const criticStatus = await this.criticNet.restore()
+  async restoreModelFrom(name) {
+    const agents = await getAgents()
+    const meta = agents[name]
+    if(!meta) return false
+
+    const shooterStatus = await this.shooterNet.restoreFrom(name + '-shooter')
+    const driverStatus = await this.driverNet.restoreFrom(name + '-driver')
+    const criticStatus = await this.criticNet.restoreFrom(name + '-critic')
 
     this.shooterNet.learningRate = this.learningRate
     this.driverNet.learningRate = this.learningRate
     this.criticNet.learningRate = 10*this.learningRate
 
-    if (shooterStatus && drivertatus && criticStatus) {
+    if (shooterStatus && driverStatus && criticStatus) {
       this.stats = new Stats()
       this.rewardWeights = this.settings.prop('rewardWeights')
+      this.saveDate = new Date(meta.savedAt)
+      this.trainDate = meta.trainedAt  ? (new Date(meta.trainedAt)) : meta.trainedAt
+      this.label = meta.label
       return true
     } else {
       return false
     }
   }
-
 }
+
+Agent.getAgents = getAgents
+Agent.delAgent = delAgent
+
+export default Agent

@@ -1,9 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
-import TrajectoryMemory from './TrajectoryMemory.js';
 import Agent, { DRIVER_ACTION_LEN, SHOOTER_ACTION_LEN } from './Agent.js';
 
 const INIT_DISCOUNT_RATE = 0.99
-const INIT_ENTROPY_COEFFICIENT = 0.005
 
 export default class TrainableAgent extends Agent {
   constructor(settings) {
@@ -78,6 +76,7 @@ export default class TrainableAgent extends Agent {
     } else {
       console.log("Skipping training of driver actor")
     }
+    this.trainDate = new Date()
 
     this.stats.shooterLoss = shooterLoss
     this.stats.shooterEntropy = shooterEntropy
@@ -164,8 +163,8 @@ export default class TrainableAgent extends Agent {
     this.memory.aggregateGameResults()
   }
 
-  async restoreModel() {
-    if (await super.restoreModel()) {
+  async restoreModelFrom(name) {
+    if (await super.restoreModelFrom(name)) {
       this.memory.resetAll()
       return true
     } else {

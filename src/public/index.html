@@ -30,10 +30,24 @@
       <div class="row">
         <div class="col-lg-6 col-12 mb-3">
           <div class="card mt-3">
-            <h5 class="card-header"><i class="ri-database-2-fill"></i> Persistency <button id="btn-remove-stored-model" type="button" class="btn btn-danger btn-sm float-end" disabled="disabled"><i class="ri-delete-bin-fill"></i> Delete</button></h5>
+            <h5 class="card-header">
+              <i class="ri-brain-line"></i> Workspace 
+              <button id="btn-remove-stored-model" type="button" class="btn btn-danger btn-sm float-end" disabled="disabled"><i class="ri-delete-bin-fill"></i> Delete</button>
+              <button id="btn-snapshot-model" type="button" class="btn btn-primary btn-sm float-end" disabled="disabled" style="margin-right: 1em"><i class="ri-camera-fill"></i> Snapshot</button>
+            </h5>
             <div class="card-body">
-              Last saved: <em id="agent-save-date" class="small">-</em>
+              <p>Label: <strong id="agent-label" class="small">-</strong></p>
+              <p>Last trained: <em id="agent-train-date" class="small">-</em></p>
+              <p>Last saved: <em id="agent-save-date" class="small">-</em></p>
             </div>
+          </div>
+          <div class="card mt-3">
+            <h5 class="card-header">
+              <i class="ri-camera-fill"></i> Snapshots
+            </h5>
+            <ul id="snapshot-list" class="list-group list-group-flush">
+              <li class="list-group-item"><em>No snapshots found</em></li>
+            </ul>
           </div>
         </div>
         <div class="col-lg-6 col-12">

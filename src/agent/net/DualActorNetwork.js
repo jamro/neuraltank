@@ -23,13 +23,22 @@ export default class DualActorNetwork extends ActorNetwork {
     await this.oldNet.save()
   }
 
+  async saveAs(name) {
+    await super.saveAs(name + '-main')
+    await this.oldNet.saveAs(name + '-old')
+  }
+
   async remove() {
     await super.remove()
     await this.oldNet.remove()
   }
 
   async restore() {
-    return (await super.restore()) && (await this.oldNet.restore())
+    return await this.restoreFrom(this.name)
+  }
+
+  async restoreFrom(name) {
+    return (await super.restoreFrom(name + '-main')) && (await this.oldNet.restoreFrom(name + '-old'))
   }
 
   refreshOldActor() {

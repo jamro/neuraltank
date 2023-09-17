@@ -32,8 +32,8 @@ export default class ActorNetwork extends PersistentNetwork {
     });
   }
 
-  async restore() {
-    const result = await super.restore()
+  async restoreFrom(name) {
+    const result = await super.restoreFrom(name)
     if(result) {
       this.outputCount /= 2
     }

@@ -45,10 +45,10 @@ const messageBus = new MessageBus(self);
     messageBus.send("epochComplete")
   })
   trainer.addEventListener('save', () => {
-    messageBus.send("saveDate", {value: (trainer.agent.dateSaved || '').toString()})
+    messageBus.send("saveDate", {value: (trainer.agent.saveDate || '').toString()})
   })
   trainer.addEventListener('restore', () => {
-    messageBus.send("saveDate", {value: (trainer.agent.dateSaved || '').toString()})
+    messageBus.send("saveDate", {value: (trainer.agent.saveDate || '').toString()})
   })
   trainer.addEventListener('remove', () => {
     messageBus.send("saveDate", {value: null})
