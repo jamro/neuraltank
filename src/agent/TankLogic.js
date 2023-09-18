@@ -1,4 +1,5 @@
 import ExtendedMath from 'jsbattle-engine/src/tanks/lib/extendedMath.js'
+import BulletVision from './BulletVision'
 
 const Math2 = ExtendedMath()
 
@@ -48,6 +49,7 @@ export default class TankLogic {
   }
 
   init(settings, info, _this, agent) {
+    _this.bulletVision = new BulletVision()
     _this.enemyPosBeamAngle = -1
     _this.enemyPosGunAngle = -1
     _this.enemyPosTankAngle = -1
@@ -60,6 +62,7 @@ export default class TankLogic {
   }
   
   loop(state, control, _this, agent) {
+    _this.bulletVision.updateState(state)
 
     let radarReward = 0
     let radarAbsAngle = state.radar.angle + state.angle
@@ -119,6 +122,9 @@ export default class TankLogic {
       _this.collisionTimer += (-1 - _this.collisionTimer)/10
     }
 
+    let bulletDistance = _this.bulletVision.nearestAccurateBullet ? _this.bulletVision.nearestAccurateBullet.distance : 300
+    bulletDistance = Math.max(-1, Math.min(1, bulletDistance/150-1))
+
     const input = [
       _this.enemyDistance,
       _this.enemyPosBeamAngle,
@@ -126,7 +132,8 @@ export default class TankLogic {
       _this.enemyPosGunAngle,
       (state.radar.wallDistance === null) ? 1 : (state.radar.wallDistance/150 - 1),
       _this.enemyPosTankAngle,
-      _this.collisionTimer
+      _this.collisionTimer,
+      bulletDistance
     ]
 
     // reward

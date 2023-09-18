@@ -285,7 +285,7 @@ export default function initUI(trainer, agent) {
       return `Input #${index+1}`
     })
     drawSingleTrajectory(driverInputChart, agent.memory.episodeMemory.driverInput, (index) => {
-      const labels = ['distance', 'radar', 'enemyDirection', 'wall', 'tankAngle', 'collision']
+      const labels = ['distance', 'radar', 'enemyDirection', 'wall', 'tankAngle', 'collision', 'bullets']
       if(labels[index]) {
         return labels[index]
       }

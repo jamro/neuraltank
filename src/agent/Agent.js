@@ -15,9 +15,9 @@ Input:
   4: wall
   5: tankAngle
 */
-const DRIVER_INPUT_MASK =  [1, 1, 1, 0, 1, 1, 1]
-const SHOOTER_INPUT_MASK = [1, 1, 1, 1, 0, 1, 0]
-const CRITIC_INPUT_MASK =  [1, 1, 1, 1, 1, 1, 1]
+const DRIVER_INPUT_MASK =  [1, 1, 1, 0, 1, 1, 1, 1]
+const SHOOTER_INPUT_MASK = [1, 1, 1, 1, 0, 1, 0, 0]
+const CRITIC_INPUT_MASK =  [1, 1, 1, 1, 1, 1, 1, 1]
 
 export const DRIVER_INPUT_INDICES =  DRIVER_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
 export const SHOOTER_INPUT_INDICES = SHOOTER_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
