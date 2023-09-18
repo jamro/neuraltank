@@ -106,8 +106,8 @@ export default class TankLogic {
     if(state.radar.enemy) {
       _this.noVisionTime = 0
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
-      radarReward *= (1-0.5*Math.max(0, _this.enemyDistance))
-      radarReward *= (1-0.5*Math.max(0, -_this.enemyDistance))
+      radarReward *= (1-1.2*Math.max(0, _this.enemyDistance))
+      radarReward *= (1-1.2*Math.max(0, -_this.enemyDistance))
     } else {
       _this.noVisionTime ++
       radarReward = -Math.min(200, _this.noVisionTime) * 0.00025
@@ -133,7 +133,7 @@ export default class TankLogic {
     const totalScore = _this.getScore()
     const gameScoreReward = totalScore - _this.lastScore
     _this.lastScore = totalScore
-    const energyReward = state.energy - _this.lastEnergy
+    const energyReward = state.energy - _this.lastEnergy + state.energy * 0.001
     _this.lastEnergy = state.energy
     const collisionReward = (state.collisions.wall || state.collisions.enemy || state.collisions.ally) ? -1 : 0
 
