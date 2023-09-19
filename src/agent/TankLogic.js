@@ -85,7 +85,7 @@ export default class TankLogic {
       let enemyPosGunAngle = Math2.deg.normalize(gunAbsAngle - enemyPosAngle)/45 // keep it in range of -1,1
       enemyPosGunAngle = Math.min(1, Math.max(-1, enemyPosGunAngle))
       _this.enemyPosGunAngle = enemyPosGunAngle
-      let enemyPosTankAngle = Math2.deg.normalize(state.angle - enemyPosAngle)/90 // keep it in range of -1,1
+      let enemyPosTankAngle = Math2.deg.normalize(state.angle - enemyPosAngle)/135 // keep it in range of -1,1
       enemyPosTankAngle = Math.min(1, Math.max(-1, enemyPosTankAngle))
       _this.enemyPosTankAngle = enemyPosTankAngle
 

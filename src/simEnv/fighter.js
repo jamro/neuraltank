@@ -4,12 +4,6 @@ export default function(jsBattle, sim, tankLogic) {
 
   const opponentCode = `importScripts('lib/tank.js');
 
-  // timer of tank turns. Whenever the tank hits a wall, the timer
-  // will be set to a positive integer. Within each simulation step
-  // the timer will be decreased by one eventually hitting zero.
-  // The tank will keep turning as long as turnTime is above zero.
-  // In that way, turning will be sustained for several steps of
-  // the simulation
   var turnTime;
   
   // SHOOT ENEMY ---------------------------------------------------------------------------------
@@ -19,38 +13,29 @@ export default function(jsBattle, sim, tankLogic) {
       return;
     }
   
-    // predict position of moving target
-    let bulletSpeed = 4;
-    let distance = Math.distance(state.x, state.y, enemy.x, enemy.y)
-    let bulletTime = distance / bulletSpeed;
-    let targetX = enemy.x + bulletTime * enemy.speed * Math.cos(Math.deg2rad(enemy.angle));
-    let targetY = enemy.y + bulletTime * enemy.speed * Math.sin(Math.deg2rad(enemy.angle));
+    let targetX = enemy.x 
+    let targetY = enemy.y
   
-    // calculate desired direction of the gun
     let targetAngle = Math.deg.atan2(targetY - state.y, targetX - state.x);
     let gunAngle = Math.deg.normalize(targetAngle - state.angle);
   
-    // point the gun at the target
     let angleDiff = Math.deg.normalize(gunAngle - state.gun.angle);
     control.GUN_TURN = 0.3 * angleDiff;
   
-    // shoot when aiming at target
     if(Math.abs(angleDiff) < 1) {
-      control.SHOOT = 1;
+      control.SHOOT = 0.6;
     }
   }
   
   // SCAN ENEMY ---------------------------------------------------------------------------------
   function scanEnemy(state, control) {
     if(!state.radar.enemy) {
-      // scan around for the enemy
       control.RADAR_TURN = 1;
     } else {
-      //keep the enemy in the middle of radar beam
       let targetAngle = Math.deg.atan2(state.radar.enemy.y - state.y, state.radar.enemy.x - state.x);
       let radarAngle = Math.deg.normalize(targetAngle - state.angle);
       let angleDiff = Math.deg.normalize(radarAngle - state.radar.angle);
-      control.RADAR_TURN = angleDiff;
+      control.RADAR_TURN = 0.3 * angleDiff;
     }
   }
   
@@ -118,9 +103,9 @@ export default function(jsBattle, sim, tankLogic) {
   opponentTank = sim.addTank(opponent).tank
   opponentTank.moveTo(
     bx + -20 + Math.random()*40, 
-    by - 120,
-    90
+    by - 100,
+    -90
   )
 
-  tankLogic.tankModel.moveTo(bx, by+120, -90)
+  tankLogic.tankModel.moveTo(bx, by+100, 0)
 }
