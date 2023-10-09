@@ -1,4 +1,5 @@
 import * as $ from 'jquery'
+import stages from '../../stages.js'
 
 export default function initUI(settings, trainer, bootCamp) {
   console.log(settings)
@@ -12,6 +13,15 @@ export default function initUI(settings, trainer, bootCamp) {
   const inputLearningRate = $('#inputLearningRate')
   const inputEntropyCoef = $('#inputEntropyCoef')
   const inputEnv = $('#inputEnv')
+  const expandCustomStageIndicator = $('#custom-stage-expand')
+  const collapseCustomStageIndicator = $('#custom-stage-collapse')
+  const buttonCustomStage = $('#custom-stage-toggle')
+  const customStageContent = $('#custom-stage-content')
+
+  const stageButtons = [
+    $('#btn-stage-01'),
+  ]
+
   const inputRewardWeights = [
     $('#input-reward-weight-1'),
     $('#input-reward-weight-2'),
@@ -27,6 +37,32 @@ export default function initUI(settings, trainer, bootCamp) {
     inputEntropyCoef,
     inputEnv
   ].concat(inputRewardWeights)
+
+
+  stageButtons.forEach((button, index) =>  button.on('click', async() => {
+    const stage = stages[index]
+    const keys = Object.keys(settings.data)
+    for (let key of keys) {
+      settings.prop(key, stage[key])
+    }
+
+    button.prop('disabled', true)
+    await trainer.resetScoreHistory()
+    bootCamp.inProgress = true
+    window.location.replace('./train.html')
+  }))
+
+  buttonCustomStage.on('click', () => {
+    if(customStageContent.css('display') == 'none') { // show
+      customStageContent.show()
+      expandCustomStageIndicator.hide()
+      collapseCustomStageIndicator.show()
+    } else { // hide
+      customStageContent.hide()
+      expandCustomStageIndicator.show()
+      collapseCustomStageIndicator.hide()
+    }
+  })
 
   inputs.forEach(i => i.prop('disabled', !i.isEditable))
 
@@ -93,7 +129,7 @@ export default function initUI(settings, trainer, bootCamp) {
     buttonTrain.prop('disabled', true)
     await trainer.resetScoreHistory()
     bootCamp.inProgress = true
-    window.location.href = '/train.html'
+    window.location.replace('./train.html')
   })
 
 }

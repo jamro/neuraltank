@@ -52,111 +52,122 @@
         </div>
         <div class="col-lg-6 col-12">
           <div class="card mt-3">
-            <h5 class="card-header"><i class="ri-tools-fill"></i> Settings</h5>
-            <div class="card-body">
-              <form>
-                <div class="form-group row mt-1">
-                  <label for="inputEnv" class="col-sm-6 col-form-label">Environment:</label>
-                  <div class="col-sm-6">
-                    <select class="form-select" aria-label="Default select example" id="inputEnv"  disabled="disabled">
-                      <option value="execution">Execution</option>
-                      <option value="zombieland">Zombieland</option>
-                      <option value="carousel">Carousel</option>
-                      <option value="pendulum">Pendulum</option>
-                      <option value="chase">Chase</option>
-                      <option value="crawler">Crawler</option>
-                      <option value="fighter">Fighter</option>
-                      <option value="jamro">Jamro</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <span class="col-sm-6 col-form-label">Active networks:</span>
-                  <div class="col-sm-6">
-                    <div class="btn-group" role="group" style="width: 100%">
-                      <input type="checkbox" class="btn-check" id="input-shooter-enabled" disabled="disabled">
-                      <label class="btn btn-outline-primary" for="input-shooter-enabled">Shooter</label>
-                    
-                      <input type="checkbox" class="btn-check" id="input-driver-enabled" disabled="disabled">
-                      <label class="btn btn-outline-info" for="input-driver-enabled">Driver</label>
+            <h5 class="card-header"><i class="ri-presentation-fill"></i> Stages</h5>
+            <div class="list-group list-group-flush">
+              <div class="list-group-item">
+                Static Scanning
+                <button id="btn-stage-01" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-rocket-line"></i> Train</button>
+              </div>
+              <button id="custom-stage-toggle" type="button" class="list-group-item list-group-item-action">
+                <strong>Custom Stage</strong>
+                <div id="custom-stage-collapse" class="btn btn-dark btn-sm float-end" type="button" style="display: none"><i class="ri-arrow-up-s-line"></i></div>
+                <div id="custom-stage-expand" class="btn btn-dark btn-sm float-end" type="button"><i class="ri-arrow-down-s-line"></i></div>
+              </button>
+              <div id="custom-stage-content" class="list-group-item" style="display: none;">
+                <form>
+                  <div class="form-group row mt-1">
+                    <label for="inputEnv" class="col-sm-6 col-form-label">Environment:</label>
+                    <div class="col-sm-6">
+                      <select class="form-select" aria-label="Default select example" id="inputEnv"  disabled="disabled">
+                        <option value="execution">Execution</option>
+                        <option value="zombieland">Zombieland</option>
+                        <option value="carousel">Carousel</option>
+                        <option value="pendulum">Pendulum</option>
+                        <option value="chase">Chase</option>
+                        <option value="crawler">Crawler</option>
+                        <option value="fighter">Fighter</option>
+                        <option value="jamro">Jamro</option>
+                      </select>
                     </div>
                   </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <span class="col-sm-6 col-form-label">Trainable networks:</span>
-                  <div class="col-sm-6">
-                    <div class="btn-group" role="group" style="width: 100%">
-                      <input type="checkbox" class="btn-check" id="input-shooter-trainable" disabled="disabled">
-                      <label class="btn btn-outline-primary" for="input-shooter-trainable">Shooter</label>
-                    
-                      <input type="checkbox" class="btn-check" id="input-driver-trainable" disabled="disabled">
-                      <label class="btn btn-outline-info" for="input-driver-trainable">Driver</label>
+                  <div class="form-group row mt-1">
+                    <span class="col-sm-6 col-form-label">Active networks:</span>
+                    <div class="col-sm-6">
+                      <div class="btn-group" role="group" style="width: 100%">
+                        <input type="checkbox" class="btn-check" id="input-shooter-enabled" disabled="disabled">
+                        <label class="btn btn-outline-primary" for="input-shooter-enabled">Shooter</label>
+                      
+                        <input type="checkbox" class="btn-check" id="input-driver-enabled" disabled="disabled">
+                        <label class="btn btn-outline-info" for="input-driver-enabled">Driver</label>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div class="form-group row row mt-1">
-                  <label for="inputEpochLen" class="col-sm-6 col-form-label">Episodes per epoch:</label>
-                  <div class="col-sm-6">
-                    <input type="text" class="form-control text-end" id="inputEpochLen" disabled="disabled">
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <label for="inputEpisodeLen" class="col-sm-6 col-form-label">Episodes time limit [ms]:</label>
-                  <div class="col-sm-6">
-                    <input type="text" class="form-control text-end" id="inputEpisodeLen" disabled="disabled">
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <label for="inputLearningRate" class="col-sm-6 col-form-label">Learning rate:</label>
-                  <div class="col-sm-6">
-                    <input type="text" class="form-control text-end" id="inputLearningRate" disabled="disabled">
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <label for="inputEntropyCoef" class="col-sm-6 col-form-label">Entropy Coefficient:</label>
-                  <div class="col-sm-6">
-                    <input type="text" class="form-control text-end" id="inputEntropyCoef" disabled="disabled">
-                  </div>
-                </div>
-                <div class="form-group row mt-1">
-                  <h5 class="col-form-label">Reward rates</h5>
-                  <div class="col text-center">
-                    <label for="input-reward-weight-1" class="col-12 col-form-label">Score</label>
-                    <div class="col-12">
-                      <input type="text" class="form-control text-center" id="input-reward-weight-1" disabled="disabled" style="width: 100%">
+                  <div class="form-group row mt-1">
+                    <span class="col-sm-6 col-form-label">Trainable networks:</span>
+                    <div class="col-sm-6">
+                      <div class="btn-group" role="group" style="width: 100%">
+                        <input type="checkbox" class="btn-check" id="input-shooter-trainable" disabled="disabled">
+                        <label class="btn btn-outline-primary" for="input-shooter-trainable">Shooter</label>
+                      
+                        <input type="checkbox" class="btn-check" id="input-driver-trainable" disabled="disabled">
+                        <label class="btn btn-outline-info" for="input-driver-trainable">Driver</label>
+                      </div>
                     </div>
                   </div>
-                  <div class="col text-center">
-                    <label for="input-reward-weight-2" class="col-12 col-form-label">Radar</label>
-                    <div class="col-12">
-                      <input type="text" class="form-control text-center" id="input-reward-weight-2" disabled="disabled" style="width: 100%">
+                  <div class="form-group row row mt-1">
+                    <label for="inputEpochLen" class="col-sm-6 col-form-label">Episodes per epoch:</label>
+                    <div class="col-sm-6">
+                      <input type="text" class="form-control text-end" id="inputEpochLen" disabled="disabled">
                     </div>
                   </div>
-                  <div class="col text-center">
-                    <label for="input-reward-weight-3" class="col-12 col-form-label">Energy</label>
-                    <div class="col-12">
-                      <input type="text" class="form-control text-center" id="input-reward-weight-3" disabled="disabled" style="width: 100%">
+                  <div class="form-group row mt-1">
+                    <label for="inputEpisodeLen" class="col-sm-6 col-form-label">Episodes time limit [ms]:</label>
+                    <div class="col-sm-6">
+                      <input type="text" class="form-control text-end" id="inputEpisodeLen" disabled="disabled">
                     </div>
                   </div>
-                  <div class="col text-center">
-                    <label for="input-reward-weight-4" class="col-12 col-form-label">Collision</label>
-                    <div class="col-12">
-                      <input type="text" class="form-control text-center" id="input-reward-weight-4" disabled="disabled" style="width: 100%">
+                  <div class="form-group row mt-1">
+                    <label for="inputLearningRate" class="col-sm-6 col-form-label">Learning rate:</label>
+                    <div class="col-sm-6">
+                      <input type="text" class="form-control text-end" id="inputLearningRate" disabled="disabled">
                     </div>
                   </div>
-                  <div class="col text-center">
-                    <label for="input-reward-weight-5" class="col-12 col-form-label">Bullets</label>
-                    <div class="col-12">
-                      <input type="text" class="form-control text-center" id="input-reward-weight-5" disabled="disabled" style="width: 100%">
+                  <div class="form-group row mt-1">
+                    <label for="inputEntropyCoef" class="col-sm-6 col-form-label">Entropy Coefficient:</label>
+                    <div class="col-sm-6">
+                      <input type="text" class="form-control text-end" id="inputEntropyCoef" disabled="disabled">
                     </div>
                   </div>
-                </div>
-                <div class="row mt-3">
-                  <div class="col">
-                    <button id="btn-train" href="/train.html" type="button" class="btn btn-danger btn-lg" style="width: 100%"><i class="ri-rocket-line"></i> Train</button>
+                  <div class="form-group row mt-1">
+                    <h5 class="col-form-label">Reward rates</h5>
+                    <div class="col text-center">
+                      <label for="input-reward-weight-1" class="col-12 col-form-label">Score</label>
+                      <div class="col-12">
+                        <input type="text" class="form-control text-center" id="input-reward-weight-1" disabled="disabled" style="width: 100%">
+                      </div>
+                    </div>
+                    <div class="col text-center">
+                      <label for="input-reward-weight-2" class="col-12 col-form-label">Radar</label>
+                      <div class="col-12">
+                        <input type="text" class="form-control text-center" id="input-reward-weight-2" disabled="disabled" style="width: 100%">
+                      </div>
+                    </div>
+                    <div class="col text-center">
+                      <label for="input-reward-weight-3" class="col-12 col-form-label">Energy</label>
+                      <div class="col-12">
+                        <input type="text" class="form-control text-center" id="input-reward-weight-3" disabled="disabled" style="width: 100%">
+                      </div>
+                    </div>
+                    <div class="col text-center">
+                      <label for="input-reward-weight-4" class="col-12 col-form-label">Collision</label>
+                      <div class="col-12">
+                        <input type="text" class="form-control text-center" id="input-reward-weight-4" disabled="disabled" style="width: 100%">
+                      </div>
+                    </div>
+                    <div class="col text-center">
+                      <label for="input-reward-weight-5" class="col-12 col-form-label">Bullets</label>
+                      <div class="col-12">
+                        <input type="text" class="form-control text-center" id="input-reward-weight-5" disabled="disabled" style="width: 100%">
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </form>
+                  <div class="row mt-3">
+                    <div class="col">
+                      <button id="btn-train" href="/train.html" type="button" class="btn btn-danger btn-lg" style="width: 100%"><i class="ri-rocket-line"></i> Train</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
