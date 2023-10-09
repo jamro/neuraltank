@@ -11,6 +11,19 @@ const stages = [
     driverEnabled: true,
     shooterTrainable: true,
     driverTrainable: false
+  },
+  {
+    name: 'Dynamic Scanning',
+    envId: 'chase',
+    epochSize: 30,
+    episodeTimeLimit: 15000,
+    learningRate: 0.0001,
+    entropyCoefficient: 0.005,
+    rewardWeights: [0, 1, 0, 0.1, 0],
+    shooterEnabled: true,
+    driverEnabled: true,
+    shooterTrainable: true,
+    driverTrainable: true
   }
 ]
 

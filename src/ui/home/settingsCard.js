@@ -20,6 +20,7 @@ export default function initUI(settings, trainer, bootCamp) {
 
   const stageButtons = [
     $('#btn-stage-01'),
+    $('#btn-stage-02'),
   ]
 
   const inputRewardWeights = [

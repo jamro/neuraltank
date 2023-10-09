@@ -31,10 +31,10 @@ export default function(jsBattle, sim, tankLogic) {
   opponent.disableSandbox()
   opponentTank = sim.addTank(opponent).tank
   opponentTank.moveTo(
-    bx -310 + 20 * Math.random(), 
+    bx -210 + 20 * Math.random(), 
     by - 50 - 50 * Math.random(),
     -15 + 90*Math.random()
   )
 
-  tankLogic.tankModel.moveTo(bx-330+60*Math.random(), by+100, -80+20*Math.random())
+  tankLogic.tankModel.moveTo(bx-230+60*Math.random(), by+100, -80+20*Math.random())
 }
