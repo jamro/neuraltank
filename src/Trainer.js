@@ -198,7 +198,7 @@ export default class Trainer extends EventTarget {
   }
 
   async resetScoreHistory() {
-    const data = JSON.parse(await localStorage.getItem('trainerState'))
+    const data = JSON.parse(await localStorage.getItem('trainerState')) || {}
     this.scoreHistory = []
     this.lossHistory = []
     this.epochIndex = 0

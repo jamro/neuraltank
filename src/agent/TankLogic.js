@@ -133,7 +133,8 @@ export default class TankLogic {
       (state.radar.wallDistance === null) ? 1 : (state.radar.wallDistance/150 - 1),
       _this.enemyPosTankAngle,
       _this.collisionTimer,
-      bulletDistance
+      bulletDistance,
+      state.radar.enemy ? 1 : -1,
     ]
 
     // reward

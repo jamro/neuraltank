@@ -266,7 +266,7 @@ export default function initUI(trainer, agent) {
     const shooterActionLabels = ['gun', 'radar']
     const driverActionLabels = ['turn', 'throttle']
     drawSingleTrajectory(shooterInputChart, agent.memory.episodeMemory.shooterInput, (index) => {
-      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos', 'tankAngle', 'turnControl']
+      const labels = ['distance', 'radar', 'enemyDirection', 'gunPos', 'tankAngle', 'turnControl', 'enemyDetected']
       if(labels[index]) {
         return labels[index]
       }
@@ -285,7 +285,7 @@ export default function initUI(trainer, agent) {
       return `Input #${index+1}`
     })
     drawSingleTrajectory(driverInputChart, agent.memory.episodeMemory.driverInput, (index) => {
-      const labels = ['distance', 'radar', 'enemyDirection', 'wall', 'tankAngle', 'collision', 'bullets']
+      const labels = ['distance', 'radar', 'enemyDirection', 'wall', 'tankAngle', 'collision', 'bullets', 'enemyDetected']
       if(labels[index]) {
         return labels[index]
       }
