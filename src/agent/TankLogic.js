@@ -59,6 +59,7 @@ export default class TankLogic {
     _this.lastScore = 0
     _this.lastEnergy = 100
     _this.collisionTimer = -1
+    _this.enemyFound = -1
   }
   
   loop(state, control, _this, agent) {
@@ -69,6 +70,7 @@ export default class TankLogic {
     let gunAbsAngle = state.gun.angle + state.angle
 
     if(state.radar.enemy) {
+      _this.enemyFound = 1
       // calculate enemy angular position wrt. the battlefield
       let enemyPosAngle = Math2.deg.atan2(state.radar.enemy.y - state.y, state.radar.enemy.x - state.x);
   
@@ -96,6 +98,7 @@ export default class TankLogic {
 
     } else {
       // smoothly move the position to the range border when enemy lost
+      _this.enemyFound = Math.max(-1, _this.enemyFound - 0.1)
       const awayEnemyPosBeamAngle = _this.enemyPosBeamAngle > 0 ? 1 : -1
       _this.enemyPosBeamAngle = awayEnemyPosBeamAngle * Math.min(1, Math.abs(_this.enemyPosBeamAngle) + 0.1)
       const awayEnemyPosGunAngle = _this.enemyPosGunAngle > 0 ? 1 : -1
@@ -134,7 +137,7 @@ export default class TankLogic {
       _this.enemyPosTankAngle,
       _this.collisionTimer,
       bulletDistance,
-      state.radar.enemy ? 1 : -1,
+      _this.enemyFound,
     ]
 
     // reward
