@@ -1,6 +1,14 @@
 import * as $ from 'jquery'
 import stages from '../../stages.js'
 
+
+function getStageElement(index, name) {
+  return `<div class="list-group-item">
+    <strong>${index+1}.</strong> ${name}
+    <button id="btn-stage-${index+1}" type="button" class="btn btn-danger btn-sm float-end"><i class="ri-rocket-line"></i> Train</button>
+  </div>`
+}
+
 export default function initUI(settings, trainer, bootCamp) {
   console.log(settings)
   const buttonTrain = $('#btn-train')
@@ -17,13 +25,13 @@ export default function initUI(settings, trainer, bootCamp) {
   const collapseCustomStageIndicator = $('#custom-stage-collapse')
   const buttonCustomStage = $('#custom-stage-toggle')
   const customStageContent = $('#custom-stage-content')
+  const stageContainer = $('#stage-container')
 
-  const stageButtons = [
-    $('#btn-stage-01'),
-    $('#btn-stage-02'),
-    $('#btn-stage-03'),
-    $('#btn-stage-04'),
-  ]
+  stages.forEach((stage, i) => {
+    stageContainer.append($(getStageElement(i, stage.name)))
+  })
+
+  const stageButtons = stages.map((_, i) => $('#btn-stage-' + (i+1)))
 
   const inputRewardWeights = [
     $('#input-reward-weight-1'),

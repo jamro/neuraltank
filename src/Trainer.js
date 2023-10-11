@@ -185,7 +185,7 @@ export default class Trainer extends EventTarget {
       lossHistory: this.lossHistory,
       epochDuration: this._epochDuration,
     }));
-
+  
     console.log("EVENT: save")
     this.dispatchEvent(new Event('save'))
   }

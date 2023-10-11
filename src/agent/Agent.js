@@ -201,7 +201,7 @@ class Agent extends EventTarget {
     this.dispatchEvent(new Event('save'))
   }
 
-  async saveModelAs(name) {
+  async saveModelAs(name, label=undefined) {
     await this.shooterNet.saveAs(name + '-shooter');
     await this.driverNet.saveAs(name + '-driver');
     await this.criticNet.saveAs(name + '-critic');
@@ -211,7 +211,7 @@ class Agent extends EventTarget {
     agents[name] = {
       name,
       trainedAt: this.trainDate,
-      label: this.label,
+      label: label || this.label,
       savedAt: new Date()
     }
     this.saveDate = agents[name].savedAt
