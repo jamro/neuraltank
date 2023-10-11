@@ -99,6 +99,8 @@ const messageBus = new MessageBus(self);
     lossHistory: trainer.lossHistory || [],
   })
   messageBus.send("settings", {
+    stageId: settings.prop('stageId'),
+    stageName: settings.prop('stageName'),
     epochSize: trainer.epochSize,
     episodeTimeLimit: trainer.episodeTimeLimit,
     learningRate: agent.learningRate,

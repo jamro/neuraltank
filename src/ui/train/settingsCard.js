@@ -7,11 +7,11 @@ export default function initUI(messageBus) {
   const inputDriverNetworkTrainable= $('#input-driver-trainable')
   const inputReload = $('#input-reload')
   const inputReloadLabel = $('#input-reload-label')
+  const inputTrainingStage = $('#inputTrainingStage')
   const inputEpochLen = $('#inputEpochLen')
   const inputEpisodeLen = $('#inputEpisodeLen')
   const inputLearningRate = $('#inputLearningRate')
   const inputEntropyCoef = $('#inputEntropyCoef')
-  const settingsLock = $('#settingsLock')
   const inputEnv = $('#inputEnv')
   const inputRewardWeights = [
     $('#input-reward-weight-1'),
@@ -26,6 +26,7 @@ export default function initUI(messageBus) {
   })
 
   messageBus.addEventListener('settings', ({data}) => {
+    inputTrainingStage.val(data.stageName)
     inputEpochLen.val(data.epochSize)
     inputEpisodeLen.val(data.episodeTimeLimit)
     inputLearningRate.val(data.learningRate)

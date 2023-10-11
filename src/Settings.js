@@ -4,6 +4,8 @@ export default class Settings extends EventTarget {
     super()
     
     this.data = {
+      stageId: 'custom',
+      stageName: 'custom',
       epochSize: 10,
       episodeTimeLimit: 15000,
       learningRate: 0.0005,

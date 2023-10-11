@@ -10,7 +10,6 @@ function getStageElement(index, name) {
 }
 
 export default function initUI(settings, trainer, bootCamp) {
-  console.log(settings)
   const buttonTrain = $('#btn-train')
   const inputShooterNetworkEnabled = $('#input-shooter-enabled')
   const inputDriverNetworkEnabled = $('#input-driver-enabled')
@@ -28,7 +27,7 @@ export default function initUI(settings, trainer, bootCamp) {
   const stageContainer = $('#stage-container')
 
   stages.forEach((stage, i) => {
-    stageContainer.append($(getStageElement(i, stage.name)))
+    stageContainer.append($(getStageElement(i, stage.stageName)))
   })
 
   const stageButtons = stages.map((_, i) => $('#btn-stage-' + (i+1)))
@@ -56,7 +55,6 @@ export default function initUI(settings, trainer, bootCamp) {
     for (let key of keys) {
       settings.prop(key, stage[key])
     }
-
     button.prop('disabled', true)
     await trainer.resetScoreHistory()
     bootCamp.inProgress = true
@@ -137,6 +135,8 @@ export default function initUI(settings, trainer, bootCamp) {
   })
 
   buttonTrain.on('click', async() => {
+    settings.prop('stageId', 'custom')
+    settings.prop('stageName', 'Custom')
     buttonTrain.prop('disabled', true)
     await trainer.resetScoreHistory()
     bootCamp.inProgress = true

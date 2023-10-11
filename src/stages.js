@@ -1,6 +1,7 @@
 const stages = [
   {
-    name: 'Static Scanning',
+    stageId: 'scan1',
+    stageName: 'Static Scanning',
     envId: 'execution',
     epochSize: 10,
     episodeTimeLimit: 7000,
@@ -13,7 +14,8 @@ const stages = [
     driverTrainable: false
   },
   {
-    name: 'Dynamic Scanning',
+    stageId: 'scan2',
+    stageName: 'Dynamic Scanning',
     envId: 'chase',
     epochSize: 30,
     episodeTimeLimit: 25000,
@@ -26,7 +28,8 @@ const stages = [
     driverTrainable: true
   },
   {
-    name: 'Static Shooting',
+    stageId: 'shoot1',
+    stageName: 'Static Shooting',
     envId: 'execution',
     epochSize: 20,
     episodeTimeLimit: 7000,
@@ -39,7 +42,8 @@ const stages = [
     driverTrainable: false
   },
   {
-    name: 'Dynamic Shooting',
+    stageId: 'shoot2',
+    stageName: 'Dynamic Shooting',
     envId: 'chase',
     epochSize: 30,
     episodeTimeLimit: 15000,
