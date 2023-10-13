@@ -14,6 +14,34 @@ const stages = [
     driverTrainable: false
   },
   {
+    stageId: 'follow1',
+    stageName: 'Follow I',
+    envId: 'chase',
+    epochSize: 20,
+    episodeTimeLimit: 10000,
+    learningRate: 0.0005,
+    entropyCoefficient: 0.005,
+    rewardWeights: [0, 0, 0, 0, 0, 1],
+    shooterEnabled: true,
+    driverEnabled: true,
+    shooterTrainable: false,
+    driverTrainable: true
+  },
+  {
+    stageId: 'follow2',
+    stageName: 'Follow II',
+    envId: 'chase',
+    epochSize: 20,
+    episodeTimeLimit: 20000,
+    learningRate: 0.0005,
+    entropyCoefficient: 0.005,
+    rewardWeights: [0, 0, 0, 0.05, 0, 1],
+    shooterEnabled: true,
+    driverEnabled: true,
+    shooterTrainable: false,
+    driverTrainable: true
+  },
+  {
     stageId: 'scan2',
     stageName: 'Dynamic Scanning',
     envId: 'chase',

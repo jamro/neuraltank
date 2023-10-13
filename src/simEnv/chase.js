@@ -4,14 +4,16 @@ export default function(jsBattle, sim, tankLogic) {
 
   const opponentCode = `importScripts('lib/tank.js');
     let turnDirection = Math.random() < 0.5 ? -1 : 1
+    let speed = 0.25
 
     tank.init(function(settings, info) {
 
     })
     tank.loop(function(state, control) {
       if(state.radar.targetingAlarm) {
-        control.THROTTLE = 0.5
+        control.THROTTLE = speed
         control.TURN = turnDirection * (150-Math.min(150, state.radar.wallDistance || 150))/50 + turnDirection * 0.01
+        speed += 0.001
       } else {
         control.THROTTLE = 0
         control.TURN = 0
@@ -33,7 +35,7 @@ export default function(jsBattle, sim, tankLogic) {
   opponentTank.moveTo(
     bx -210 + 20 * Math.random(), 
     by - 50 - 50 * Math.random(),
-    -15 + 90*Math.random()
+    -30 + 60*Math.random()
   )
 
   tankLogic.tankModel.moveTo(bx-230+60*Math.random(), by+100, -80+20*Math.random())

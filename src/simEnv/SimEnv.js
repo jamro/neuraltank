@@ -67,14 +67,16 @@ export default class SimEnv extends Simulation {
     // calculate distance to enemy tank
     let neuralTank = null
     for(let tank of this._tankList) {
+      if(!tank) continue
       if(tank.name === 'neuraltank') {
         neuralTank = tank
         break;
       }
     }
 
-    let minDistance = 1000
+    let minDistance = 500
     for(let tank of this._tankList) {
+      if(!tank || !neuralTank) continue
       if(tank.name === 'neuraltank') {
         continue;
       }
