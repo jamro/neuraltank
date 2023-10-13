@@ -19,6 +19,7 @@ export default function initUI(messageBus) {
     $('#input-reward-weight-3'),
     $('#input-reward-weight-4'),
     $('#input-reward-weight-5'),
+    $('#input-reward-weight-6'),
   ]
 
   inputReload.on('change', () => {

@@ -11,7 +11,7 @@ export default function(jsBattle, sim, tankLogic) {
     tank.loop(function(state, control) {
       if(state.radar.targetingAlarm) {
         control.THROTTLE = 0.5
-        control.TURN = turnDirection * (300-(state.radar.wallDistance || 300))/150 + turnDirection * 0.02
+        control.TURN = turnDirection * (150-Math.min(150, state.radar.wallDistance || 150))/50 + turnDirection * 0.01
       } else {
         control.THROTTLE = 0
         control.TURN = 0

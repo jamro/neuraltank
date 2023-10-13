@@ -37,6 +37,9 @@ export default class TankLogic {
       },
       getBulletDistanceScore: () => {
         return this._simulation.bulletDistanceScore
+      },
+      getTankDistanceScore: () => {
+        return 1 - Math.abs(150-this._simulation.tankDistance)/150
       }
     }
     console.log(_this)
@@ -148,7 +151,7 @@ export default class TankLogic {
     _this.lastEnergy = state.energy
     const collisionReward = (state.collisions.wall || state.collisions.enemy || state.collisions.ally) ? -1 : 0
 
-    const rewards = [gameScoreReward, radarReward, energyReward, collisionReward, _this.getBulletDistanceScore()]
+    const rewards = [gameScoreReward, radarReward, energyReward, collisionReward, _this.getBulletDistanceScore(), 0.1*_this.getTankDistanceScore()]
     const actions = agent.act(input, rewards, _this.getScoreCorrections())
     control.TURN = actions[0]
     control.THROTTLE = actions[1]

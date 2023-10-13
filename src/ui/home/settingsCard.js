@@ -38,6 +38,7 @@ export default function initUI(settings, trainer, bootCamp) {
     $('#input-reward-weight-3'),
     $('#input-reward-weight-4'),
     $('#input-reward-weight-5'),
+    $('#input-reward-weight-6'),
   ]
 
   const inputs = [

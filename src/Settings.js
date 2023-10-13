@@ -10,7 +10,7 @@ export default class Settings extends EventTarget {
       episodeTimeLimit: 15000,
       learningRate: 0.0005,
       entropyCoefficient: 0.005,
-      rewardWeights: [0, 1, 0, 0, 0],
+      rewardWeights: [0, 1, 0, 0, 0, 0],
       envId: 'pendulum',
       shooterEnabled: true,
       driverEnabled: true,

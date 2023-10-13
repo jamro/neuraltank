@@ -1,4 +1,5 @@
 import Simulation from "jsbattle-engine/src/engine/Simulation";
+import { distance } from "mathjs";
 
 export default class SimEnv extends Simulation {
   constructor(renderer, debug) {
@@ -6,6 +7,7 @@ export default class SimEnv extends Simulation {
     this.stepCounter = 0
     this.scoreCorrectionQueue = []
     this.bulletDistanceScore = 0
+    this.tankDistance = 1000
   }
 
   _createBullet(owner, power) {
@@ -33,6 +35,7 @@ export default class SimEnv extends Simulation {
     super._updateModel()
     this.stepCounter++
 
+    // calculate enemy bullet distance
     let bulletDistance = 1000000
     for(let bullet of this._bulletList) {
       if(!bullet) continue
@@ -60,6 +63,28 @@ export default class SimEnv extends Simulation {
     } else {
       this.bulletDistanceScore += (2/Math.sqrt(bulletDistance) - this.bulletDistanceScore)/5
     }
+
+    // calculate distance to enemy tank
+    let neuralTank = null
+    for(let tank of this._tankList) {
+      if(tank.name === 'neuraltank') {
+        neuralTank = tank
+        break;
+      }
+    }
+
+    let minDistance = 1000
+    for(let tank of this._tankList) {
+      if(tank.name === 'neuraltank') {
+        continue;
+      }
+      let dx = tank.x - neuralTank.x
+      let dy = tank.y - neuralTank.y
+      let distance = Math.sqrt(dx*dx + dy*dy)
+      minDistance = Math.min(minDistance, distance)
+    }
+    this.tankDistance = minDistance
+    
   }
 
 }
