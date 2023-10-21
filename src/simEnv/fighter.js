@@ -23,7 +23,7 @@ export default function(jsBattle, sim, tankLogic) {
     control.GUN_TURN = 0.3 * angleDiff;
   
     if(Math.abs(angleDiff) < 1) {
-      control.SHOOT = 0.6;
+      control.SHOOT = Math.random() > 0.85 ? 0.3 : 0;
     }
   }
   
