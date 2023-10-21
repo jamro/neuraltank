@@ -173,6 +173,29 @@
               </div>
             </div>
           </div>
+          <div class="card mt-3">
+            <h5 class="card-header">
+              <i class="ri-movie-2-line"></i> Playbacks 
+            </h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <select class="form-select" id="inputPlaybackStage">
+                  <option value="">[Select]</option>
+                </select>
+              </li>
+              <li id="playbackChartContainer" class="list-group-item" style="display: none;">
+                <canvas id="playbackChart" style="width: 100%; height: 5em"></canvas>
+              </li>
+              <li id="playbackSnapshotContainer" class="list-group-item" style="display: none;">
+                <div class="row">
+                  <div class="col-xxl-4 col-xl-12 mb-xl-2">
+                    <i class="ri-brain-line"></i> <span id="playbackSnapshotDate">...</span>, Score: <strong id="playbackSnapshotScore">...</strong>
+                    <button id="btn-restore-playback" type="button" class="btn btn-warning btn-sm float-end" style="margin: 0 0.5em"><i class="ri-upload-line"></i> Restore</button>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

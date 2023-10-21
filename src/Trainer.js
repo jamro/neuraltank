@@ -23,6 +23,7 @@ export default class Trainer extends EventTarget {
     this.currentTimeLimit = this.settings.prop('episodeTimeLimit')
     this.envId = this.settings.prop('envId')
     this.style = 'debug'
+    this.startTime = new Date().getTime()
   }
 
   get simulation() {
@@ -170,6 +171,7 @@ export default class Trainer extends EventTarget {
     this.episodeIndex = 0
     this.scoreHistory = trainerState.scoreHistory
     this.lossHistory = trainerState.lossHistory
+    this.startTime = trainerState.startTime
 
     console.log("EVENT: restore")
     this.dispatchEvent(new Event('restore'))
@@ -177,13 +179,39 @@ export default class Trainer extends EventTarget {
   }
 
   async save() {
+    const score = this.scoreHistory.length > 0 ? this.scoreHistory[this.scoreHistory.length-1].mean : 0
     await this.agent.saveModel()
+    // save the best result
+    let isBest = true
+    for(let past of this.scoreHistory) {
+      if(score < past.mean) {
+        isBest = false
+        break;
+      }
+    }
+    if(isBest) {
+      await this.agent.saveModelAs(
+        `best_${this.settings.prop('stageId')}_${this.startTime}`,
+        `[Best ${this.settings.prop('stageName')}] score: ${score.toFixed(2)}`
+      )
+    }
+
+    await this.agent.saveModelAs(
+      'playback_' + new Date().getTime(), 
+      JSON.stringify({
+        stageId: this.settings.prop('stageId'),
+        stageName: this.settings.prop('stageName'),
+        score: Math.round(score*100)/100,
+        stageStartTime: this.startTime
+      })
+    )
 
     await localStorage.setItem("trainerState", JSON.stringify({
       epochIndex: this.epochIndex,
       scoreHistory: this.scoreHistory,
       lossHistory: this.lossHistory,
       epochDuration: this._epochDuration,
+      startTime: this.startTime
     }));
   
     console.log("EVENT: save")
@@ -207,6 +235,7 @@ export default class Trainer extends EventTarget {
     data.epochIndex = this.epochIndex
     data.lossHistory = this.lossHistory
     data.epochDuration = this.epochDuration
+    data.startTime = new Date().getTime()
     await localStorage.setItem("trainerState", JSON.stringify(data));
   }
 

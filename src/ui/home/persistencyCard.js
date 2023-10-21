@@ -10,6 +10,7 @@ async function reloadSnapshotList(onRestore, onLabelChange) {
   }
   container.html('')
   for(let agent of agents) {
+    if(agent.name.startsWith('playback_')) continue
     container.append(getSnapshotElement(agent))
     $(`#btn-delete-snapshot-${agent.name}`).on('click', async () => {
       if(!confirm("Really? This operation cannot be undone.")) return
@@ -76,6 +77,10 @@ export default function initUI(settings, trainer, bootCamp) {
     agentTrainDate.text('-')
     agentSaveDate.text('-')
     agentLabel.text('-')
+  })
+
+  window.addEventListener('workspaceChange', () => {
+    refreshWorkspace()
   })
 
   const restoreSnapshot = async (name) => {
