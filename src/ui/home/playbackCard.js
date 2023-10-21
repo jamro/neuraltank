@@ -33,6 +33,7 @@ export default function initUI(settings, trainer, bootCamp) {
   const playbackSnapshotDate = $('#playbackSnapshotDate')
   const playbackSnapshotScore = $('#playbackSnapshotScore')
   const restorePlaybackButton = $('#btn-restore-playback')
+  const removePlaybackButton = $('#btn-remove-playback')
   const playbackChartCtx = document.getElementById('playbackChart');
   let selectedStageId = null
   let playbacks = []
@@ -68,6 +69,7 @@ export default function initUI(settings, trainer, bootCamp) {
   function selectPlayback(id) {
     const playback = playbacks.find(p => p.id === id)
     playbackChartContainer.css('display', id ? 'block' : 'none')
+    removePlaybackButton.css('display', id ? 'block' : 'none')
     playbackSnapshotContainer.css('display', 'none')
     snapshotHistory = []
     selectedSnapshot = null
@@ -109,6 +111,23 @@ export default function initUI(settings, trainer, bootCamp) {
     trainer.agent.label = `[Playback ${selectedSnapshot.meta.stageName}] score: ${selectedSnapshot.meta.score.toFixed(2)}`
     await trainer.agent.saveModel()
     window.dispatchEvent(new Event('workspaceChange'))
+  })
+
+  removePlaybackButton.on('click', async () => {
+    if(!selectedStageId) return 
+    const playback = playbacks.find(p => p.id === selectedStageId)
+    if(!playback) return 
+    removePlaybackButton.prop('disabled', 'disabled')
+    inputPlaybackStage.prop('disabled', 'disabled')
+    selectPlayback(null)
+
+    for(let snapshot of playback.snapshots) {
+      await Agent.delAgent(snapshot.name)
+    }
+    playbacks = await getPlaybacks()
+    await reloadPlaybacks(playbacks)
+    removePlaybackButton.prop('disabled', false)
+    inputPlaybackStage.prop('disabled', false)
   })
     
   setTimeout(async() => {
