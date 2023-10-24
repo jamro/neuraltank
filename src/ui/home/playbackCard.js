@@ -119,9 +119,15 @@ export default function initUI(settings, trainer, bootCamp) {
     if(!playback) return 
     removePlaybackButton.prop('disabled', 'disabled')
     inputPlaybackStage.prop('disabled', 'disabled')
+    const defaultOption = $('#inputPlaybackStage option[value=""]')
     selectPlayback(null)
+    inputPlaybackStage.val('')
 
-    for(let snapshot of playback.snapshots) {
+    for(let i=0; i < playback.snapshots.length; i++) {
+      const progress = 100*(i / playback.snapshots.length)
+      defaultOption.html(`Deleting... ${progress.toFixed(1)}%`)
+      const snapshot = playback.snapshots[i]
+      await new Promise(done => setTimeout(done))
       await Agent.delAgent(snapshot.name)
     }
     playbacks = await getPlaybacks()
