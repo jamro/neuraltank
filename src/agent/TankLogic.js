@@ -40,6 +40,9 @@ export default class TankLogic {
       },
       getTankDistanceScore: () => {
         return 1 - Math.abs(150-this._simulation.tankDistance)/150
+      },
+      getWorldRadarScore: () => {
+        return 1 - Math.abs(this._simulation.tankRadarAngle)/180
       }
     }
     console.log(_this)
@@ -58,7 +61,7 @@ export default class TankLogic {
     _this.enemyPosTankAngle = -1
     _this.enemyDistance = 1
     _this.enemyDirection = 0
-    _this.noVisionTime = 0
+    //_this.noVisionTime = 0
     _this.lastScore = 0
     _this.lastEnergy = 100
     _this.collisionTimer = -1
@@ -110,17 +113,32 @@ export default class TankLogic {
       _this.enemyPosTankAngle = awayEnemyPosTankAngle * Math.min(1, Math.abs(_this.enemyPosTankAngle) + 0.1)
       _this.enemyDistance = Math.min(1, _this.enemyDistance + 0.05)
       _this.enemyDirection += (0-_this.enemyDirection)/50
+
+      // disable smoothing (experimental)
+      _this.enemyFound = -1
+      _this.enemyPosBeamAngle = awayEnemyPosBeamAngle
+      _this.enemyPosGunAngle = awayEnemyPosGunAngle
+      _this.enemyPosTankAngle = awayEnemyPosTankAngle
+      _this.enemyDistance = 1
+      _this.enemyDirection = 0
+
     }
 
     if(state.radar.enemy) {
-      _this.noVisionTime = 0
+      //_this.noVisionTime = 0
+      /*
       radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
       radarReward *= (1-1.2*Math.max(0, _this.enemyDistance))
       radarReward *= (1-1.2*Math.max(0, -_this.enemyDistance))
+      */
+      radarReward = Math.max(0, 1 - Math.abs(_this.enemyPosBeamAngle))/5
+      radarReward = Math.max(0, radarReward * radarReward - 0.007)
     } else {
-      _this.noVisionTime ++
-      radarReward = -Math.min(200, _this.noVisionTime) * 0.00025
+      //_this.noVisionTime ++
+      //radarReward = -Math.min(200, _this.noVisionTime) * 0.00025
+      radarReward = 0
     }
+    radarReward += 0.02 * _this.getWorldRadarScore()
 
     if(state.collisions.wall || state.collisions.enemy || state.collisions.ally) {
       _this.collisionTimer = 1

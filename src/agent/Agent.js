@@ -24,8 +24,8 @@ export const SHOOTER_INPUT_INDICES = SHOOTER_INPUT_MASK.map((v, i) => v ? i : nu
 export const CRITIC_INPUT_INDICES =  CRITIC_INPUT_MASK.map((v, i) => v ? i : null).filter(v => v !== null)
 
 export const DRIVER_STATE_LEN = DRIVER_INPUT_INDICES.length
-export const SHOOTER_STATE_LEN = SHOOTER_INPUT_INDICES.length + 1
-export const CRITIC_STATE_LEN = CRITIC_INPUT_INDICES.length
+export const SHOOTER_STATE_LEN = SHOOTER_INPUT_INDICES.length + 1 // add input from driver
+export const CRITIC_STATE_LEN = CRITIC_INPUT_INDICES.length + 1 // add reward as input
 
 export const SHOOTER_ACTION_LEN = 2
 export const DRIVER_ACTION_LEN = 2
@@ -136,7 +136,6 @@ class Agent extends EventTarget {
     const criticInput = this.filterCriticInput(input)
     const shooterInput = this.filterShooterInput(input)
     const driverInput = this.filterDriverInput(input)
-    const criticInputTensor = tf.tensor2d([criticInput]);
     const driverInputTensor = tf.tensor2d([driverInput]);
 
     // process reward
@@ -168,6 +167,8 @@ class Agent extends EventTarget {
     }
     const shooterActionArray = shooterAction.arraySync()[0]
 
+    criticInput.push(scoreIncrement)
+    const criticInputTensor = tf.tensor2d([criticInput]);
     this.stats.expectedValue = this.criticNet.exec(criticInputTensor).dataSync()[0]
 
     this.memory.add({

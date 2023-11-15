@@ -8,6 +8,7 @@ export default class SimEnv extends Simulation {
     this.scoreCorrectionQueue = []
     this.bulletDistanceScore = 0
     this.tankDistance = 1000
+    this.tankRadarAngle = Math.PI
   }
 
   _createBullet(owner, power) {
@@ -75,6 +76,7 @@ export default class SimEnv extends Simulation {
     }
 
     let minDistance = 500
+    let enemyAngle = 0
     for(let tank of this._tankList) {
       if(!tank || !neuralTank) continue
       if(tank.name === 'neuraltank') {
@@ -83,10 +85,19 @@ export default class SimEnv extends Simulation {
       let dx = tank.x - neuralTank.x
       let dy = tank.y - neuralTank.y
       let distance = Math.sqrt(dx*dx + dy*dy)
-      minDistance = Math.min(minDistance, distance)
+      if(distance < minDistance) {
+        minDistance = distance
+        enemyAngle = Math.atan2(dy, dx) * 180/Math.PI
+      }
+
     }
-    this.tankDistance = minDistance
+    this.tankDistance = minDistance // in degrees
+
+    this.tankRadarAngle = neuralTank.angle + neuralTank.radarAngle - enemyAngle
+    while (this.tankRadarAngle > 180) this.tankRadarAngle -= 360
+    while (this.tankRadarAngle < -180) this.tankRadarAngle += 360
     
+
   }
 
 }

@@ -99,7 +99,6 @@ export default class TrainableAgent extends Agent {
     const criticInput = this.filterCriticInput(input)
     const shooterInput = this.filterShooterInput(input)
     const driverInput = this.filterDriverInput(input)
-    const criticInputTensor = tf.tensor2d([criticInput]);
     const driverInputTensor = tf.tensor2d([driverInput]);
 
     // process reward
@@ -129,6 +128,8 @@ export default class TrainableAgent extends Agent {
     }
     const shooterActionArray = shooterAction.arraySync()[0]
 
+    criticInput.push(scoreIncrement)
+    const criticInputTensor = tf.tensor2d([criticInput]);
     const expectedValue = this.criticNet.exec(criticInputTensor).dataSync()[0]
     this.stats.endBenchmark()
 
